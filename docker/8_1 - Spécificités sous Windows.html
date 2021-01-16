@@ -1,0 +1,494 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_9695d5cd-ac2a-4045-a5ab-59d053ae1b8e" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Spécificités sous Windows<var style="display:none"> Windows</var></h1>
+      <p class="defaut">Nous avons abondamment parlé des
+spécificités d’architecture et de mise en place
+de Docker sous Windows dans le chapitre dédié à l’installation,
+mais finalement peu des spécificités d’exploitation
+de Docker dans ce système d’exploitation qui n’était
+pas initialement prévu pour le faire fonctionner mais qui, au
+bout de quelques années, commence à devenir une
+alternative réaliste, peut-être pas pour de la
+production à grande échelle, mais au moins pour
+des charges de travail simples. L’ajout du sous-système
+Windows pour Linux est un grand pas en avant et pourrait même
+changer les choses encore plus en profondeur.</p>
+      <p class="defaut">À plusieurs reprises, nous avons également
+souligné le caractère multiplateforme des images
+Docker bien conçues et montré qu’il était
+parfois difficile de faire la part entre le fonctionnement dans
+un système ou dans l’autre. Il existe toutefois quelques
+particularités sous Windows qu’il convient de préciser
+pour les lecteurs intéressés.</p>
+      <div class="note">
+        <div class="remarkimg"><span class="icon-note"></span></div>
+        <div class="divinline">
+          <p class="remarque">Au grand regret de l’auteur, qui a
+le plaisir d’être reconnu Most Valuable Professional par
+Microsoft depuis dix ans environ, il n’est toujours pas possible,
+pour cette troisième édition de l’ouvrage sur
+Docker, de recommander l’utilisation de cette solution en production
+sur un système d’exploitation Windows. Les performances
+sont encore en retrait,&nbsp;particulièrement à cause
+de la taille des images de base. Par contre, la stabilité de
+.NET Core fait qu’il est possible de faire fonctionner des applications
+.NET dans des conteneurs Docker sous Linux, et ce avec un niveau
+d’outillage d’excellente qualité qui en fait même
+la solution la plus aboutie à ce jour pour le développement
+d’applicatifs web industriels.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Images de base</h2>
+        <div class="sect3" id="refTitle1">
+          <h3 class="title">a. Nécessité</h3>
+          <p class="defaut">Lorsqu’un conteneur Docker est démarré,
+il a besoin d’une image de base avec les fonctionnalités
+système isolées. Une spécificité de
+Docker pour Windows à connaître est qu’il n’est
+pas possible d’utiliser la commande suivante dans un <span class="courier11">Dockerfile</span>&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs vbnet"><span class="hljs-keyword">FROM</span> scratch</code></pre>
+          <p class="defaut">En effet, Docker pour Windows ne supporte
+pas ce mode où l’image de base est vide, et il est indispensable
+de spécifier une image de base Windows. Nous allons voir
+ci-dessous que plusieurs choix sont possibles.</p>
+        </div>
+        <div class="sect3" id="refTitle2">
+          <h3 class="title">b. Windows Server Core<var style="display:none"> Windows Server Core</var></h3>
+          <p class="defaut">Afin de ne pas retomber dans la surconsommation
+de ressources liée à la virtualisation, il est
+important d’utiliser des images les plus légères
+possible, avec un minimum de fonctionnalités qui ne seront
+pas effectivement utilisées. Pour cela, lorsque Windows
+Server exécute un conteneur lui-même basé sur Windows,
+il est intéressant de partir d’une version Windows Server
+réduite, qui est appelée Server Core. Server Core
+est un Windows Server, mais dans lequel tous les modules de confort
+ont été supprimés (certaines interfaces
+graphiques, en particulier). Ceci permet une certaine légèreté,
+en contrepartie de l’impossibilité d’utiliser ce système
+pour autre chose que des fonctionnalités serveur. En gros,
+il était possible avec Windows Server de réaliser
+les mêmes tâches utilisateur qu’avec un Windows
+dédié aux utilisateurs personnels, comme Windows
+10. Avec Windows Server Core, ce n’est plus possible, et seules
+des fonctionnalités comme la virtualisation, le serveur
+web et le serveur ActiveDirectory sont disponibles.</p>
+          <p class="defaut">Cette réduction sur les fonctionnalités
+ne s’accompagnait pas d’une réduction suffisante de la
+taille, et la version 2016 pesait encore plus de 10 Go. Les efforts réalisés
+sur la version 2019 permettent d’arriver à un poids de
+3 Go, ce qui est encore énorme mais permet tout de même
+une utilisation en production dans des contextes correctement contraints.</p>
+          <p class="defaut">L’image de base d’un Server Core est <span class="courier11">windows/servercore</span> (code à utiliser dans
+le <span class="courier11">FROM</span> du fichier <span class="courier11">Dockerfile</span>), mais dans le registre
+dédié fourni par Microsoft sur <span class="courier11">mcr.microsoft.com</span>. Le Docker Hub contient
+toujours les pages de référence à ces
+images, mais leur contenu est dans le registre géré par Microsoft.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention, un changement majeur a
+eu lieu récemment et les images officielles Microsoft ne
+sont désormais plus préfixées par <span class="courier11">Microsoft</span>. Ainsi, l’image <span class="courier11">microsoft/windowsservercore</span> est
+désormais remplacée par <span class="courier11">windows/servercore</span> citée
+ci-dessus.</p>
+            </div>
+          </div>
+          <p class="defaut">Il n’existe pas de tag <span class="courier11">latest</span> sur
+les images Windows, Microsoft forçant ainsi à un
+choix explicite de la version à utiliser. En plus de la
+version cible du système d’exploitation (qui doit être
+compatible avec le système d’exploitation local), l’étiquette
+utilisée permet de choisir le mode de mise à jour
+de l’image entre deux stratégies très différentes&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Une image comme <span class="courier11">mcr.microsoft.com/windows/servercore:ltsc2019</span> est
+ainsi servie par le Long-Term Servicing Channel, ce qui veut dire
+que Microsoft s’engage à une maintenance sur cinq ans.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">À l’inverse, une image
+comme <span class="courier11">mcr.microsoft.com/windows/servercore:2004</span> (<span class="courier11">2004</span> correspondant à avril
+2020 et non à l’année 2004) est dite SAC, car
+elle est supportée par le Semi-Annual Channel. L’utilisateur
+bénéficie alors de mises à jour plus
+régulières sur les nouveautés du système,
+mais avec un support limité&nbsp;en contrepartie à dix-huit
+mois.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Ces modes de distribution pouvant
+encore évoluer, le lecteur intéressé est
+encouragé à se référer à la
+documentation officielle sur <a class="url" href="https://docs.microsoft.com/en-us/windows-server/get-started-19/servicing-channels-19" target="_blank">https://docs.microsoft.com/en-us/windows-server/get-started-19/servicing-channels-19</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle3">
+          <h3 class="title">c. Nano Server<var style="display:none"> Nano Server</var></h3>
+          <p class="defaut">Windows Server en mode Server Core était
+déjà une version légère du système d’exploitation
+serveur de Microsoft, avec un nombre de dépendances réduit, mais
+la taille de l’image de base reste importante. Bien sûr,
+le fait de passer par Docker réduit le problème
+par rapport à des machines virtuelles, car cette image
+de base n’est téléchargée qu’une fois
+et les couches sont partagées. De plus, les mises à jour
+du système sont fournies sous forme d’images complémentaires,
+ce qui réduit encore les téléchargements.
+Toutefois, il y avait besoin d’une alternative réellement
+plus légère, et c’est Nano Server qui concrétise
+ce besoin.</p>
+          <p class="defaut">Nano Server va encore plus loin, car il ne
+contient que ce qui est nécessaire à exécuter
+des processus. Ainsi, il ne dispose d’aucune interface graphique
+et ne fournit d’ailleurs même pas de moyen d’ouvrir une
+session locale. Il faut donc spécifier tout ce qui est
+nécessaire pour lancer les processus dans la configuration
+initiale du système Nano Server.</p>
+          <p class="defaut">Ensuite, les interactions peuvent bien sûr
+passer par des échanges sur les ports réseau,
+mais on ne peut pas se connecter à un Nano Server comme
+on le ferait sur un Windows Server. De nombreuses autres limitations
+existent, mais toutes ces impasses ont pour but d’alléger
+le système, et au final, Nano Server est extrêmement
+léger et rapide à démarrer, ce qui est
+particulièrement adapté pour un usage avec Docker.</p>
+          <p class="defaut">Pour être précis à propos
+de cette utilisation de Nano Server, il convient d’indiquer que
+Nano Server peut être choisi comme image de base pour des
+images Docker, mais qu’il peut également servir de système
+d’exploitation hôte à Docker&nbsp;; bref,
+qu’il est possible de démarrer des conteneurs sur un Nano
+Server. Attention, contrairement à un hôte Windows
+Server qui pourra lancer des conteneurs basés sur une image
+Server Core ou une image Nano Server, il n’est possible de lancer
+que des conteneurs basés sur une image Nano Server si l’hôte
+est lui-même un Nano Server.</p>
+          <p class="defaut">L’image de base pour un Nano Server est <span class="courier11">windows/nanoserver</span>. Généralement,
+les images applicatives utilisant cette image comme base exposent
+ceci par une étiquette suffixée par <span class="courier11">-nanoserver</span>, même si ce n’est
+qu’une convention.</p>
+          <p class="defaut">Comme son nom l’indique, l’image <span class="courier11">windows/nanoserver</span> permet
+de lancer un système Nano Server dans un conteneur (ceci
+indépendamment du fait que le système d’exploitation
+hôte du démon Docker soit un Windows 10, un Windows
+Server ou un Nano Server lui-même). La légèreté de
+Nano Server reste relative, et l’écosystème Docker&nbsp;sous
+Windows n’atteint pas encore les niveaux de miniaturisation d’images
+Linux&nbsp;comme celles fournies par CoreOS ou Alpine. Toutefois,
+de gros efforts ont été portés également
+lors du passage de la version 2016 à la version 2019 et
+le poids est passé d’un peu plus de 2 Go à environ
+300 Mo, ce qui commence à ouvrir à de vrais usages
+en production d’images Docker pour Windows.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Ce n’est pas un hasard que .NET s’appuie
+sur cette image, car il n’aurait pas été envisageable
+de déployer des charges utiles de quelques mégaoctets
+de librairies sur des images de base plus de cent fois plus grosses.
+Avec la réutilisation des couches de base et une bonne
+gestion des ressources sur la machine hôte, déployer
+des applications .NET sur des conteneurs Windows commence à devenir
+possible, même si la logique reste pour l’instant de profiter
+de la compatibilité Linux de .NET pour déployer
+ces images sur des conteneurs Linux.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle4">
+          <h3 class="title">d. Compatibilité et disponibilité</h3>
+          <p class="defaut">De nombreuses applications sont compatibles
+avec Nano Server, comme IIS et des plateformes applicatives web,
+dont Node.js. Pour d’autres applications avec plus de code "legacy",
+seule l’image de base Windows Server Core dispose de toutes les
+librairies nécessaires pour assurer une bonne compatibilité.
+Par exemple, SQL Server ne fonctionnera qu’avec cette image plus
+lourde.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention, les versions des images
+de base doivent être en correspondance avec celle du système
+hôte, avec toutefois des tolérances pour certains
+cas particuliers qui sont expliqués dans le détail à l’adresse
+suivante&nbsp;: <a class="url" href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/system-requirements#matching-container-host-version-with-container-image-versions" target="_blank">https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/system-requirements#matching-container-host-version-with-container-image-versions</a></p>
+            </div>
+          </div>
+          <p class="defaut">À noter également que de
+plus en plus d’images officielles commencent à supporter
+une version Windows en plus de la traditionnelle version Linux.
+C’est par exemple le cas de l’image <span class="courier11">mongo</span> qui
+est la source officielle pour des conteneurs exécutant
+la base de données NoSQL MongoDB. La page d’accueil montre
+clairement les tags supportés, avec certains suffixés
+par <span class="courier11">-windowsservercore</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP01.png" title="images/07EP01.png" src="IMAGES/07EP01.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOMW1LDy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle5">
+          <h3 class="title">e. Autres versions</h3>
+          <p class="defaut">Une image <span class="courier11">Windows</span> (tout
+court, et qui s’accorde alors avec la machine hôte, qu’il
+s’agisse d’un Windows 10 ou Windows Server) ainsi qu’une image <span class="courier11">windows/iotcore</span> (dédiée à des
+utilisations Internet of Things) sont également disponibles
+sur le registre géré par Microsoft. Leur exposition
+au public est toutefois portée par Docker&nbsp;Hub,
+Microsoft ayant visiblement privilégié cette interface
+de recherche connue par tous pour la mise à disposition
+de ses images, même si leur téléchargement
+se fait sur une URL gérée par l’éditeur lui-même.</p>
+        </div>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">f. Cas particulier de .NET</h3>
+          <p class="defaut">Un des principaux usages des conteneurs Docker
+en milieu Windows correspond à l’exposition d’applications
+codées en .NET. Entre le fait que .NET Core et .NET 5.0
+qui commence l’unification de .NET "legacy" avec .NET Core supportent
+tous les deux Linux en plus de Windows, que les conteneurs peuvent être
+créés pour fonctionner sur chaque plateforme,
+voire supportent le multi-architecture, et que la machine hôte
+Windows peut désormais supporter des charges de conteneur
+Linux grâce à WSL 2, il y a de quoi se perdre
+dans les versions des images disponibles.</p>
+          <p class="defaut">Fort heureusement, la sortie de .NET 5.0 va
+s’accompagner d’une simplification des images à utiliser,
+comme cela a commencé avec les images .NET Core. Les images à mettre
+en œuvre sont&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">dotnet/sdk</span>&nbsp;:
+image contenant les outils de compilation, typiquement utilisée
+pour le premier stade d’un build multistages.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">dotnet/aspnet</span>&nbsp;:
+image de base pour la runtime d’une application web.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">dotnet/runtime</span>&nbsp;:
+image de base pour la runtime d’une application en mode console.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Au moment de l’écriture de la présente
+section (octobre 2020), l’étiquette <span class="courier11">latest</span> sur
+une version Linux amd64 correspond à une <span class="courier11">5.0.100-rc.2-buster-slim-amd64</span>, basée
+donc sur Debian, tandis que la version correspondante en architecture
+Windows est une <span class="courier11">5.0.100-rc.2-nanoserver-2004</span>.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">La sortie de la version officielle
+de .NET 5.0 étant proche, il paraissait peu utile de parler
+des versions .NET Core 2.1 et 3.1, même s’il est à noter
+que c’est bien à ce jour la 3.1 qui reste la version Long-Term
+Support.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle7">
+        <h2 class="title">2. Différences avec Linux</h2>
+        <div class="sect3" id="refTitle8">
+          <h3 class="title">a. Généralités</h3>
+          <p class="defaut">Comme une énorme part de Docker sous
+Windows est similaire à Docker sous Linux, le mieux est
+peut-être de simplement signaler quelques différences. Lors
+de la précédente édition du livre, Docker
+pour Windows commençait à peine à être
+utilisé et était en retard de quelques fonctionnalités
+sur son équivalent sous Linux. Toutes les fonctionnalités
+sont désormais portées, et la version Windows
+suit, à quelques jours près au maximum, les versions
+Linux. Des décalages mineurs existent encore, mais il s’agit
+désormais de simples retards et non plus de difficultés
+techniques liées à la plateforme. Afin de ne pas perdre
+de temps avec ce type d’incertitudes, nous nous concentrerons ci-dessous
+sur les différences structurelles entre les versions Linux
+et Windows, soit celles qui sont appelées à durer.</p>
+        </div>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">b. Dockerfile</h3>
+          <p class="defaut">Les séparateurs de fichiers sont
+souvent cités comme une différence très
+facilement reconnaissable entre Linux, qui utilise le slash (symbole <span class="courier11">/</span>) et Windows, qui utilise
+l’antislash ou backslash (symbole <span class="courier11">\</span>).
+Les fichiers <span class="courier11">Dockerfile</span> n’échappent
+bien sûr pas à cette particularité, mais
+il convient de faire bien attention, car il n’est pas question de
+simplement remplacer un symbole par un autre.</p>
+          <p class="defaut">Ainsi, dans le cas des mots-clés <span class="courier11">WORKDIR</span> et <span class="courier11">CMD</span>,
+c’est bien l’antislash qui sera utilisé, mais en le doublant
+pour éviter qu’il soit pris comme caractère d’échappement.
+Ainsi, pour faire pointer le répertoire courant du conteneur
+sur <span class="courier11">C:\MyApp</span>, la syntaxe
+suivante sera utilisée&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">WORKDIR C:\\MyApp</code></pre>
+          <p class="defaut">Si le symbole antislash peut créer
+de la confusion avec le symbole utilisé en fin de ligne
+pour des commandes multilignes, il est possible de spécifier
+un autre symbole d’échappement, à savoir l’accent
+inversé (symbole <span class="courier11">`</span>)
+grâce à la commande suivante à placer
+au tout début du fichier <span class="courier11">Dockerfile</span>&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs typescript"># <span class="hljs-built_in">escape</span>=<span class="hljs-string">`</span></code></pre>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Même si le symbole dièse
+en début de ligne est souvent perçu comme faisant de
+la ligne un contenu ignoré et réservé aux
+commentaires, la ligne est, plus précisément,
+un commentaire ou une directive de parsing. Dans ce cas précis,
+l’analyse du fichier <span class="courier11">Dockerfile</span>&nbsp;par
+la commande <span class="courier11">BUILD</span> fera en sorte
+de modifier le caractère d’échappement pour le
+reste du fichier.</p>
+            </div>
+          </div>
+          <p class="defaut">Par contre, pour les commandes manipulant
+des fichiers comme <span class="courier11">COPY</span>, <span class="courier11">ADD</span> ou <span class="courier11">RUN</span>,
+c’est une autre approche qui devra être suivie, à savoir
+remplacer les antislashs par des slashs, comme si nous utilisions
+Linux. Supposons que nous souhaitions recopier un fichier de configuration
+dans un répertoire applicatif&nbsp;; la commande sera
+alors la suivante&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">ADD web.config C:/MyApp</code></pre>
+          <p class="defaut">À noter que la syntaxe suivante est également
+possible&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">ADD web.config /MyApp/</code></pre>
+          <p class="defaut">Pour lancer des scripts PowerShell, la commande <span class="courier11">RUN</span> sera toujours utilisée, mais
+en spécifiant <span class="courier11">powershell.exe</span> comme
+premier paramètre. Par exemple&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs css"><span class="hljs-selector-tag">RUN</span> <span class="hljs-selector-tag">powershell</span> <span class="hljs-selector-tag">-command</span> <span class="hljs-selector-tag">Expand-Archive</span> <span class="hljs-selector-tag">-Path</span> <span class="hljs-selector-tag">c</span>:\<span class="hljs-selector-tag">output</span><span class="hljs-selector-class">.zip</span> <span class="hljs-selector-tag">-</span>&nbsp;
+<span class="hljs-selector-tag">DestinationPath</span> <span class="hljs-selector-tag">c</span>:\<span class="hljs-selector-tag">MyApp</span></code></pre>
+          <p class="defaut">Il est également possible de spécifier
+le shell à utiliser pour les commandes <span class="courier11">RUN</span> à l’aide
+de la commande <span class="courier11">SHELL</span>&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs javascript">SHELL [<span class="hljs-string">"powershell"</span>]<var style="display:none"> SHELL</var></code></pre>
+          <p class="defaut">La commande <span class="courier11">SHELL</span> peut également être
+utilisée en mode Linux, mais il est plus rare de changer
+le shell par défaut, alors qu’en mode Windows, il est assez courant
+d’alterner entre <span class="courier11">cmd.exe</span> et <span class="courier11">powershell.exe</span>. À noter que
+la syntaxe JSON est obligatoire pour entrer le shell à utiliser
+et que plusieurs commandes <span class="courier11">SHELL</span> peuvent être
+utilisées dans un <span class="courier11">Dockerfile</span>&nbsp;:
+elles affecteront alors uniquement les lignes qui les suivent et
+précèdent la commande <span class="courier11">SHELL</span> suivante.</p>
+          <p class="defaut">Pour le reste, les fichiers <span class="courier11">Dockerfile</span> sont globalement équivalents
+sous Windows à ceux utilisés dans la version Linux
+de Docker.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Pour plus de détails sur
+ces spécificités, l’auteur recommande la lecture
+de <a class="url" href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/manage-windows-dockerfile" target="_blank">https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/manage-windows-dockerfile</a> et
+en particulier celle des sections notées <b>Windows Considerations</b>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle10">
+          <h3 class="title">c. Gestion du réseau</h3>
+          <p class="defaut">La gestion du réseau en lien avec
+Docker nécessiterait en elle-même un chapitre
+complet, et une étude comparative complète du
+réseau Docker entre Linux et Windows est hors sujet pour
+le présent livre. L’auteur se contentera donc de montrer
+que cette différence est fondamentale, car elle se retrouve
+dès le choix du mode de fonctionnement en réseau.</p>
+          <p class="defaut">Docker pour Linux propose les drivers réseau
+suivants&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">bridge</span>&nbsp;;</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">host</span>&nbsp;;</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">null</span>&nbsp;;</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">overlay</span>.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À cette liste se rajoute
+bien sûr tout type défini par un plug-in custom,
+mais le sujet ici est plutôt de comparer les modes natifs.</p>
+            </div>
+          </div>
+          <p class="defaut">Docker pour Windows dispose des drivers suivants&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">nat</span>&nbsp;;</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">transparent</span>&nbsp;;</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">overlay</span>&nbsp;;</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1"><span class="courier11">l2bridge</span>.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Le comportement de ces drivers - qui est d’ailleurs
+différent en fonction de l’utilisation d’un hôte
+simple ou d’un cluster - n’a donc potentiellement rien à voir
+entre les deux systèmes d’exploitation et nécessitera
+des paramétrages ajustés. Une excellente ressource
+pour connaître les subtilités du réseau
+dans les conteneurs sous Windows est la page suivante&nbsp;: <a class="url" href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/architecture" target="_blank">https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/architecture</a></p>
+          <p class="defaut">La technologie de virtualisation Microsoft
+Hyper-V est utilisée pour faire tourner des conteneurs
+d’un niveau Windows sur une machine hôte ne présentant
+pas la même version, dans certaines limites de compatibilité toutefois. Comme
+cet hyperviseur dispose&nbsp;également d’une couche
+de gestion, il était logique de rendre disponible cette&nbsp;couche
+dans le lancement des conteneurs, et ceci est réalisé par
+l’option d’isolation <span class="courier11">--isolation</span> sur
+la commande <span class="courier11">docker run</span>. Passer une
+valeur <span class="courier11">hyperv</span> à cette option
+permet de mettre en place une étanchéité supplémentaire à celle
+de la couche Docker, tout en restant plus léger que dans
+le cas de deux machines virtuelles distinctes. De plus, dans ce
+mode, c’est l’hyperviseur qui se charge d’exposer les adaptateurs
+virtuels qui seront mis à disposition des conteneurs, rendant
+ainsi possibles des manipulations plus avancées des couches
+réseau. La page <a class="url" href="https://docs.microsoft.com/fr-fr/virtualization/windowscontainers/manage-containers/hyperv-container" target="_blank">https://docs.microsoft.com/fr-fr/virtualization/windowscontainers/manage-containers/hyperv-container</a> donne
+plus de détails sur les modes d’isolation disponibles.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle11">
+        <h2 class="title">3. Mise en œuvre</h2>
+        <p class="defaut">Dans la précédente édition
+du présent ouvrage, une mise en œuvre était
+démontrée sur une image Windows avec Internet
+Information Server en remplacement d’une image Linux <span class="courier11">nginx</span> pour exposer un serveur web,
+car il existait encore des petites différences de gestion
+du conteneur, en particulier sur l’exposition des ports.</p>
+        <p class="defaut">Il se trouve que les deux manipulations sont
+désormais similaires, à part les différences
+de syntaxe montrées ci-dessus. Cette section n’est donc
+désormais plus utile.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

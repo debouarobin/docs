@@ -1,0 +1,355 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_97ff72b4-5b23-4e6c-8084-96c48c6b6f61" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">L’outil Docker for Windows<var style="display:none"> Docker for Windows</var><var style="display:none"></var></h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Configuration standard</h2>
+        <p class="defaut">Dans Windows Server, tout le pilotage de Docker
+se fait par la ligne de commande ainsi&nbsp;que par les applications
+de configuration du système. Dans le cas de Windows 10,
+une icône en forme de baleine dans la zone de notification rend
+plus simples les manipulations par l’utilisateur, grâce à la
+présence d’un menu contextuel&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP02.png" title="images/07EP02.png" src="IMAGES/07EP02.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">La plupart des entrées de ce menu
+sont suffisamment simples pour ne pas nécessiter de description
+additionnelle. Par contre, les paramètres (<b>Settings</b> en anglais), ou en tout cas
+certains d’entre eux, réclament quelques explications supplémentaires.</p>
+        <p class="defaut">La section <b>Daemon</b> permet
+de jouer sur quelques paramètres du serveur Docker lui-même
+(ce qui explique que toute modification doive être suivie
+d’un redémarrage de ce dernier)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP03.png" title="images/07EP03.png" src="IMAGES/07EP03.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Le choix du mode <b>Advanced</b> au
+lieu de <b>Basic</b> change l’interface
+pour que l’administrateur fournisse toutes les configurations souhaitées
+sous forme de fichier de paramétrage en JSON, le lien <b>configuration file</b> renvoyant à la documentation
+associée sur <a class="url" href="https://docs.docker.com/engine/reference/commandline/dockerd/#windows-configuration-file" target="_blank">https://docs.docker.com/engine/reference/commandline/dockerd/#windows-configuration-file</a>. À titre
+de référence, les sections suivantes sont disponibles
+dans le fichier de configuration&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs json">{&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"authorization-plugins"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"bridge"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"cluster-advertise"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"cluster-store"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"debug"</span>: <span class="hljs-literal">true</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"default-ulimits"</span>: {},&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"disable-legacy-registry"</span>: <span class="hljs-literal">false</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"dns"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"dns-opts"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"dns-search"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"exec-opts"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"fixed-cidr"</span>: <span class="hljs-string">""</span>,<b>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"graph"</span>: <span class="hljs-string">""</span>,</b>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"group"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"hosts"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"insecure-registries"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"labels"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"live-restore"</span>: <span class="hljs-literal">true</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"log-driver"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"log-level"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"mtu"</span>: <span class="hljs-number">0</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"pidfile"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"raw-logs"</span>: <span class="hljs-literal">false</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"registry-mirrors"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"storage-driver"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"storage-opts"</span>: [],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"swarm-default-advertise-addr"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"tlscacert"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"tlscert"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"tlskey"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-attr">"tlsverify"</span>: <span class="hljs-literal">true</span>&nbsp;
+}</code></pre>
+        <p class="defaut">Nous renvoyons de manière générale à la
+page <a class="url" href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon" target="_blank">https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon</a> pour
+le détail de chaque attribut, sauf pour un attribut particulier,
+vu qu’il s’est révélé extrêmement
+utile pour l’auteur&nbsp;: l’élément <span class="courier11">graph</span> permet de spécifier
+sur quel endroit du disque dur les images et les conteneurs seront stockés.
+Ceci peut être très utile si votre disque dur
+système manque d’espace, par exemple parce que le système
+d’exploitation prend beaucoup de place avec ses mises à jour.
+En effet, les images peuvent rapidement consommer elles aussi beaucoup
+de place, et les placer sur un autre disque dur est alors une solution plus
+confortable que d’avoir à faire trop souvent le ménage.</p>
+        <p class="defaut">La coche en dessous permet de sélectionner
+si les fonctionnalités expérimentales doivent être
+montrées ou pas. Dans un chapitre précédent,
+il était expliqué que, dans la récente
+version sous Linux, le mode expérimental pouvait désormais être
+activé ou pas sans avoir à procéder à une
+nouvelle installation de Docker. Il en va de même dès
+le début pour la version Windows.</p>
+        <p class="defaut">Enfin, l’interface permet de spécifier
+les registres non sécurisés acceptés
+par le démon. Ceci est pratique lorsqu’un registre est
+mis en place sur un réseau local. Attention toutefois&nbsp;à la
+nécessaire confiance dans le contenu des images.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Les deux modes de conteneurs disponibles</h2>
+        <p class="defaut">Lorsque l’installation de Docker pour Windows
+est terminée, une fenêtre de notification apparaît
+pour indiquer que Docker est prêt à l’utilisation&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP04.png" title="images/07EP04.png" src="IMAGES/07EP04.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Comme nous y invite cette fenêtre,
+nous ouvrons une console PowerShell et entrons par exemple la commande <span class="courier11">docker version</span>, comme nous l’avons fait à maintes
+reprises&nbsp;pour valider que le logiciel est présent&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP05.png" title="images/07EP05.png" src="IMAGES/07EP05.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Le fait que le serveur soit en mode Linux
+(ligne <span class="courier11">OS/Arch</span> dans la
+section <span class="courier11">Server</span>) peut paraître
+surprenant, vu que le mode Docker for Windows est justement là pour
+remplacer la vieille approche Docker Toolbox basée sur
+une virtualisation Linux. En fait, les deux modes sont tous simplement
+encore accessibles et celui par défaut est basé sur
+les conteneurs Linux. Mais il est possible de passer en mode Windows
+containers, et c’est le but de la manipulation qui suit&nbsp;:</p>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Dans la zone des icônes de notification à droite
+de la barre d’état de Windows, localisez&nbsp;une icône
+en forme de baleine. Il s’agit de celle liée à Docker.</p>
+        </div>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Cliquez avec le bouton droit sur cette icône.</p>
+        </div>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Dans le menu qui apparaît (et qui
+est reproduit ci-dessous), cliquez sur <b>Switch to Windows containers</b>.</p>
+        </div>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP06.png" title="images/07EP06.png" src="IMAGES/07EP06.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Une fenêtre d’avertissement apparaît,
+expliquant que les conteneurs Linux continueront à fonctionner
+mais qu’ils ne seront plus accessibles tant qu’on ne repasse pas
+en mode Linux&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP07.png" title="images/07EP07.png" src="IMAGES/07EP07.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Patientez quelques secondes comme vous y invite
+la fenêtre ci-dessous, qui apparaît alors&nbsp;:</p>
+        </div>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP08.png" title="images/07EP08.png" src="IMAGES/07EP08.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">En fonction de votre installation,
+il est possible qu’une fenêtre vous prévienne que
+des composants doivent être ajoutés pour que Docker
+fonctionne dans ce mode et qu’un redémarrage de la machine
+soit nécessaire. Attention, car ce redémarrage
+est automatique et sans avertissement. Il est donc conseillé d’arrêter
+toute autre activité sur la machine le temps que cette
+installation additionnelle arrive à terme.</p>
+          </div>
+        </div>
+        <p class="defaut">Au bout d’un certain temps, Docker est à nouveau
+prêt à fonctionner&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP09.png" title="images/07EP09.png" src="IMAGES/07EP09.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Cette fois, le fait d’exécuter une
+commande <span class="courier11">docker version</span> montre bien que
+non seulement le client, mais aussi le serveur cette fois, sont
+en mode Windows (pour varier&nbsp;les approches, nous montrons
+ci-dessous une console standard et non PowerShell)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP10.png" title="images/07EP10.png" src="IMAGES/07EP10.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Le client est toujours de type <span class="courier11">windows/amd64</span>, mais cette
+fois le serveur l’est aussi. En résumé,
+dans Docker sous Windows 10, le client est toujours une application
+Windows,&nbsp;mais elle peut piloter ou bien une implémentation
+native Windows du serveur Docker (le terme anglais de Docker Engine
+sera souvent utilisé dans la documentation) ou bien une
+implémentation Linux apportée au choix par deux
+modes&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">le Windows Subsystem
+for Linux, qui est un véritable noyau Linux porté par
+Windows et qui dispose d’une ou de plusieurs distributions&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">sinon, une émulation par
+machine virtuelle cachée d’un serveur Docker sous Linux.</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Bien sûr, il est possible ensuite
+de revenir vers des conteneurs Linux. Par contre, il est nécessaire
+de choisir et on ne peut pas gérer en même temps
+des conteneurs Windows et des conteneurs Linux&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP11.png" title="images/07EP11.png" src="IMAGES/07EP11.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Si l’on pousse encore un cran plus loin cet
+effacement progressif de la distinction entre les systèmes
+d’exploitation, on peut se prendre à rêver d’images
+proposant les mêmes fonctions sous Linux et sous Windows.
+Ne serait-il pas pratique de pouvoir simplement demander au système,
+quel qu’il soit, de fournir (par exemple) un conteneur avec un serveur
+web Apache et de simplement l’exploiter non seulement sans savoir
+sur quel nœud d’une grappe de serveurs il a été déployé,
+mais même sans savoir de quel système d’exploitation
+ce nœud est équipé&nbsp;?</p>
+        <p class="defaut">L’informatique réservant parfois
+des surprises inattendues de simplicité lorsque tous les
+efforts ont été réalisés en
+amont pour la rendre telle, il se trouve que ceci est possible et,
+du surcroît, simple à mettre en œuvre.
+De la même manière qu’il est possible d’étiqueter
+des images Docker différentes du même nom avec
+des versions différentes, il est possible désormais
+de les étiqueter également avec des identifiants
+de plateforme, et ainsi d’obtenir deux images qui répondent
+au même identifiant et à la même version,
+l’une étant par exemple basée sur une distribution
+Linux légère comme Alpine et l’autre sur une image
+de base Windows Nano Server.</p>
+        <p class="defaut">C’est cette fonctionnalité de gestion
+de la plateforme dans les images Docker qui permet de réaliser
+cette prouesse de faire fonctionner une même application
+dans un mode ou l’autre, en fonction de ce qui est souhaité,
+et sans avoir à recompiler quoi que ce soit.</p>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. &nbsp;Mode conteneurs Linux (hors mode WSL)</h2>
+        <p class="defaut">Si la commande <b>Switch to Linux containers…</b> du
+menu contextuel sur l’icône de notification Docker est
+lancée, des ajouts sont observables dans la fenêtre
+des paramètres&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP12.png" title="images/07EP12.png" src="IMAGES/07EP12.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">La section <b>Advanced</b> permet
+d’ajuster la mémoire et le nombre de processeurs logiques&nbsp;disponibles
+pour Docker. Il peut paraître surprenant que ceci ne s’applique
+qu’en mode Linux containers. En fait, il se trouve que Docker Toolbox n’est
+pas aussi mort que cela. Ou plutôt, son esprit est toujours
+vivant et derrière Docker pour Windows&nbsp;en mode
+Linux containers se cache potentiellement encore une machine virtuelle
+permettant de lancer un Docker pour Linux, mais de manière
+transparente pour l’utilisateur, qui reste sur son système
+Windows.</p>
+        <p class="defaut">Contrairement à Docker Toolbox qui était
+un produit à part et qui installait une machine&nbsp;virtuelle
+VirtualBox sur la base d’une image <span class="courier11">boot2docker</span>,
+le nouvel outil est&nbsp;intégré dans Docker
+pour Windows et il provisionne une machine virtuelle dans Hyper-V
+(l’hyperviseur de Windows) en partant d’une image disque de type
+Moby Linux.&nbsp;L’astuce de fonctionnement reste toutefois la
+même, et le fait que Windows dispose d’un sous-système
+Linux ne suffit pas encore à exécuter nativement
+des conteneurs Linux. La raison pour laquelle la fenêtre
+de configuration propose une section pour ajuster les ressources
+dédiées à Docker est que l’éditeur
+a souhaité laisser un peu la main sur la création de
+la machine virtuelle dans Hyper-V.</p>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Attention à ne pas confondre
+cette utilisation d’Hyper-V pour faire fonctionner des conteneurs
+Linux sur Windows avec l’utilisation d’Hyper-V dans le cas des conteneurs
+Windows lancés en mode d’isolation renforcé, comme
+expliqué plus haut. Dans les deux cas, il s’agit de s’appuyer
+sur des fonctionnalités de la même technologie
+d’hyperviseur, mais les deux usages sont complètement séparés,
+avec des buts différents.</p>
+          </div>
+        </div>
+        <p class="defaut">Pour la même raison, à savoir
+qu’Hyper-V fournit un switch réseau virtuel pour supporter
+les conteneurs Linux dans la machine virtuelle qui est lancée dans
+ce but, une session <b>Network</b> permet
+de modifier les paramètres de ce switch virtuel, ainsi
+que du DNS associé.</p>
+        <p class="defaut">Comme précisé dans le titre
+de la section, ce mode de fonctionnement est toutefois de l’histoire
+ancienne avec les nouvelles versions de Windows (et même certaines
+plus anciennes de Windows 10, la fonctionnalité ayant été backportée)
+et leur support de Windows Subsystem for Linux. Aucune émulation n’est
+nécessaire, car le client Docker&nbsp;Windows communique
+alors avec un démon Docker natif Linux tournant sur le
+noyau Linux déployé à l’intérieur même
+du système d’exploitation Windows. Ce mode de fonctionnement ouvre
+de nouveaux horizons pour les développeurs, en rendant
+très simple de développer sur une machine Windows
+tout en ciblant des conteneurs locaux qui fonctionneront de manière
+extrêmement proche de la cible de production sur un serveur
+Linux.</p>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Gestion des images</h2>
+        <p class="defaut">L’outil dispose également d’une console
+relativement simple mais potentiellement utile pour lister les images
+présentes&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP13.png" title="images/07EP13.png" src="IMAGES/07EP13.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle4">
+        <h2 class="title">5. Cas particulier des lecteurs de disque</h2>
+        <p class="defaut">Une troisième section n’apparaît
+dans Docker pour Windows que si le mode <b>Linux containers</b> est
+actif, à savoir celle nommée <b>Shared Drives</b> (disques partagés
+en français)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP14.png" title="images/07EP14.png" src="IMAGES/07EP14.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Si vous souhaitez que vos conteneurs Linux
+aient accès à vos disques Windows, il faut choisir
+auxquels dans cette interface puis cliquer sur <b>Apply</b>.
+Une fenêtre comme celle ci-dessous s’ouvrira alors dans
+laquelle vous devrez fournir vos informations d’accès à ces
+disques&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP15.png" title="images/07EP15.png" src="IMAGES/07EP15.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Attention, ces crédentiels sont stockés
+par Docker, et si vous ne lancez pas la commande <span class="courier11">docker</span> avec le même utilisateur,
+alors les conteneurs concernés n’auront pas un accès
+effectif aux fichiers du disque.</p>
+      </div>
+      <div class="sect2" id="refTitle5">
+        <h2 class="title">6. Gestion Kubernetes<var style="display:none"> Kubernetes</var></h2>
+        <p class="defaut">Enfin, l’outil Docker for Windows inclut une
+gestion, certes minimaliste pour l’instant mais bien fonctionnelle,
+de Kubernetes. En activant l’option dans les menus de configuration,
+il est possible de faire en sorte que le démon local participe à un
+cluster avec un seul nœud, et se comporte ainsi comme un
+cluster Kubernetes, à la robustesse près évidemment.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/07EP16.png" title="images/07EP16.png" src="IMAGES/07EP16.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOyX7jEy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Le menu contextuel de Docker for Windows montre également
+les contextes Kubernetes disponibles sur la machine cliente et permet
+de basculer graphiquement de l’un à l’autre, ce qui permet
+un petit gain de temps par rapport à la commande <span class="courier11">kubectl config set-context</span>.</p>
+        <p class="defaut">Enfin, une autre option visible ci-dessus
+permet de faire pointer les déploiements de type <span class="courier11">docker stack</span> sur le cluster Kubernetes
+par défaut, plutôt que sur le démon Docker
+spécifié (et qui est par défaut le démon
+local ou le cluster Swarm qui lui est joint).</p>
+        <p class="defaut">Il y a encore quelques mois, quelques instabilités étaient
+encore présentes sur cette option&nbsp;de fonctionnement
+en mode Kubernetes. Il n’est pas impossible que cela provienne de
+la cohabitation avec un autre cluster MiniKube déployé localement
+sur la machine de l’auteur, mais, de manière générale,
+il est utile de rappeler que ces fonctionnalités ne sont
+dans tous les cas pas d’un niveau de maturité suffisant
+pour une utilisation autre que des tests de technologie.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

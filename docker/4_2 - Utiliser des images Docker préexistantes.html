@@ -1,0 +1,1114 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_1c2a84e5-a2bf-4ca1-a9d8-3fc5b6d63f7b" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Utiliser des images Docker préexistantes</h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Le registre Docker Hub<var style="display:none"> Registre</var></h2>
+        <div class="sect3" id="refTitle1">
+          <h3 class="title">a. Le principe</h3>
+          <p class="defaut">Le premier exemple d’exécution de
+Docker a été montré plus haut en utilisant une
+image existante, car il s’agit du moyen le plus simple de mettre
+en œuvre des conteneurs. En pratique, utiliser des conteneurs
+existants au lieu de créer les siens propres représente
+même la majorité des usages.</p>
+          <p class="defaut">Le succès de Docker tient en effet
+non seulement à l’outil en lui-même, mais également
+pour une grande part dans le fait que Docker - aidé d’une
+abondante communauté - met à disposition publique
+un grand nombre d’images préconstruites. Il est ainsi possible
+de déployer des conteneurs avec Apache, Nginx, PostgreSQL,
+MongoDB,&nbsp;WordPress et des centaines d’autres serveurs et
+applications, et ce par une simple commande éventuellement
+accompagnée du paramétrage adéquat.</p>
+          <p class="defaut">Le site Docker Hub, accessible sur <a class="url" href="https://hub.docker.com/" target="_blank">https://hub.docker.com/</a>,
+donne accès à ces images. Si vous êtes
+connecté au compte (voir plus loin la notion de compte Docker
+Hub), l’affichage&nbsp;par défaut est celui de vos
+images et il faut alors cliquer sur <b>Explore</b> pour
+avoir accès à la liste de toutes les images publiques mises à disposition
+par le registre Docker&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP18.png" title="images/03EP18.png" src="IMAGES/03EP18.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Lors de la précédente édition
+du présent ouvrage, un effort avait été engagé par
+Docker&nbsp;pour promouvoir le Docker Store, qui était
+une version améliorée du Docker Hub donnant accès à des
+images payantes, traitées différemment de celles
+provenant de la communauté (et dont le foisonnement, il
+faut bien le reconnaître, rend parfois difficile de trouver
+la bonne image, sûre et adaptée au besoin). Il
+semble que le principe ait été complètement
+abandonné et l’URL <a class="url" href="https://store.docker.com" target="_blank">https://store.docker.com</a> est
+désormais redirigée&nbsp;vers le Docker Hub,
+qui ne fait d’ailleurs plus référence à des
+origines différenciées des images.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle2">
+          <h3 class="title">b. Recherche et qualification d’images</h3>
+          <p class="defaut">La colonne de gauche permet de filtrer la
+recherche par catégories et au moyen d’autres options que
+nous allons détailler. Il est également possible
+de filtrer par une expression textuelle, à entrer dans
+la zone de texte à côté de la loupe, tout
+en haut de l’interface.</p>
+          <p class="defaut">Les trois premières options de filtre
+nécessitent une explication détaillée
+pour bien saisir&nbsp;leurs différences&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Une image "Docker
+Certified" peut être utilisée en production sur
+un Docker Enterprise&nbsp;Edition, et bénéficie
+donc indirectement du support de Docker. Elle est validée
+par des tests, y compris du point de vue de la sécurité.
+Ces images, très peu nombreuses, sont en général
+gratuites du point de vue de leur consommation sur le Docker&nbsp;Hub,
+mais associées avec un programme de support payant de la
+part des éditeurs en charge de la production de l’image
+en collaboration avec Docker.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Les images "Verified Publisher"
+sont un peu plus nombreuses et bénéficient également
+d’un bon niveau de qualité, car elles sont maintenues directement
+par leur éditeur. Docker ne s’engage alors pas sur le bon
+fonctionnement de l’image, mais sur le fait que c’est bien l’éditeur
+identifié qui fournit cette image.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Les images "Official Images" sont
+celles publiées directement par Docker et sur lesquelles&nbsp;la
+société s’engage sur la propreté de la
+compilation de l’image, mais pas sur le contenu. Bien sûr,
+pour que cela puisse être possible, seuls les contenus
+open source peuvent être présentés de
+cette manière par Docker. On retrouve dans ces 165 images
+au moment de l’écriture toutes les principales applications
+de l’écosystème open source.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Un exemple d’image "Verified Publisher" est
+celle-ci-dessous, publiée par Microsoft et sur laquelle
+Docker s’engage donc à ce que ce soit bien l’éditeur
+en question qui l’entretient&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP19.png" title="images/03EP19.png" src="IMAGES/03EP19.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">On note toutefois que le registre Docker Hub
+référence cette image, mais qu’elle est stockée
+ailleurs, car la commande de récupération qui
+est fournie pointe sur le registre de Microsoft&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">docker pull mcr.microsoft.com/dotnet/framework/samples</code></pre>
+          <p class="defaut">Pour ce qui est des "Official Images", la
+référence sera toujours avec un nom simple, sans
+préfixe, ce qui aboutit à l’utilisation par défaut
+du Docker Hub. Par exemple, c’est le cas pour l’image ci-dessous,
+qui contient le serveur de base de données open source
+PostgreSQL&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP20.png" title="images/03EP20.png" src="IMAGES/03EP20.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Comme on peut le voir, la commande référence
+directement le nom de l’image&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">docker pull postgres</code></pre>
+          <p class="defaut">À noter qu’on trouvera parfois également
+la syntaxe <span class="courier11">library/postgres</span> (ou
+tout autre nom d’image officielle). Le préfixe <span class="courier11">library</span> est en effet le préfixe
+par défaut pour les dépôts d’images,
+et correspond au registre Docker Hub entretenu par la société&nbsp;Docker
+elle-même.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Encore une fois, le fait que les images
+aient été fournies par Docker est une raison essentielle&nbsp;du
+succès de l’outil, car il a rendu possible pour les utilisateurs de
+déployer des serveurs en une seule ligne de commande, alors
+que l’installation manuelle pouvait parfois nécessiter
+des efforts considérables et des connaissances expertes
+pour aboutir.</p>
+            </div>
+          </div>
+          <p class="defaut">De manière générale,
+pour un usage de test, les images officielles et d’éditeur vérifié seront à privilégier.
+Pour un usage en production commerciale, et donc sur Docker Enterprise&nbsp;Edition
+pour bénéficier du support, il est recommandé si
+possible d’utiliser des images certifiées par Docker. Si
+l’image que vous cherchez n’existe sous aucune de ces deux formes,
+vous pourrez certainement la trouver dans la jungle des images issues
+de la communauté, mais sans aucune garantie de qualité.
+Il est alors fortement recommandé de construire soi-même son
+image, quitte à s’inspirer des fichiers <span class="courier11">Dockerfile</span> existants, mais en ayant
+dessus un œil particulièrement critique pour ne
+pas risquer des problèmes de sécurité.
+En particulier, tout appel à un script en ligne devra être jugé de
+manière très suspicieuse, et recopié uniquement
+si un grand niveau de confiance peut être accordé à l’URL
+(par exemple s’il s’agit du site d’un éditeur reconnu).</p>
+        </div>
+        <div class="sect3" id="refTitle3">
+          <h3 class="title">c. Exemple de recherche</h3>
+          <p class="defaut">Supposons que nous ayons besoin de mettre
+en œuvre un serveur Nginx. En entrant ce mot-clé en
+haut de l’interface et en validant la recherche, nous obtenons l’affichage
+suivant&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP21.png" title="images/03EP21.png" src="IMAGES/03EP21.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Plus de 67 000 résultats &nbsp;!
+Heureusement, le site montre les images les plus téléchargées
+en premier, mais il y a clairement un tas d’entrées parasites
+et d’images certainement très spécialisées
+dans leur usage de Nginx. Le premier réflexe à avoir
+est donc de commencer par filtrer sur des images de source sûre. En
+activant les deux filtres sur le côté, on réduit à deux
+images seulement, la première étant clairement
+ce que nous cherchons, à savoir une image officielle du
+serveur Nginx.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP22.png" title="images/03EP22.png" src="IMAGES/03EP22.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le nombre de téléchargements
+indiqué est également un bon gage de qualité d’une
+image, en tout cas lorsqu’il est significativement élevé.
+Passé les quelques millions de téléchargements
+(dans notre exemple, plus de dix millions), on peut considérer
+qu’une mauvaise qualité (performance, adaptation, fonctionnalités,
+etc.) ou qu’une perversion quelconque (virus, backdoor, bombe logique,
+autres) a eu toutes les chances d’être détectée,
+même si ce n’est bien sûr pas une garantie.</p>
+          <p class="defaut">Les étiquettes situées sous
+le libellé de l’image donnent des informations complémentaires
+sur les plateformes ciblées et les catégories éventuelles
+d’appartenance du résultat&nbsp;de la recherche.</p>
+          <p class="defaut">Ensuite, un clic sur le résultat
+de la recherche lui-même mène à la page
+correspondante, avec cette fois-ci tous les détails afférents&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP23.png" title="images/03EP23.png" src="IMAGES/03EP23.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Un coup d’œil aux étiquettes
+de cette image permet de mieux comprendre l’utilisation des étiquettes
+partagées, présentées plus avant dans
+ce chapitre&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP24.png" title="images/03EP24.png" src="IMAGES/03EP24.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Dans le cas de Nginx, le choix des mainteneurs
+de l’image a été d’affecter l’étiquette
+par défaut <span class="courier11">latest</span> à la
+dernière version officielle, à savoir la 1.19.2
+en septembre 2020. La traduction française en "la plus
+récente" n’est donc pas à prendre au pied de la
+lettre, car il existait à ce moment-là des versions
+encore plus récentes de Nginx, mais qui n’était
+pas considérées comme utilisables autrement que
+par des beta testeurs. Une autre étiquette partagée
+nommée stable permet d’aiguiller les clients vers la version
+la plus stable de Nginx à date, à savoir la 1.18,
+tandis que la version 1.19.2 est également qualifiée
+par le biais d’une étiquette partagée de <span class="courier11">mainline</span>.<var style="display:none"> latest</var></p>
+          <p class="defaut">Le parti pris des mainteneurs est donc que
+le client ne précisant pas de version souhaitera plutôt être
+sur cette version <span class="courier11">mainline</span>. Ce choix
+diffère en fonction des images, et si on prend le cas des
+images Ubuntu, par exemple, l’image fournie par défaut
+et donc pointée par le tag <span class="courier11">latest</span> n’est
+pas la dernière version "mainline" correspondant à la
+dernière distribuée généralement,
+soit la 20.10, mais la dernière version de type Long Term
+Support, à savoir la 20.04 à date&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP25.png" title="images/03EP25.png" src="IMAGES/03EP25.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour revenir à l’image <span class="courier11">nginx</span>, on notera que les tags sont également
+dupliqués en fonction de l’image de base, qui peut être
+une image Debian Slim par défaut, ou bien une image Alpine,
+plus légère, si on utilise l’étiquette
+correspondante. La présence ou pas de PERL dans l’image
+est également spécifiée au moyen d’un
+dédoublement d’étiquette. Évidemment,
+il arrive un moment où les étiquettes deviennent
+trop nombreuses et où il devient plus propre de créer un
+autre dépôt d’image, quitte à ce qu’il
+suive le même cycle de versions.</p>
+        </div>
+        <div class="sect3" id="refTitle4">
+          <h3 class="title">d. Cas des images communautaires</h3>
+          <p class="defaut">En revenant une page en arrière et
+en décochant les filtres de façon à voir à nouveau
+toutes les images issues de la communauté, sur cette même
+recherche avec le mot-clé <span class="courier11">nginx</span>,
+la profusion de résultats montre clairement le problème
+pour un débutant&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP26.png" title="images/03EP26.png" src="IMAGES/03EP26.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Parmi les dizaines de milliers d’images trouvées,
+certaines correspondent à des usages particuliers de Nginx
+(en tant que proxy, contrôleur de type ingress pour Kubernetes,
+etc.), d’autres à des installations de Nginx embarquant
+des frameworks de développement (Nginx avec PHP et FPM,
+Nginx avec Drupal, etc.)&nbsp;; certaines sont issues de sociétés&nbsp;reconnues
+pour la qualité de leurs images, d’autres proviennent d’une
+personne ayant utilisé la partie publique du Docker Hub
+pour véhiculer des images d’une plateforme à l’autre
+sans réelle volonté de partage (la documentation
+inexistante de ces images est un mauvais signe)&nbsp;; certaines
+sont téléchargées des millions de fois,
+d’autres presque jamais et sont visiblement obsolètes.
+Bref, l’effet pour une personne cherchant simplement une image avec
+Nginx peut être celui d’une foire aux images sans queue
+ni tête, mais il est nécessaire d’en passer par
+les images de la communauté si aucune image officielle
+n’est disponible et que créer une image par soi-même
+n’est pas une option.</p>
+          <p class="defaut">À cause de ce problème,
+mais aussi certainement pour réduire les coûts
+de stockage, Docker a annoncé le 1er septembre 2020 que
+les images inutilisées vont progressivement être
+supprimées du registre Docker Hub, en tout cas pour les
+comptes gratuits. Les utilisateurs clients de la plateforme et ayant payé pour
+un compte Pro ou Team ne sont donc pas concernés, mais
+tous les autres verront leurs images supprimées si elles
+n’ont été ni modifiées ni consommées
+durant les six derniers mois.</p>
+          <p class="defaut">Dans le même temps, Docker va appliquer
+des limitations sur la consommation des images, selon les niveaux
+suivants&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Les comptes anonymes
+pourront réaliser 100 opérations <span class="courier11">pull</span> maximum sur une période
+de 6 heures.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Les comptes gratuits mais connectés
+verront cette limite haute doublée, à 200 opérations <span class="courier11">pull</span> sur 6 heures.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Là encore, les comptes
+payants de type Pro et Team ne sont pas concernés et pourront
+réaliser autant de commandes <span class="courier11">docker
+pull</span> qu’ils le souhaitent.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Si ces limitations vous paraissent
+rédhibitoires et que vous ne souhaitez pas payer un compte
+Docker, des solutions seront proposées plus loin dans l’ouvrage,
+avec en particulier la mise en œuvre d’un registre privé.
+Il restera toujours à payer les coûts de l’infrastructure,&nbsp;mais
+ce mode de fonctionnement permet de s’affranchir de toute limite
+contractuelle.</p>
+            </div>
+          </div>
+          <p class="defaut">Pour revenir au problème de foisonnement
+des images, qui ne sera pas réglé de sitôt,
+de bonnes pratiques permettent toutefois de se frayer un chemin
+dans le dédale. Prenons&nbsp;par exemple l’image Nginx
+fournie par Bitnami&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP27.png" title="images/03EP27.png" src="IMAGES/03EP27.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le nombre de téléchargements
+et d’étoiles ainsi que la notoriété de
+l’entreprise sont deux points rassurants, même si le lien à l’entreprise
+n’est matérialisé que par l’utilisation&nbsp;du
+logo, qu’on ne peut qu’espérer légitime. Le contenu
+détaillé de la section&nbsp;<b>Overview</b> est également bon
+signe pour le potentiel utilisateur. Bitnami insiste&nbsp;sur
+le fait que les images sont remises à jour très
+fréquemment pour inclure les derniers correctifs et cela
+peut se constater sur la fraîcheur de l’image (dernière
+version datant d’une demi-journée sur la capture ci-dessus). Enfin,
+des liens renvoient à des ressources de documentation sur
+le site officiel de Bitnami qui font en retour référence à cette
+image. Indépendamment, chacun de ces indices n’a qu’une
+fiabilité limitée, mais un faisceau d’indices
+positifs aboutit au final à un niveau de garantie potentiellement
+suffisant,&nbsp;en tout cas pour des essais et une qualification
+avant production.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Il est nécessaire d’être
+identifié pour voter et affecter une étoile à une
+image donnée.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle5">
+          <h3 class="title">e. Compléments sur les images officielles<var style="display:none"> Images officielles</var></h3>
+          <p class="defaut">Contrairement aux images communautaires dont
+le nom est préfixé de l’identifiant du propriétaire
+de l’image (séparé du nom de l’image elle-même
+par un symbole /), les images officielles ne sont pas préfixées.
+Comme indiqué plus haut, ceci est équivalent à un
+préfixe <span class="courier11">library</span>.</p>
+          <p class="defaut">À noter également que la
+liste des images officielles est maintenue sur le dépôt GitHub
+nommé <span class="courier11">docker-library/official-images</span> (<a class="url" href="https://github.com/docker-library/official-images" target="_blank">https://github.com/docker-library/official-images</a>,
+puis descendre dans le répertoire nommé <span class="courier11">library</span>)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP28.png" title="images/03EP28.png" src="IMAGES/03EP28.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La lecture de la page principale est une mine
+de bonnes pratiques pour la propreté des images créées.
+Nous avons cité plus haut le problème de sécurité des images
+nécessitant un appel d’URL lors de leur génération,
+mais sans fournir de solutions.</p>
+          <p class="defaut">Celles-ci se trouvent dans la page citée,
+avec un haut niveau de détails&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP29.png" title="images/03EP29.png" src="IMAGES/03EP29.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">f. Recherche par la ligne de commande</h3>
+          <p class="defaut">Le client Docker en ligne de commande permet également
+de rechercher des images en fonction de mots-clés&nbsp;:</p>
+          <p><span class="bridgehead_niv4">Rechercher une image Docker</span></p>
+          <pre class="literallayout"><code class="hljs sql">docker search <span class="hljs-comment">--filter=stars=20 nginx</span><var style="display:none"><span class="hljs-comment"> docker search</span></var></code></pre>
+          <p class="defaut">L’exécution de cette commande entraîne
+la recherche de toutes les images contenant le mot-clé <span class="courier11">nginx</span> et disposant d’au moins vingt étoiles
+en notation.</p>
+          <p class="defaut">Elle aboutit à l’affichage suivant,
+ou quelque chose approchant&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP30.png" title="images/03EP30.png" src="IMAGES/03EP30.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les colonnes d’informations renvoient&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Le nom de l’image.
+Noter en particulier que la première image - donc la mieux
+notée, le tri se faisant par le nombre d’étoiles
+descendant - est composée uniquement du mot <span class="courier11">nginx</span>, sans préfixe correspondant à un
+propriétaire. Il s’agit, comme nous l’avions expliqué,
+de la convention pour nommer les images officielles. Sauf besoin
+particulier, si nous avons besoin d’un conteneur avec le serveur
+web Nginx, c’est cette image que nous utiliserions.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">La description de l’image, encouragée
+lors du dépôt d’une image, de façon que
+les utilisateurs potentiels puissent connaître les particularités
+d’une image. Par défaut, l’affichage est tronqué,
+mais l’option <span class="courier11">--no-trunc=true</span> permet
+de voir les descriptions&nbsp;complètes si besoin.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Le nombre d’étoiles.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Une indication du caractère
+officiel de l’image.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Une indication du fait que la compilation
+de l’image a été réalisée de
+manière automatique.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">L’ancienne option <span class="courier11">--stars</span> est
+désormais obsolète et remplacée par <span class="courier11">--filter</span>, qui est plus générique. À noter également
+que l’option <span class="courier11">--filter</span> peut être
+remplacée par sa version allongée <span class="courier11">-f</span>, mais de manière générale,
+les options seront utilisées dans le livre sous leur forme
+complète, qui est plus adaptée à développer
+une bonne compréhension de leur effet.</p>
+            </div>
+          </div>
+          <p class="defaut">Si besoin de retrouver les options, les commandes
+ci-dessous sont disponibles&nbsp;:</p>
+          <p><span class="bridgehead_niv4">Obtenir la liste des commandes du client
+Docker</span></p>
+          <pre class="literallayout"><code class="hljs scss">docker help</code></pre>
+          <p><span class="bridgehead_niv4">Obtenir de l’aide sur les options d’une
+commande</span></p>
+          <pre class="literallayout"><code class="hljs scss">docker help nom_de_la_commande</code></pre>
+          <p class="defaut">Le contenu de l’aide se limite toutefois à l’explication
+des options de la commande, mais pour avoir tout le détail
+de leur contenu, il faut parfois se référer à la
+documentation en ligne. Dans le cas de l’option <span class="courier11">--filter</span> de
+la commande <span class="courier11">docker search</span>, c’est
+l’URL <a class="url" href="https://docs.docker.com/engine/reference/commandline/search/#filtering" target="_blank">https://docs.docker.com/engine/reference/commandline/search/#filtering</a> qui
+pointera sur les explications complètes&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP31.png" title="images/03EP31.png" src="IMAGES/03EP31.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle7">
+          <h3 class="title">g. Précautions sur une image non officielle</h3>
+          <p class="defaut">Une image non officielle peut venir de n’importe
+qui et contenir n’importe quelle fonctionnalité. Il convient
+donc de se sécuriser un minimum lors de sa mise en œuvre.
+Bien sûr, l’étanchéité inhérente
+au mode de fonctionnement de Docker donne une certaine garantie
+de non-impact sur la machine hôte, mais cela n’empêche
+pas des comportements potentiellement dangereux dans le conteneur
+lui-même.</p>
+          <p class="defaut">Prenons l’exemple de l’image <span class="courier11">jpgouigoux/mathapi</span>. Une recherche
+sur le registre mène à la page d’accueil qui décrit
+rapidement ce qu’est censée réaliser l’image,
+comment l’utiliser et quelques propriétés supplémentaires.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP32.png" title="images/03EP32.png" src="IMAGES/03EP32.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le fait que la documentation indique un dépôt
+GitHub comme source de l’image est un premier pas vers une validation
+du contenu de l’image. Dans ce cas, Docker a créé lui-même
+l’image à partir du code source disponible, et en particulier
+du fichier <span class="courier11">Dockerfile</span>.&nbsp;Ceci
+permet non seulement de valider que l’image disponible n’a pas été trafiquée
+par la personne propriétaire du dépôt dans
+Docker Hub (c’est Docker qui se charge de sa compilation à partir
+des fichiers sources), mais en plus de jeter un œil sur
+le <span class="courier11">Dockerfile</span>, répertorié justement
+par le troisième onglet de l’interface&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP33.png" title="images/03EP33.png" src="IMAGES/03EP33.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Nous allons regarder plus en détail
+le contenu de ce fichier par la suite, mais d’ores et déjà,
+sa présence permet de lever l’opacité sur le contenu
+de l’image.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Cette opacité n’est pas en
+soi un problème, du moment que la confiance est établie
+avec le fournisseur. Dans les architectures orientées services,
+il est même logique que l’implémentation soit
+la plus cachée possible et que seul le contrat de service
+soit visible. Par exemple, avant analyse de l’image citée ci-dessus,
+nous ne connaissons même pas la technologie sous-jacente,
+et il est tout à fait possible de l’utiliser sans savoir
+quel serveur applicatif ni même quel langage sont utilisés.</p>
+            </div>
+          </div>
+          <p class="defaut">Si nécessaire, tous les fichiers
+pourront même être contrôlés
+en allant sur le dépôt source sur GitHub&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP34.png" title="images/03EP34.png" src="IMAGES/03EP34.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le fichier <span class="courier11">Dockerfile</span> est
+bien sûr le même que celui reporté dans
+Docker Hub&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP35.png" title="images/03EP35.png" src="IMAGES/03EP35.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour compléter l’analyse, il convient
+de vérifier son contenu, avec un œil critique,
+voire l’assistance d’un professionnel si l’usage prévu
+est pour de la production.</p>
+          <p class="defaut">Tout d’abord, le mot-clé <span class="courier11">FROM</span> référence une
+image qui, même si elle n’est pas officielle, provient
+d’une source plus reconnue, à savoir le compte nommé <span class="courier11">Microsoft</span>. Attention, le fait de posséder
+un compte nommé ne veut pas dire que la personne représente&nbsp;la
+société associée. Toutefois, Docker n’a
+aucun intérêt à laisser des personnes
+usurper des comptes d’entreprises connues. Dans le cas particulier
+de cette image <span class="courier11">Microsoft/aspnet</span>,
+un coup d’œil sur la page du registre permet de retrouver
+un lien sur le site MSDN officiel de Microsoft, et qui renvoie lui-même
+sur la page du registre Docker. La relation de confiance est donc établie,
+même si elle ne peut jamais&nbsp;être absolue.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">La version <span class="courier11">1.0.0-beta4</span> est
+une version obsolète de <span class="courier11">Microsoft/aspnet</span>,
+et l’image basée&nbsp;dessus est par conséquent
+obsolète elle aussi. On peut d’ailleurs le vérifier
+en notant&nbsp;la date du dernier commit du <span class="courier11">Dockerfile</span> en
+mai 2015.</p>
+            </div>
+          </div>
+          <p class="defaut">Dans un cas comme celui-ci, il est facile
+d’établir que l’image est obsolète et donc peu
+sûre. Parfois, ceci n’apparaît pas aussi clairement
+et la pratique consiste alors à suivre l’origine des images
+les unes par rapport aux autres. Dans presque tous les cas, nous
+tomberons nécessairement à un moment ou à un
+autre sur une image provenant d’un fournisseur dans lequel la confiance est
+suffisamment forte pour que nous ne validions pas son contenu. Il
+reste alors à valider toutes les commandes additionnelles
+qui sont portées par les fichiers <span class="courier11">Dockerfile</span> successifs,
+de façon à valider qu’ils n’ajoutent pas de fonctionnalités
+malicieuses.</p>
+          <p class="defaut">Dans certains cas, il est relativement simple
+de valider le contenu. Par exemple, si nous revenons à l’image <span class="courier11">jpgouigoux/mathapi</span>, les fichiers
+déposés sont au nombre de trois, et leur contenu
+est facilement vérifiable sur le même dépôt
+GitHub que le fichier <span class="courier11">Dockerfile</span>.
+Un coup d’œil au fichier <span class="courier11">Service.cs</span>,
+par exemple, montre clairement que le contenu est tel qu’attendu.</p>
+          <p class="defaut">Dans d’autres cas, l’analyse est bien plus
+complexe. Prenons par exemple l’image officielle de runtime ASP.NET
+Core, téléchargeable avec la commande <span class="courier11">docker pull mcr.microsoft.com/dotnet/aspnet</span>.
+L’adresse du dépôt montre qu’il est régi
+par microsoft.com, et l’image est référencée
+officiellement sur le Docker Hub. Nous pouvons donc avoir un bon
+niveau de confiance lors de l’utilisation de cette image, mais imaginons
+que ce ne soit pas le cas. Il aurait donc été nécessaire
+d’analyser le contenu du <span class="courier11">Dockerfile</span> disponible
+en suivant le lien portant l’étiquette <span class="courier11">latest</span> comme
+vu ci-dessous&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP36.png" title="images/03EP36.png" src="IMAGES/03EP36.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Or, il se trouve que ce contenu est loin d’être
+simple à analyser&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs php">ARG REPO=mcr.microsoft.com/dotnet/runtime&nbsp;
+ARG ASPNET_VERSION=<span class="hljs-number">5.0</span><span class="hljs-number">.0</span>-preview<span class="hljs-number">.8</span><span class="hljs-number">.20414</span><span class="hljs-number">.8</span>&nbsp;
+&nbsp;
+<span class="hljs-comment"># Installer image&nbsp;</span>
+FROM amd64/buildpack-deps:buster-curl <span class="hljs-keyword">as</span> installer&nbsp;
+ARG ASPNET_VERSION&nbsp;
+&nbsp;
+<span class="hljs-comment"># Retrieve ASP.NET Core&nbsp;</span>
+RUN curl -SL --output aspnetcore.tar.gz 
+https:<span class="hljs-comment">//dotnetcli.azureedge.net/dotnet/aspnetcore/Runtime$ASPNET_&nbsp;</span>
+VERSION/aspnetcore-runtime-$ASPNET_VERSION-linux-x64.tar.gz \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; aspnetcore_sha512=’c32970cc75f337648c53c32c6c0ff1ef5b025ad3
+bc58ec23e5e931a4958fc8213fb5d8cb924664dc356aca782cea96066aad93b7f49
+ecb133ac7c00def01611e’ \&nbsp;
+&nbsp;&nbsp;&nbsp;&amp;&amp; <span class="hljs-keyword">echo</span> <span class="hljs-string">"$aspnetcore_sha512&nbsp;&nbsp;aspnetcore.tar.gz"</span> | sha512sum -c - \&nbsp;
+&nbsp;&nbsp;&nbsp;&amp;&amp; tar -ozxf aspnetcore.tar.gz ./shared/Microsoft.AspNetCore.App \&nbsp;
+&nbsp;&nbsp;&nbsp;&amp;&amp; rm aspnetcore.tar.gz&nbsp;
+&nbsp;
+&nbsp;
+<span class="hljs-comment"># ASP.NET Core image&nbsp;</span>
+FROM $REPO:<span class="hljs-number">5.0</span>-buster-slim&nbsp;
+ARG ASPNET_VERSION&nbsp;
+&nbsp;
+ENV ASPNET_VERSION $ASPNET_VERSION&nbsp;
+&nbsp;
+COPY --from=installer [<span class="hljs-string">"/shared/Microsoft.AspNetCore.App"</span>, 
+<span class="hljs-string">"/usr/share/dotnet/shared/Microsoft.AspNetCore.App"</span>]</code></pre>
+          <p class="defaut">L’image de base est elle aussi officielle,
+mais le fichier est bien plus fourni que celui de l’image étudiée
+auparavant, avec en particulier une image qui sert pour la construction
+et une image de base pour l’exécution. Surtout, le script télécharge
+et décompresse un fichier de paquetage dont le contenu
+est opaque et devrait être lui-même étudié pour
+lever tout doute. Cette analyse nécessiterait toutefois
+une expertise poussée pour valider&nbsp;que le contenu
+est sans effets indésirables. En l’absence d’une telle
+compétence, la question revient encore une fois à celle
+de la confiance dans le producteur de l’image, et c’est la raison pour
+laquelle Docker oriente de plus en plus l’utilisateur vers des images
+officielles.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle8">
+        <h2 class="title">2. Gestion du compte Docker Hub et dépôts
+privés</h2>
+        <p class="defaut">Jusqu’à maintenant, nous n’avons
+fait que consommer des images Docker depuis le registre,&nbsp;et
+ces images étaient publiques. Nul besoin donc de se connecter
+au Docker Hub. Toutefois, afin de pousser des images dans le registre public,
+il est nécessaire de posséder un compte actif
+et de s’y connecter. Cette identification sert également
+pour accéder à des dépôts privés.
+Comme leur nom l’indique, les dépôts privés
+sont des dépôts&nbsp;d’images Docker qui ne
+sont accessibles qu’aux personnes possédant l’autorisation
+de les exploiter.</p>
+        <p class="defaut">Docker propose des comptes gratuits ou payants.
+La limitation des premiers est qu’ils n’autorisent qu’un seul dépôt
+privé. Le nombre de dépôts publics est toutefois - à ce
+jour en tout cas - illimité.</p>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">a. Création d’un compte</h3>
+          <p class="defaut">La procédure de création
+d’un compte se passe d’explications tant elle est simple. Il suffit
+de se connecter sur <a class="url" href="https://hub.docker.com" target="_blank">https://hub.docker.com</a> et
+de cliquer sur la commande <b>Log In</b> pour
+accéder à la fenêtre de connexion, dans
+laquelle un lien <b>Create Account</b> permet&nbsp;de
+demander un compte&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP37.png" title="images/03EP37.png" src="IMAGES/03EP37.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La page suivante ne demande rien de spécial&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP38.png" title="images/03EP38.png" src="IMAGES/03EP38.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Une fois visité le lien de confirmation
+envoyé par courriel, le compte est prêt pour connexion,
+et l’image de votre profil en haut à droite de l’interface confirme
+normalement que vous êtes connecté.</p>
+        </div>
+        <div class="sect3" id="refTitle10">
+          <h3 class="title">b. Caractéristiques du compte</h3>
+          <p class="defaut">Le compte juste créé est
+un compte gratuit. Il n’est pas limité en nombre de dépôts
+d’images publics, mais il n’autorise qu’un seul dépôt
+privé. Attention au sens du mot dépôt&nbsp;;
+en langage Docker, il s’agit d’un ensemble d’images avec le même
+nom, mais potentiellement des étiquettes différentes.</p>
+          <p class="defaut">Une autre limite est que seule une opération
+de compilation d’une image depuis son code source sur GitHub (voir
+un peu plus loin pour les détails) peut être lancée à la
+fois. Pour des besoins de tests ou de développement, ceci
+est en général suffisant.</p>
+          <p class="defaut">Si toutefois ces conditions sont trop restrictives
+pour votre usage, il est possible de recourir&nbsp;à des
+offres payantes qui vous ouvriront plus de dépôts
+privés et de capacités de compilations en parallèle
+(le vocable anglais est build).</p>
+          <p class="defaut">L’adresse <a class="url" href="https://docs.docker.com/docker-hub/billing/" target="_blank">https://docs.docker.com/docker-hub/billing/</a> liste
+les différentes offres à ce jour&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP39.png" title="images/03EP39.png" src="IMAGES/03EP39.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Une autre possibilité pour changer
+de plan est de passer par votre compte Docker Hub et de choisir
+l’entrée <b>Billing</b> dans
+le menu associé à votre profil&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP40.png" title="images/03EP40.png" src="IMAGES/03EP40.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">En fonction de vos besoins, il peut être
+pertinent de mettre en œuvre votre propre registre&nbsp;privé,
+ou bien de regarder du côté d’autres offres commerciales
+comme Azure Container Registry. Une section complète du
+chapitre sur l’industrialisation de Docker est dédiée à la
+gestion des registres privés.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle11">
+          <h3 class="title">c. Automated build et compte GitHub<var style="display:none"> Automated build</var></h3>
+          <p class="defaut">Comme expliqué un peu plus haut,
+il est possible de rendre Docker Hub responsable de la compilation
+d’une image Docker à partir du code source déposé sur
+GitHub. Ce mode de fonctionnement, marqué comme Automated
+Build sur les dépôts, permet de donner une garantie à l’utilisateur
+final que l’image sur Docker Hub correspond bien au fichier <span class="courier11">Dockerfile</span> affiché, mais
+permet aussi au développeur de se débarrasser
+complètement de cette opération, qui sera réalisée
+automatiquement à chaque modification sur le dépôt
+du code source.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À ce stade de la lecture,
+il est normal que le lecteur ne voie pas encore clairement de quoi
+il est question avec ce fichier <span class="courier11">Dockerfile</span> et
+quelques autres notions de Docker. Tout ceci sera expliqué en
+détail dans les chapitres à venir&nbsp;; le
+but était de montrer, dès la présentation
+du Docker Hub, que tout un chacun est en mesure de fournir ses propres
+images Docker et ce de manière industrielle si nécessaire.</p>
+            </div>
+          </div>
+          <p class="defaut">Pour cela, il est nécessaire que
+les comptes Docker Hub et GitHub soient liés. Ce dernier
+point mérite une explication un peu plus détaillée
+que pour la création de compte.<var style="display:none"> GitHub</var></p>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Connectez-vous avec le compte créé sur
+Docker Hub (<a class="url" href="http://hub.docker.com" target="_blank">http://hub.docker.com</a>).</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur le nom de votre compte, tout en
+haut à droite.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Choisissez la commande <b>Account Settings</b>.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Allez dans l’onglet <b>Linked Accounts</b>.</p>
+          </div>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP41.png" title="images/03EP41.png" src="IMAGES/03EP41.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Comme expliqué sur la page ci-dessus,
+le lien avec un compte de type GitHub ou Bitbucket vous permet de
+mettre en place un système de build automatique de vos
+images. Si vous avez mis en place un dépôt GitHub
+contenant un fichier <span class="courier11">Dockerfile</span> (traditionnellement à la
+racine, même s’il est possible de fonctionner autrement),
+il est possible d’utiliser un webhook pour que chaque modification
+poussée dans le dépôt GitHub lance la
+compilation de l’image Docker et sa mise à disposition
+sous la nouvelle version dans Docker Hub.<var style="display:none"> webhook</var></p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Un webhook est une sorte d’événement
+transmis entre deux applicatifs web. Il se caractérise&nbsp;par
+un appel d’URL réalisé par l’émetteur,
+accompagné de paramètres qui dépendent
+du contexte. Le récepteur peut alors déclencher un
+traitement particulier en fonction de ces valeurs. La technologie
+des webhooks n’est pas spécifique à Docker Hub
+ou GitHub. Il s’agit d’une pratique désormais courante
+dans les services web.</p>
+            </div>
+          </div>
+          <p class="defaut">Nous allons mettre en œuvre cette
+solution sur une solution exemple nommée <span class="courier11">WebApplication1</span>&nbsp;et qui a été créée
+en suivant simplement l’assistant Visual Studio&nbsp;2019 pour
+créer une application de fourniture d’API en ASP.NET Core
+5.0.</p>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur <b>Connect</b> sur
+la ligne GitHub.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Connectez-vous à votre compte GitHub.</p>
+          </div>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP42.png" title="images/03EP42.png" src="IMAGES/03EP42.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Si vous avez mis en place une authentification
+multifacteur, c’est le moment d’activer votre clé USB de
+sécurité ou sinon d’utiliser un des autres modes disponibles&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP43.png" title="images/03EP43.png" src="IMAGES/03EP43.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’écran suivant est celui qui permet
+de créer le lien à proprement parler entre les
+comptes Docker Hub et GitHub, permettant au premier de consommer
+les données de l’autre en se présentant sous votre
+identité, grâce au protocole OAuth&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP44.png" title="images/03EP44.png" src="IMAGES/03EP44.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur <b>Authorize docker</b>.</p>
+          </div>
+          <p class="defaut">Une fois les droits accordés, le
+site redirige vers la fenêtre initiale, dans laquelle on
+peut normalement constater que le lien est désormais réalisé sur
+le compte GitHub&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP45.png" title="images/03EP45.png" src="IMAGES/03EP45.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Revenez sur votre compte Docker Hub, cliquez
+sur l’entrée <b>Repositories</b> dans
+le menu principal en haut de l’interface&nbsp;:</p>
+          </div>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP46.png" title="images/03EP46.png" src="IMAGES/03EP46.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur le bouton <b>Create Repository</b>.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Fournissez un nom au dépôt.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Spécifiez si besoin une description
+(c’est une bonne pratique de ne pas laisser ce champ vide).</p>
+          </div>
+          <p class="defaut">La partie haute de l’interface permet de renseigner
+cette première partie des données&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP47.png" title="images/03EP47.png" src="IMAGES/03EP47.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Choisissez si le dépôt créé sera
+public ou privé.</p>
+          </div>
+          <p class="defaut">La fonctionnalité qui nous intéresse
+le plus se trouve en bas de l’interface, et peut être accédée
+en cliquant sur l’icône correspondant au dépôt
+de code source à utiliser&nbsp;:</p>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur l’icône GitHub.</p>
+          </div>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP48.png" title="images/03EP48.png" src="IMAGES/03EP48.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Sélectionnez l’organisation à utiliser.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Sélectionnez ensuite le dépôt
+de code source contenant le fichier <span class="courier11">Dockerfile</span> qui
+devra être utilisé par Docker Hub pour générer
+l’image Docker qui sera ensuite mise à disposition dans
+ce compte.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur l’icône <b>+</b> de <b>BUILD RULES</b> pour
+ajouter une entrée de génération d’image.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Modifiez l’entrée <span class="courier11">Dockerfile
+location</span> pour qu’elle contienne l’adresse du fichier&nbsp;<span class="courier11">Dockerfile</span> dans le code source de
+votre projet. Par défaut, cette adresse est simplement <span class="courier11">Dockerfile</span>, car les fichiers sont
+en général à la racine du dépôt.
+Dans notre exemple, le fichier <span class="courier11">Dockerfile</span> se
+trouve sous le répertoire <span class="courier11">WebApplication1/</span>.</p>
+          </div>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP49.png" title="images/03EP49.png" src="IMAGES/03EP49.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Il est possible de lancer le build automatisé lorsqu’une
+branche est modifiée ou bien sur une étiquette
+(tag). La seconde colonne permet de spécifier le nom de la
+branche ou de l’étiquette en question. La troisième
+permet de spécifier l’étiquette qui sera accolée&nbsp;à l’image
+Docker une fois compilée et déposée dans
+le dépôt Docker Hub. Enfin,&nbsp;la troisième
+colonne dans les lignes d’options, comme nous l’avons vu, correspond à la
+localisation du fichier <span class="courier11">Dockerfile</span> à utiliser.
+La cinquième option permet, si l’utilisateur le souhaite,
+de désactiver le cache de compilation (nous reviendrons
+plus loin sur ce comportement de mise en cache, lors de l’explication
+détaillée des mécanismes composant la compilation
+des images Docker).</p>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Cliquez sur <b>Create &amp; Build</b>.
+Contrairement au bouton précédent, cette commande
+permet de créer la règle de lancement automatique
+du build lorsque le contenu du code source est modifié,
+mais aussi de lancer une première compilation de l’image.</p>
+          </div>
+          <p class="defaut">L’interface passe alors sur la page liée
+au dépôt qui vient d’être créé et
+qui, fort logiquement, est pour l’instant vide&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP50.png" title="images/03EP50.png" src="IMAGES/03EP50.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">En cliquant sur le lien en bas à droite
+de l’interface, on a accès aux détails du build
+en cours&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP51.png" title="images/03EP51.png" src="IMAGES/03EP51.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La consultation de l’onglet <b>Builds</b> depuis la page correspondant
+au dépôt montre également cette information
+sous une autre forme&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP52.png" title="images/03EP52.png" src="IMAGES/03EP52.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Au bout d’une ou deux minutes, des résultats
+commencent à apparaître dans les logs&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP53.png" title="images/03EP53.png" src="IMAGES/03EP53.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Dans tous les cas, il est nécessaire
+d’attendre la fin de la compilation de l’image pour voir apparaître
+les autres informations, par exemple les étiquettes d’image
+disponibles. Dans notre cas, il n’y aura bien sûr que l’étiquette <span class="courier11">latest</span>, comme paramétré plus
+haut&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP54.png" title="images/03EP54.png" src="IMAGES/03EP54.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">À noter que le bouton <b>Trigger</b> dans l’onglet <b>Builds</b> permet de lancer manuellement
+un build de l’image à partir du code source.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Si un fichier <span class="courier11">Readme.md</span> avait été mis
+en place dans GitHhub, nous aurions pu constater sa récupération
+automatique dans le dépôt Docker Hub.</p>
+            </div>
+          </div>
+          <p class="defaut">Un clic sur le bouton <b>Public View</b> dans
+l’interface permet de passer à l’affichage tel que le verront
+les personnes souhaitant utiliser l’image Docker&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP55.png" title="images/03EP55.png" src="IMAGES/03EP55.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le lien au dépôt de source
+est la garantie par Docker Hub que l’image fournie correspond effectivement
+au contenu du fichier <span class="courier11">Dockerfile</span> qu’on
+peut revoir dans l’interface,&nbsp;comme montré dans
+la capture ci-dessus.</p>
+          <p class="defaut">En conclusion, le mécanisme que nous
+venons de montrer avec un dépôt de code source
+lié par un événement au dépôt
+d’image par un webhook est le standard de facto de production d’images
+Docker, et correspond bien à la philosophie de séparation
+correcte des responsabilités qui prévaut dans
+les services web et par-delà dans n’importe quel système
+informatique correctement urbanisé. Chacun doit faire son
+job et son job seulement, de façon à le réaliser le
+mieux possible.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Pour plus de détails sur
+la configuration avancée des builds automatisés,
+une documentation très fournie est disponible sur http://docs.docker.com/docker-hub/builds/</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle12">
+          <h3 class="title">d. Connexion au compte en ligne de commande</h3>
+          <p class="defaut">Le mode de manipulation des images dans le
+registre, sur un navigateur, se prête bien à la
+recherche d’images par mots-clés ou à leur administration,
+mais lorsqu’il s’agit de mettre en production, il faut prendre la
+main sur ces images et les installer effectivement. Bien qu’il existe
+des interfaces graphiques pour Docker, la pratique est d’utiliser
+la ligne de commande. Afin d’accéder à des dépôts
+privés, il faut donc pouvoir se connecter à son
+compte Docker Hub depuis la ligne de commande.</p>
+          <p><span class="bridgehead_niv4">Connexion à un compte Docker
+Hub</span></p>
+          <pre class="literallayout"><code class="hljs">docker login</code></pre>
+          <p class="defaut">La connexion nécessite de passer
+le nom du compte créé dans Docker Hub, le mot
+de passe ainsi qu’une adresse de courrier électronique&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP56.png" title="images/03EP56.png" src="IMAGES/03EP56.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Nous reviendrons dans le prochain chapitre
+sur l’utilité du compte Docker pour pouvoir pousser des
+images compilées localement dans le registre, de manière
+publique ou privée. Pour l’instant, nous concluons cette
+section avec la commande inverse de la précédente&nbsp;:</p>
+          <p><span class="bridgehead_niv4">Déconnexion du compte Docker
+Hub</span></p>
+          <pre class="literallayout"><code class="hljs">docker logout</code></pre>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Il est important de noter qu’il est
+tout à fait possible d’utiliser Docker sans avoir de compte
+sur Docker Hub. En effet, de nombreux avantages peuvent être tirés
+des images existantes, et même dans le cas où un
+utilisateur crée ses propres images, il peut tout à fait
+les faire passer d’une machine à une autre sans recourir à l’hébergement
+proposé par Docker. La première solution est d’exporter
+les images dans des fichiers. La seconde&nbsp;est de mettre
+en place son propre dépôt d’images. Nous étudierons
+ces deux possibilités dans le prochain chapitre.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle13">
+          <h3 class="title">e. Webhook sur événement de push dans
+Docker Hub</h3>
+          <p class="defaut">Nous avons vu plus haut l’utilisation des
+webhooks de GitHub par Docker Hub pour lancer une compilation automatique
+d’une image lors d’une opération de modification d’une
+branche ou d’une étiquette sur un dépôt
+GitHub donné, mais il existe également une fonctionnalité de
+webhook dont Docker Hub est l’émetteur.</p>
+          <p class="defaut">La page de la documentation Docker correspondant à cette
+fonctionnalité (<a class="url" href="https://docs.docker.com/docker-hub/webhooks/" target="_blank">https://docs.docker.com/docker-hub/webhooks/</a>)
+fournit un exemple du contenu JSON qui sera envoyé à un
+callback lors d’un événement de push&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs php">{&nbsp;
+&nbsp;&nbsp;<span class="hljs-string">"callback_url"</span>: &nbsp;
+<span class="hljs-string">"https://registry.hub.docker.com/u/svendowideit/busybox/hook/2141&nbsp;
+bc0cdec4hebec411i4c1g40242eg110020/"</span>,&nbsp;
+&nbsp;&nbsp;<span class="hljs-string">"push_data"</span>: {&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"images"</span>: [&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"27d47432a69bca5f2700e4dff7de0388ed65f9d3fb1ec645e2bc24c223d
+c1cc3"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"51a9c7c1f8bb2fa19bcd09789a34e63f35abb80044bc10196e304f6634c
+c582c"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"..."</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;],&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"pushed_at"</span>: <span class="hljs-number">1.417566822e+09</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"pusher"</span>: <span class="hljs-string">"svendowideit"</span>&nbsp;
+&nbsp;&nbsp;},&nbsp;
+&nbsp;&nbsp;<span class="hljs-string">"repository"</span>: {&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"comment_count"</span>: <span class="hljs-number">0</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"date_created"</span>: <span class="hljs-number">1.417566665e+09</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"description"</span>: <span class="hljs-string">""</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"full_description"</span>: <span class="hljs-string">"webhook triggered from a ’docker push’"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"is_official"</span>: <span class="hljs-keyword">false</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"is_private"</span>: <span class="hljs-keyword">false</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"is_trusted"</span>: <span class="hljs-keyword">false</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"name"</span>: <span class="hljs-string">"busybox"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"namespace"</span>: <span class="hljs-string">"svendowideit"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"owner"</span>: <span class="hljs-string">"svendowideit"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"repo_name"</span>: <span class="hljs-string">"svendowideit/busybox"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"repo_url"</span>: <span class="hljs-string">"https://registry.hub.docker.com/u/svendowideit/ 
+busybox/"</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"star_count"</span>: <span class="hljs-number">0</span>,&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-string">"status"</span>: <span class="hljs-string">"Active"</span>&nbsp;
+&nbsp;&nbsp;}&nbsp;
+}</code></pre>
+          <p class="defaut">Le callback n’est appelé que si l’opération
+de push s’est correctement déroulée.</p>
+          <p class="defaut">À ce jour, le seul événement
+déclenché par Docker Hub est celui correspondant à cette
+opération de push. Cet événement est
+bien sûr répété à chaque opération
+de dépôt, même si l’image déposée
+n’a pas changé. De plus, il s’active sur un dépôt
+manuel, mais également lors d’un dépôt
+suite à une compilation automatique. Le paramétrage
+d’un webhook est réalisé dans l’onglet <b>Webhooks</b> sur un dépôt
+Docker Hub&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP57.png" title="images/03EP57.png" src="IMAGES/03EP57.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Sur un dépôt standard, il
+est également possible de chaîner des webhooks, avec
+une exécution en succession (l’appel au callback suivant
+dans une liste chaînée ne sera réalisé&nbsp;que
+lorsque le précédent aura été validé par
+un retour correct de l’URL appelée), mais cela dépasse
+le cadre du présent ouvrage.</p>
+        </div>
+        <div class="sect3" id="refTitle14">
+          <h3 class="title">f. Déconnexion des comptes Docker Hub et GitHub</h3>
+          <p class="defaut">Si d’aventure vous souhaitiez déconnecter
+les comptes Docker Hub et GitHub, le premier réflexe sera
+de réaliser l’opération inverse de celle montrée plus
+haut en accédant à votre profil Docker Hub et à ses
+paramètres. Dans l’onglet <b>Linked Accounts</b> des <b>Account Settings</b>, il sera effectivement
+possible de déconnecter le fournisseur GitHub&nbsp;en
+cliquant sur l’icône associée.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP58.png" title="images/03EP58.png" src="IMAGES/03EP58.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Toutefois, ceci ne suffit pas complètement à remettre
+la situation dans son état initial, et il faudra également
+supprimer l’autorisation de Docker Hub dans les paramètres
+de GitHub, en cliquant le lien <b>Revoke</b> associé dans
+la liste des <b>Authorized OAuth Apps</b>,
+qui se trouve dans l’onglet <b>Applications</b> des paramètres
+du compte&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP59.png" title="images/03EP59.png" src="IMAGES/03EP59.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPf%2flBFy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention à bien supprimer
+le lien d’abord. Si vous supprimez l’autorisation en premier, l’icône
+de suppression de lien ne sera plus cliquable et il vous faudra vous
+déconnecter et vous reconnecter à votre compte
+Docker Hub pour pouvoir déconnecter le compte.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

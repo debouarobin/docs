@@ -1,0 +1,314 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_ededf9ab-94d9-4ea2-9fe0-cd70cd728b54" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Docker comme alternative légère à la
+virtualisation<var style="display:none"> Virtualisation</var></h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. L’approche par virtualisation </h2>
+        <p class="defaut">Afin de bien comprendre les bases, il est
+nécessaire de savoir que Docker n’est pas une technologie
+de virtualisation. La raison pour laquelle ce sujet est évoqué est
+que Docker&nbsp;a, pour une grande partie, des objectifs communs
+avec la virtualisation. Le concept même de virtualisation
+signifie que l’on fait croire à un système qu’on
+lui fournit des ressources, alors que celles-ci ne sont pas réelles.
+Dans le cas d’un serveur virtuel, une application ne voit pas de
+différence entre la mémoire vive et le temps de
+CPU qui lui sont alloués par une machine virtuelle ou par
+un serveur physique. Ainsi, deux applications verront deux machines
+distinctes, alors qu’en fait il s’agit de la même machine
+physique, que l’hyperviseur se charge de faire apparaître
+comme deux machines séparées, en virtualisant
+les ressources et en gérant leur lien avec les vraies ressources, à savoir
+la mémoire vive présente sur les barrettes de
+RAM et les tranches de CPU physique.</p>
+        <p class="defaut">Le but de cette manipulation est de réaliser
+un cloisonnement, qui permet une meilleure&nbsp;gestion des
+ressources. Un hyperviseur peut par exemple décider plus
+facilement d’allouer plus ou moins de mémoire à une
+machine virtuelle, sans qu’il soit nécessaire&nbsp;d’ouvrir
+le serveur et de remplacer des barrettes de mémoire comme
+on le faisait lors de la préhistoire informatique, il y
+a quelques dizaines d’années.<var style="display:none"> Hyperviseur</var></p>
+        <p class="defaut">Cette approche est également utile à une
+exploitation simplifiée des applications sur la même
+machine, car il donne une excellente garantie de cloisonnement entre
+les machines&nbsp;virtuelles. Il est ainsi possible de supprimer
+une machine complète sans affecter&nbsp;l’autre application,
+ou de modifier des versions de dépendances sans risquer
+des effets de bord délétères sur les
+applications portées par la même machine.</p>
+        <p class="defaut">Tous ces avantages ont fait que la virtualisation
+a eu un énorme succès, à tel point qu’il
+est rare aujourd’hui que des administrateurs exploitent directement
+des serveurs physiques, à part pour quelques cas spécifiques.
+La virtualisation a encore de beaux jours devant elle pour sa capacité à gérer
+de manière élastique des ressources physiques,
+mais pour ce qui est de la fonctionnalité de cloisonnement,
+Docker - ou de manière&nbsp;plus générale,
+les technologies de conteneurs - a aujourd’hui un rapport
+efficacité/coût largement supérieur.</p>
+        <p class="defaut">Afin de préciser en quoi cette efficacité consiste,
+il convient de schématiser une architecture traditionnelle
+de virtualisation, telle que nous venons de la décrire
+et telle qu’on la retrouve aujourd’hui dans des outils comme VMware, Hyper-V
+ou VirtualBox.&nbsp;</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP01.png" title="images/01EP01.png" src="IMAGES/01EP01.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmMEO7QBy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">La taille des blocs symbolise la place occupée
+par les différentes composantes, mais les proportions ne
+montrent pas pleinement l’énorme quantité d’espace nécessitée
+par un système d’exploitation (OS, pour <span class="italic">Operating System</span>). Le schéma
+serait alors illisible tant les OS modernes embarquent des couches
+d’indirection, des fonctionnalités diverses&nbsp;et
+des composants uniquement présents pour des raisons de
+compatibilité, voire d’exhaustivité, quitte à installer
+par exemple des composants multimédias sur un serveur web
+qui n’en aura jamais la moindre utilité.</p>
+        <p class="defaut">Le fait qu’une machine virtuelle (VM) nécessite
+la réinstallation d’un OS complet, au-dessus de celui de
+la machine physique, rend le problème particulièrement
+prégnant. Il faut en plus ajouter que dans la pratique
+industrielle, la virtualisation ne sert pas souvent pour déployer
+des OS différents sur un même support physique.
+Les fonctionnalités recherchées sont principalement la
+facilité de déploiement d’une nouvelle machine
+par duplication d’une image préexistante, ainsi que la
+capacité à créer une étanchéité forte
+entre deux environnements. Le système d’exploitation
+est dans ces cas identique. La redondance, que ce soit en mémoire
+vive ou sur les disques, est alors particulièrement marquée,
+et le gaspillage de ces ressources généralement conséquent.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Tentatives de réduction de la consommation
+de ressources</h2>
+        <p class="defaut">Certes, certains systèmes d’exploitation
+sont optimisés pour la virtualisation et donc fortement
+allégés. Par exemple, VMware ESXi est un système
+d’exploitation réduit aux strictes fonctionnalités
+nécessaires pour faire tourner un hyperviseur. L’équivalent
+pour le système d’exploitation maître sous Windows
+est un Windows Server "Core", sans interface graphique mais avec
+le rôle Hyper-V. Et pour ce qui est des systèmes
+d’exploitation hébergés dans les machines virtuelles,
+il est également possible de faire porter son choix sur
+des versions très légères comme Linux
+CoreOS ou Alpine, ou Windows Nano Server dans le monde Microsoft.
+Toutefois, même dans ces versions réduites, la consommation
+de ressources est loin d’être anodine, et l’hyperviseur
+lui-même en consomme.</p>
+        <p class="defaut">Des approches existent également
+pour mettre en commun des portions d’images de VM, mais Vagrant,
+pour prendre un seul exemple, va simplement partager l’espace disque
+pour des machines se ressemblant. Lors du démarrage, la
+VM nécessitera son propre espace en mémoire vive.</p>
+        <p class="defaut">Des efforts ont également été réalisés
+sur la façon de gérer les ressources physiques,
+et les hyperviseurs récents sont capables de réaliser
+du surprovisionnement. Par exemple, ils sont en mesure de montrer
+plus de mémoire aux machines virtuelles que ce que la mémoire
+vive du serveur physique peut supporter en théorie, en
+jouant sur le fait que toutes les machines ne seront pas nécessairement
+sollicitées au même moment.&nbsp;</p>
+        <p class="defaut">Mais lorsque deux machines sont en fonction,
+il y a tout de même duplication des fonctionnalités,
+dont de nombreuses sont rarement - voire jamais - utilisées.
+Le prix à payer en termes de performances et de difficultés à équilibrer
+les charges est très élevé.&nbsp;</p>
+        <p class="defaut">Bref, toutes ces améliorations sont
+marginales et seul un changement radical d’optique&nbsp;permettrait
+de réduire drastiquement le coût du cloisonnement. L’idéal,
+lorsque l’OS ou de larges portions sont partagés, serait
+que les applications qui doivent rester étanches puissent
+accéder à des fonctionnalités communes
+(OS principalement, mais également des librairies), tout
+en préservant une garantie d’étanchéité.</p>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Comment Docker règle radicalement le problème</h2>
+        <p class="defaut">Il se trouve que c’est ce que permet la technologie
+de conteneurs, dont Docker est un outil facilitant l’exploitation.
+Au lieu de virtualiser des ressources pour assurer le cloisonnement&nbsp;des
+applications qu’elles portent, Docker se sert de fonctionnalités
+du système d’exploitation existant pour faire en sorte
+que ces applications tournent sur ce système mais sans
+se voir les unes les autres, en ayant l’impression qu’elles ont
+le système pour elles toutes seules. Les fonctionnalités
+du système existent depuis longtemps dans Linux et sont
+arrivées plus récemment dans Windows, mais étaient
+complexes d’accès. Docker a simplement rendu extrêmement
+simple de les exploiter pour créer un cloisonnement sans
+avoir à virtualiser des ressources.</p>
+        <p class="defaut">Le schéma ci-dessous montre une version
+(simplifiée à l’extrême, les détails
+et cas particuliers étant étudiés par
+la suite) de la façon dont Docker permet d’économiser
+de la mémoire.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP02.png" title="images/01EP02.png" src="IMAGES/01EP02.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmMEO7QBy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Bien évidemment, la place gagnée
+en compressant la pile de tout ce qui est nécessaire pour
+faire tourner des applications permet - et c’est d’ailleurs
+le but - de faire fonctionner&nbsp;bien plus d’applications
+sur la même quantité de ressources physiques.
+Le schéma correct est donc plutôt le suivant.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP03.png" title="images/01EP03.png" src="IMAGES/01EP03.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmMEO7QBy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Encore une fois, pour des raisons d’expressivité,
+les proportions visuelles des schémas n’ont rien à voir
+avec la réalité. Dans la pratique, le ratio entre
+le nombre d’applications déployées dans des conteneurs
+et le nombre d’applications lancées en mode virtuel&nbsp;sera
+bien supérieur au ratio de 5 pour 2 illustré dans
+les schémas précédents. Le ratio effectif
+dépend de nombreux facteurs (types d’OS homogènes
+ou pas, dépendances communes entre les applications, etc.),
+mais des retours d’expérience font état de nombres
+allant de 5 à 80. Cette dernière valeur correspond
+toutefois à un cas particulier d’alignement et ne doit
+pas entraîner une focalisation sur ce critère.
+L’essentiel tient dans l’utilisation améliorée
+des ressources.</p>
+        <p class="defaut">Cette forte baisse de la redondance est bien
+sûr très positive du point de vue écologique
+comme du point de vue économique. Les gains de type GreenIT (informatique
+"verte") sur des architectures de type cluster ou cloud sont évidents
+et participent à la vitesse étonnante d’adoption
+de Docker. Mais il faut bien reconnaître que, pour l’administrateur
+des applications, l’écologie n’est souvent pas un critère
+fondamental, et c’est bien la vitesse de mise en œuvre d’un
+conteneur qui emporte l’adhésion. Un conteneur démarre
+en effet en quelques centaines de millisecondes dans la plupart
+du temps, alors qu’une machine virtuelle prendra quelques dizaines
+de secondes au mieux. Ces quelques secondes&nbsp;ainsi que l’utilisation
+bien moindre de ressources ont ouvert de nombreux usages jusqu’alors
+inenvisageables, ou alors difficilement applicables en pratique.</p>
+        <p class="defaut">Pour ne donner qu’un exemple, attardons-nous
+sur le cas d’un développeur désirant lancer des
+tests unitaires sur son code. Une bonne pratique est de repartir à chaque
+fois d’un environnement vierge. Les machines virtuelles sont idéales
+pour cela, car on peut les créer une bonne fois pour toutes,
+puis à chaque arrêt leur demander de supprimer
+les modifications depuis le lancement. Mais dans une approche de
+type TDD (<span class="italic">Test-Driven Development</span>,
+soit développement piloté par les tests), le développeur
+est censé relancer tous les tests à chaque fois
+qu’il modifie ou ajoute une fonctionnalité dans son code, soit
+potentiellement des dizaines de fois par heure. Lorsque les tests
+unitaires atteignent une durée d’exécution dépassant
+la minute, cette boucle d’itération devient plus lente.
+Le confort apporté par un démarrage en moins d’une
+seconde par rapport à 30 ou plus fait que le TDD est réellement
+respecté, ouvrant la voie à de substantielles
+améliorations dans la qualité du code.</p>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Positionnement de Docker par rapport à la
+virtualisation<var style="display:none"> Virtualisation</var></h2>
+        <p class="defaut">Surtout, Docker réalise cette économie
+de ressources sans sacrifier l’étanchéité des
+conteneurs, qui est assurée au niveau de l’OS sous-jacent.
+Une section plus loin dans ce chapitre reviendra plus en détail
+sur les méthodes utilisées pour cela. Bien sûr,
+comme dans tout processus logiciel, des failles existent, et il convient
+de sécuriser cette étanchéité par
+des mesures additionnelles et le suivi scrupuleux des correctifs.
+Mais le même discours peut être tenu sur les hyperviseurs
+traditionnels.</p>
+        <p class="defaut">Comme on peut le voir sur les schémas
+ci-dessus, l’approche Docker permet de s’abstraire&nbsp;d’un
+quelconque hyperviseur. Il est alors remplacé par ce que nous
+avons simplement noté comme "Docker", sans préciser
+pour l’instant ce que comprend cette brique. Pour le moment,
+nous précisons simplement qu’il ne s’agit
+ni d’un émulateur ni d’un moteur de virtualisation
+ou paravirtualisation, ni d’un hyperviseur&nbsp;: Docker
+est un logiciel client-serveur basé sur des fonctionnalités
+de bas niveau du noyau Linux&nbsp;(et désormais Windows, comme
+expliqué plus haut). C’est en ce sens qu’on
+ne peut pas parler de virtualisation légère pour
+Docker, même si fonctionnellement une grande partie des
+usages correspond à cette façon de simplifier
+le produit.</p>
+        <p class="defaut">Pour finir cette section, il peut d’ailleurs être
+instructif de s’attarder sur les différences et complémentarités
+des deux approches. Comme dit précédemment, aucune
+n’est infaillible du point de vue de la sécurité de
+l’étanchéité des contenus. Des failles
+ont été trouvées sur Docker comme sur
+la plupart des hyperviseurs qui permettent d’accéder à des
+données d’une autre VM ou d’un autre conteneur, voire au
+système hôte lui-même. De même,
+les fonctionnalités de base fournies par l’une ou l’autre
+des technologies sont très proches&nbsp;: création et
+lancement d’une entité, arrêt/pause/redémarrage,
+association à des ressources physiques comme le réseau
+ou le système de fichiers, etc.</p>
+        <p class="defaut">Les points de divergence principaux sont que
+l’approche de virtualisation consiste à simuler le fonctionnement
+d’une machine physique, tandis que Docker et les technologies de
+conteneurs en général partent du principe que
+la machine est centrale et que l’étanchéité doit être
+assurée par les fonctionnalités de l’OS lui-même.
+L’approche virtualisée est donc plus stricte car elle pose l’étanchéité a
+priori, d’où le sentiment répandu d’une meilleure
+garantie de ce point de vue.</p>
+        <p class="defaut">Une autre forte différence réside
+dans la richesse des écosystèmes. Les solutions
+de virtualisation bénéficient d’une vingtaine
+d’années d’expérience avec une très large
+diffusion. De nombreux outils additionnels (migration de machines à la
+volée, provisionning, gestion virtuelle du réseau,
+etc.) ont été ajoutés et stabilisés.
+De son côté,&nbsp;l’approche par conteneurs
+n’est pas non plus nouvelle. Elle existe depuis longtemps sur les
+mainframes et a connu un regain de popularité - bien
+que limité - lors de la mise en œuvre
+sur des systèmes d’exploitation plus modernes. Mais son
+utilisation restreinte à un cercle d’initiés fait
+que les outils n’abondent pas.</p>
+        <p class="defaut">Dans le cas particulier de Docker, l’outil
+est désormais presque aussi largement diffusé que
+la virtualisation et très stable. À partir d’un
+premier écosystème qui s’est rapidement mis en
+place autour de lui et a sédimenté en même
+temps (voire a été inclus dedans),&nbsp;une
+plateforme s’est mise en place sous la houlette de Docker Inc.,
+l’entreprise assurant la part principale du développement
+de Docker. Les années de jeunesse de Docker, comme pour
+beaucoup de technologies ayant grandi trop rapidement, ont été marquées
+par des problèmes de sécurité et de changement
+des API, mais cette époque était déjà passée
+lors de la seconde édition du présent livre et
+sont aujourd’hui de l’histoire ancienne.&nbsp;La plateforme
+est même tellement stable qu’elle en devient une commodité,
+et il faut bien reconnaître que les innovations les plus
+récentes se font autour&nbsp;de Docker&nbsp;et
+non plus dans le moteur lui-même.</p>
+        <p class="defaut">Au final, Docker est aujourd’hui
+dans une position de complémentarité avec la virtualisation
+plutôt que de remplacement. La virtualisation garde clairement
+certains prés carrés sur lesquels Docker n’a pas
+vocation à s’aventurer, au risque de se dénaturer
+en voulant couvrir trop de domaines différents. Mais l’approche
+par conteneurs a largement gagné en popularité après
+avoir longtemps vu sa supériorité technique cantonnée à des
+niches pour experts, et représente désormais la
+méthode préférentielle de déploiement
+pour les architectures sophistiquées. Elle est de plus
+en plus utilisée par des services logiciels en ligne ou
+même on premise comme une méthode standard de
+mise en œuvre rapide. Tel projet open source propose une
+image Docker pour que les développeurs puissent le tester
+en quelques secondes&nbsp;; telle application en ligne ouvre
+des tenants de démo en démarrant un conteneur
+Docker pour pouvoir facilement limiter&nbsp;les quotas et le
+temps total d’utilisation&nbsp;; telle application locale démarre
+des conteneurs pour exécuter des calculs sur des moteurs qui
+seraient trop complexes à installer sur la machine… Bref,
+Docker a pleinement réalisé son rôle
+de facilitateur d’utilisation de cette technologie de conteneurs.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

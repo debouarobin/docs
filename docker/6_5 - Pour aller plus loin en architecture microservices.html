@@ -1,0 +1,146 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_89f3d09c-ceae-4275-adc2-6900a6b383c2" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Pour aller plus loin en architecture microservices<var style="display:none"> Microservices</var></h1>
+      <p class="defaut">Bien que ce ne soit pas le sujet de ce livre,
+les microservices sont si intimement liés à la
+technologie Docker qu’il semblait opportun de donner quelques pistes d’analyse
+supplémentaires autour des architectures les mettant en œuvre.</p>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Bonnes pratiques</h2>
+        <p class="defaut">La granularité des microservices
+est un enjeu essentiel lors de la conception du système.
+Si les besoins sont une distribution de volumes très importants
+(de données ou de traitements), alors la granularité devra être
+la plus fine possible. Si les enjeux sont l’agilité du
+système d’information, alors on privilégiera l’alignement
+fonctionnel, et les microservices seront d’une granularité plus
+forte, équivalente à un domaine fonctionnel ou,
+pour être plus précis, un Bounded Context en approche
+Domain-Driven Design.&nbsp;Dans ce second cas, qui est le plus
+courant pour une grande majorité de l’industrie&nbsp;du
+logiciel (même si l’origine des microservices est sur le
+premier cas), il est essentiel de ne pas découper les microservices
+sur des critères techniques, mais de bien les garder segmentés comme
+les domaines métier.</p>
+        <p class="defaut">Les microservices sont très souvent
+en communication les uns les autres au moyen d’API et il est alors
+essentiel, pour respecter le principe d’autonomie des microservices,
+de faire en sorte que la compatibilité ascendante soit
+systématiquement respectée, de façon
+qu’une dépendance reste faible et que son changement ait
+le moins de chances possible de générer un fonctionnement incorrect
+dans le microservice qui en dépend. Dans les cas où le
+déploiement de microservices doit pouvoir revenir en arrière
+sur des versions stables (nous reviendrons plus loin dans le chapitre
+sur les orchestrateurs sur cette fonctionnalité de rolling
+ugrade des conteneurs), alors la compatibilité descendante
+devra également être prise en compte - ce
+qui est éminemment plus complexe.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Lien à l’urbanisation des SI</h2>
+        <p class="defaut">Les approches de microservices et d’alignement
+fonctionnel sont très liées aux principes d’urbanisation
+des systèmes d’information, dont le principe central est
+de refuser des approches de type Big Bang et d’organiser
+l’évolutivité progressive du SI. Les
+microservices&nbsp;hébergés par Docker sont
+alors les briques de base du système, avec des capacités
+de standardisation et de modularité qui permettent l’évolution à la
+manière des modèles réalisés
+en LEGO <sup class="superscript">(TM)</sup>.</p>
+        <p class="defaut">Des patrons d’évolution d’architecture
+commencent à apparaître et permettent aux architectes
+de SI rigides ou peu évolutifs de disposer de bonnes pratiques
+pour les réaligner,&nbsp;les assouplir, ou bien les
+structurer progressivement par un entourage de services propres,
+qui se construiront autour de l’ancien système
+et le remplaceront au fur et à mesure. On peut citer par
+exemple le pattern Strangler Fig, popularisé par Martin
+Fowler.</p>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Persistance</h2>
+        <p class="defaut">La complexité de la gestion de la
+persistance dans des environnements distribués, mais aussi
+sur des systèmes de conteneurs qui recherchent une abstraction
+maximale des ressources sous-jacentes, nécessite des solutions architecturelles
+plutôt que techniques.</p>
+        <p class="defaut">Fort heureusement, ces solutions sont largement
+documentées et présentent de nombreux avantages
+additionnels. Les approches SQL sont progressivement en train d’être
+supplantées dans la gestion transactionnelle par les architectures
+NoSQL, plus adaptées à la représentation
+de données fonctionnellement structurées.</p>
+        <p class="defaut">Bien que l’autonomie des services puisse paraître
+un obstacle à la consistance des données, une
+bonne découpe en domaines et une utilisation de données NoSQL
+où les structures sont alignées avec la description
+fonctionnelle font que la consistance a posteriori est assez facile à mettre
+en œuvre. Une fois en place, elle apporte des bénéfices
+très importants comme une meilleure agilité par
+rapport aux changements de règles métier, mais également
+l’abandon de la gestion de verrous, les transactions n’étant
+désormais indispensables que pour des raisons fonctionnelles
+et non techniques,&nbsp;et devenant de fait gérables
+par des mécanismes de compensation ou de consistance à date
+de valeur.</p>
+        <p class="defaut"><var style="display:none"> Command and Query Responsibility Segregation</var><var style="display:none"> Event Sourcing</var>Enfin, des architectures comme l’Event Sourcing
+ou le Command and Query Responsibility Segregation sont désormais
+suffisamment établies pour mettre en œuvre les
+principes décrits précédemment sous des
+formes suffisamment normalisées pour être utilisées
+en production. Ces deux approches sont très complémentaires.
+La première va avoir pour principe de remplacer les actions sur
+le modèle de données par des piles d’évènements
+métier, ce qui permet de revenir si nécessaire
+sur le passé et de "rejouer&nbsp;l’histoire" du point
+de vue de la donnée, ce qui est beaucoup plus souple que
+les modèles traditionnels de persistance de la donnée,
+qui ne connaissent pour ainsi dire qu’un instant de la donnée,
+même si c’est normalement le plus récent. De nombreuses
+approches de traitement de la donnée, pour des raisons
+d’analyse, rendent très utile de pouvoir connaître
+l’évolution complète du cycle de vie des objets
+traités informatiquement. La seconde technologie citée,
+CQRS, propose de séparer complètement l’écriture
+de la donnée, réalisée au moyen de commandes
+qu’on pourra sérialiser et stocker, de la lecture des données
+ou plutôt des lectures des données.</p>
+        <p class="defaut">En effet, comme les deux opérations
+sont séparées, il est simple de préparer
+des vues parfaitement adaptées des mêmes données
+pour des besoins fonctionnels différents. La source de
+l’évènement sera ainsi toujours la même
+(et selon le modèle d’Event Sourcing, pourra librement être
+parcourue dans le temps), mais les transformations qu’il a pour
+conséquence pourront être adaptées en fonction
+de la "grille de lecture" cible. Par exemple, la même opération
+de modification pourra faire apparaître une nouvelle ligne
+dans une liste d’historique, modifier un fichier dans un affichage,
+ou bien encore augmenter un compteur dans un rapport de Business
+Intelligence. La souplesse des microservices rend beaucoup plus
+simple l’usage de tels principes.</p>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Orchestration fonctionnelle</h2>
+        <p class="defaut">Une fois les conteneurs utilisés
+comme briques de base de déploiement des services, des
+architectures complètement urbanisées deviennent
+possibles alors qu’elles relevaient de l’utopie il y a peu. Des
+approches de SI idéal comme décrit par Dominique
+Vauquier (constitué d’un Master Data Management pour la
+gestion des données, d’un Business Rules Management System
+pour les règles métier et d’un moteur utilisant
+la norme Business Process Modeling Notation pour l’orchestration)
+deviennent ainsi possible.</p>
+        <p class="defaut">Enfin, Docker, en conjonction avec des protocoles
+d’échanges standardisés, permet de mettre en place
+des SI avec un middleware complètement inexistant, remplacé par
+des événements portés par des webhooks
+et des échanges purement portés par le protocole
+HTTP. L’intergiciel peut alors être incorporé uniquement
+pour des fonctionnalités secondaires de robustesse, authentification,
+routage, etc., le SI restant fonctionnel même sans lui.</p>
+        <p class="page"></p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

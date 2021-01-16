@@ -1,0 +1,694 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_003d7a24-ce3b-4afd-b8a7-58fbee9f36df" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Les fondements de Docker</h1>
+      <p class="defaut">Comme expliqué plus haut, Docker
+s’est appuyé sur des fondements existants et rencontre
+un succès certain car il a rendu simple l’utilisation de
+ces technologies sous-jacentes. Sans rentrer dans les détails
+(Docker a justement pour but de nous cacher cette mécanique
+complexe), il convient toutefois de jeter un œil sous le
+capot pour mieux comprendre le fonctionnement de la machine Docker.</p>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Les technologies Linux clés pour Docker</h2>
+        <div class="sect3" id="refTitle1">
+          <h3 class="title">a. Namespaces<var style="display:none"> Namespace</var></h3>
+          <p class="defaut">À la base de la technologie de conteneurs
+se trouve la notion de namespace. Ces "espaces&nbsp;de nommage"
+permettent de créer des ensembles de ressources gérées
+par Linux&nbsp;alors que, traditionnellement, elles étaient
+gérées en un seul bloc. Par exemple, les processus
+sont identifiés par un numéro, accessible dans une
+liste de tous les processus lancés par le système
+Linux. On parle d’identifiant de processus, ou PID.<var style="display:none"> PID</var></p>
+          <p class="defaut">En dehors des namespaces, la commande <span class="courier11">ps</span> renvoie la liste complète
+des processus tournant sur la machine Linux. Le principe du namespace
+est de réaliser des visualisations restreintes de ces ressources,
+selon une autre logique. Par exemple, dans le namespace 1, seul
+le processus de PID 10 est visible, et il apparaît sous
+une valeur de PID local de 3. Dans un second namespace, les processus
+11 et 12 sont visibles, mais sous les identifiants 3 et 4.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP05.png" title="images/01EP05.png" src="IMAGES/01EP05.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Ainsi, là où le noyau Linux
+empêche d’avoir le même identifiant pour deux processus
+séparés, il est possible, à condition
+de se positionner dans deux namespaces différents, de trouver
+deux fois le même PID. D’une certaine manière,
+on peut dire que l’identifiant du processus est en fait <span class="courier11">namespace1.pid3</span>. En cela, les namespaces
+fonctionnent&nbsp;un peu à la manière des espaces
+de nommage des classes dans les langages objet comme Java ou C#.</p>
+          <p class="defaut">De plus, lorsque l’utilisateur du système
+se place dans un namespace donné, il ne voit par la commande <span class="courier11">ps</span> que les processus associés à ce
+namespace. Il se retrouve isolé de tout le reste des processus
+gérés par le noyau Linux.</p>
+          <p class="defaut">C’est cette capacité équivalant à préfixer
+les identifiants qui est mise en œuvre par les namespaces
+dans le noyau Linux. L’exemple pris sur les processus pourrait être
+repris pour toutes les autres ressources qui supportent le cloisonnement
+par cette technologie. Il existe en effet des espaces de nommage
+pour les processus (<span class="courier11">pid</span>), comme
+expliqué ci-dessus, mais également pour les interfaces
+réseau (<span class="courier11">net</span>), les communications
+interprocessus (<span class="courier11">ipc</span>), les points
+de montage (<span class="courier11">mnt</span>), etc.</p>
+        </div>
+        <div class="sect3" id="refTitle2">
+          <h3 class="title">b. Mise en œuvre d’un namespace</h3>
+          <p class="defaut">La création d’un namespace dédié est
+une fonctionnalité essentielle à son fonctionnement,
+et que Docker réalise assez rapidement lors du démarrage
+d’un conteneur. Il est possible grâce à la commande
+Linux <span class="courier11">unshare</span> de réaliser cette étape
+avec une simple ligne de commande. Pour illustrer cette commande,
+nous allons montrer ci-dessous la correspondance entre deux identifiants
+de processus, à l’intérieur et à l’extérieur
+du contexte.<var style="display:none"> unshare</var></p>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Dans une invite de commandes Linux, entrez
+la commande suivante&nbsp;:</p>
+          </div>
+          <pre class="programlisting"><code class="hljs sql">sudo unshare -f -p <span class="hljs-comment">--mount-proc /usr/bin/sh</span></code></pre>
+          <p class="defaut">L’option <span class="courier11">-f</span> permet
+de forker le processus courant. L’option <span class="courier11">-p</span> spécifie
+que le contexte va réaliser le cloisonnement des identifiants
+de processus, comme dans l’exemple de la section précédente.
+La capture ci-dessous d’un extrait de l’aide de la commande <span class="courier11">unshare</span> montre les autres options
+de cloisonnement possibles&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs typescript">jpg<span class="hljs-meta">@ClearLinuxContainers</span>~ $ unshare --help&nbsp;
+&nbsp;
+Usage&nbsp;:&nbsp;
+unshare [options] [&lt;program&gt; [&lt;argument&gt;...]]&nbsp;
+&nbsp;
+Run a program <span class="hljs-keyword">with</span> some namespaces unshared <span class="hljs-keyword">from</span> the parent.&nbsp;
+&nbsp;
+Options&nbsp;:&nbsp;
+-m, --mount[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare mounts <span class="hljs-keyword">namespace</span>&nbsp;
+-u, --uts[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare UTS <span class="hljs-keyword">namespace</span> (hostname etc)&nbsp;
+-i, --ipc[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare System V IPC <span class="hljs-keyword">namespace</span>&nbsp;
+-n, --net[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare network <span class="hljs-keyword">namespace</span>&nbsp;
+-p, --pid[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare pid <span class="hljs-keyword">namespace</span>&nbsp;
+-U, --user[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare user <span class="hljs-keyword">namespace</span>&nbsp;
+-C, --cgroup[=&lt;file&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unshare cgroup <span class="hljs-keyword">namespace</span></code></pre>
+          <p class="defaut">L’option <span class="courier11">--mountproc</span> est également
+nécessaire pour s’abstraire du proc filesystem et ne voir
+que les processus du namespace créé lors de l’exécution de
+la commande adéquate&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP06.png" title="images/01EP06.png" src="IMAGES/01EP06.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le shell lancé dans le contexte est
+vu localement comme le processus de PID 1. En se plaçant
+dans une autre console sur le même système Linux,
+une commande identique permet de retrouver le même processus <span class="courier11">/usr/bin/sh</span>, mais
+sous un PID différent, en l’occurrence 2125 dans la capture
+ci-dessous&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP07.png" title="images/01EP07.png" src="IMAGES/01EP07.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les dates de démarrage permettent
+de valider l’équivalence. Lors de la sortie du namespace&nbsp;à l’aide
+de la commande <span class="courier11">exit</span> entrée
+dans la première console, le processus disparaît
+logiquement&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP08.png" title="images/01EP08.png" src="IMAGES/01EP08.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle3">
+          <h3 class="title">c. cgroups<var style="display:none"> cgroups</var></h3>
+          <p class="defaut">Au-delà de la possibilité qu’offrent
+les namespaces d’avoir une vision partielle des fonctionnalités
+offertes par le noyau, il est également nécessaire
+de pouvoir cloisonner l’accès aux ressources, comme la
+mémoire, les accès disques ou les tranches de
+CPU (<span class="italic">Central Processing Unit</span>,
+c’est-à-dire le microprocesseur). Que l’application dans
+un namespace voie seulement les ressources de son namespace est
+une chose, mais il faut également garantir qu’elle ne peut
+pas voir les ressources en dehors. C’est le rôle des control
+groups, ou cgroups.</p>
+          <p class="defaut">Les cgroups fonctionnent évidemment
+en étroite collaboration avec les namespaces, même
+s’il s’agit techniquement de deux fonctionnalités distinctes.</p>
+          <p class="defaut">Les cgroups permettent par exemple d’allouer
+uniquement 15&nbsp;% du CPU disponible à un
+processus, ou même à un ensemble de processus
+(typiquement les processus liés à un système
+de virtualisation niveau OS).</p>
+          <p class="defaut">Pour les lecteurs les plus curieux, les commandes
+permettant de créer un control group et d’exécuter
+un processus dans les limites définies par ce dernier sont <span class="courier11">cgcreate</span> et <span class="courier11">cgexec</span>.
+Contrairement à la commande <span class="courier11">unshare</span> dont une
+démonstration semblait essentielle pour montrer la séparation
+des identifiants d’un même processus dans des contextes
+séparés, la mise en œuvre de ces commandes
+n’apporterait pas une compréhension supplémentaire
+des mécanismes de Docker et n’est donc pas développée
+ici.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle4">
+        <h2 class="title">2. Autres dépendances du système</h2>
+        <div class="sect3" id="refTitle5">
+          <h3 class="title">a. netfilter et iptables</h3>
+          <p class="defaut">Comme nous le verrons plus loin, la gestion
+réseau est un sujet d’importance dans la mise en œuvre
+de Docker, car chaque conteneur est un processus réellement
+indépendant et, à ce titre, il possède
+une adresse IP différente de celles des autres conteneurs
+et différente également de celles associées
+au système sous-jacent.</p>
+          <p class="defaut">Bien entendu, Docker ne réinvente
+pas quoi que ce soit sur le sujet et utilise la gestion de la sécurité réseau
+et la couche de pare-feu existante de Linux. Ce sont justement ces
+deux technologies qui sont utilisées, netfilter étant
+le cadre de fonctionnement des interceptions d’appels réseau
+dans le noyau Linux et iptables le mécanisme de définition
+des règles d’approbation ou de rejet pour ces appels.</p>
+        </div>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">b. capabilities</h3>
+          <p class="defaut">En plus du filtrage des appels réseau
+entrants et sortants, la sécurité des appels système
+est particulièrement importante pour les conteneurs Docker,
+car démarrer un conteneur nécessite des accès
+relativement privilégiés et il est important que
+le processus isolé, une fois démarré,
+n’en bénéficie pas obligatoirement.</p>
+          <p class="defaut">Le noyau Linux prévoit des branchements
+possibles dans nombre de ses fonctionnalités, de façon à externaliser
+des règles possibles de blocage ou d’autorisation d’exécution
+desdites fonctionnalités vers des blocs séparés,
+qu’on appelle les Linux Security Modules (LSM).</p>
+          <p class="defaut">La gestion, largement connue, des accès
+aux fichiers de Linux, est ainsi implémentée dans
+un LSM dédié, qui est le <span class="italic">Discretionnary Access Control</span>.
+Parfois, et c’est le cas pour Docker, il est nécessaire
+d’intercepter finement les appels à telle ou telle fonctionnalité du
+noyau Linux&nbsp;; c’est alors le LSM nommé capabilities
+qui se charge du filtrage.</p>
+        </div>
+        <div class="sect3" id="refTitle7">
+          <h3 class="title">c. AppArmor et SELinux</h3>
+          <p class="defaut">AppArmor et SELinux sont également
+des implémentations de LSM, qui permettent de mettre en œuvre
+des modèles de sécurité pour des applications
+et de forcer au niveau&nbsp;système leur respect, même
+si les processus applicatifs utilisent le superutilisateur root.</p>
+          <p class="defaut">Docker communique avec AppArmor et SELinux
+de deux manières. Tout d’abord, il rentre bien sûr,
+comme tout autre logiciel, dans le cadre d’une définition
+de ses propres droits d’exécution par ces LSM. Mais Docker
+peut également fonctionner en mode inverse&nbsp;et
+prescrire des modèles de sécurité pour
+les processus tournant dans les images qu’il a lancées.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle8">
+        <h2 class="title">3. Architecture du moteur Docker</h2>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">a. LXC</h3>
+          <p class="defaut">Les technologies précédentes étant
+relativement complexes à manipuler par des lignes de commandes,
+LXC est né comme une première approche de simplification
+de leur utilisation. Le paradigme utilisé est celui des
+conteneurs, d’où le nom LXC (<span class="italic">Linux Containers</span>).
+La notion de conteneur regroupe les allocations de ressources et
+l’isolation par namespaces/cgroups de façon à faciliter la
+mise en œuvre d’ensembles de processus isolés
+les uns des autres.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Il est à noter que le principe
+d’isolation par conteneurs existait déjà dans d’autres
+OS, comme FreeBSD (technologie Jails) ou Solaris (où ils étaient
+dénommés zones). Le principe maître derrière
+les conteneurs est d’offrir une isolation au niveau du système&nbsp;:
+c’est le système d’exploitation qui se charge de l’étanchéité des
+ressources. Bien sûr, cette approche n’est pas absolue
+et dépend de la programmation correcte des mécanismes.
+Mais le surcoût d’une étanchéité de
+niveau supérieur, par une émulation complète
+d’une machine, est énorme, et les hyperviseurs ne sont
+d’ailleurs pas non plus exempts de failles, même si elles
+sont souvent d’un autre type. Lorsque les besoins nécessitent&nbsp;une
+garantie d’étanchéité de très
+haut niveau (manipulation de données hautement confidentielles,
+secret militaire, etc.), le coût limité des ressources
+matérielles amène souvent à la conclusion
+qu’une séparation physique des machines est la meilleure
+des garanties.</p>
+            </div>
+          </div>
+          <p class="defaut">LXC n’a pas eu le succès que la technologie
+méritait, en partie à cause d’un manque de documentation,
+et en partie à cause d’un support plutôt dégradé sur
+les OS Linux autres qu’Ubuntu. Docker a relevé le défi
+de la mise à disposition du plus grand nombre, en s’appuyant
+dans un premier temps sur LXC, mais il a vite été nécessaire
+de passer à une approche plus modulaire.</p>
+        </div>
+        <div class="sect3" id="refTitle10">
+          <h3 class="title">b. libcontainer<var style="display:none"> libcontainer</var></h3>
+          <p class="defaut">À partir de la version 0.9 de mars
+2014, toutefois, Docker a supprimé sa dépendance à LXC
+en la basant sur une interface plus contractuelle, définissant
+de manière standard les API gérant l’accès
+aux ressources. Ceci permet d’ouvrir la porte à d’autres
+OS (nous reviendrons plus tard sur le cas de Windows). Cette interface
+est connue sous le nom de libcontainer, et Docker a réalisé la
+première implémentation pointant sur le noyau
+Linux.</p>
+          <p class="defaut">L’API libcontainer permet d’utiliser les namespaces
+sans avoir à dépendre d’une implémentation
+particulière. Elle prépare Docker à une
+utilisation dans des OS autres que Linux.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP09.png" title="images/01EP09.png" src="IMAGES/01EP09.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Quelques années plus tard, lors de
+l’écriture de la présente édition, on
+peut constater que cette modularisation et cette ouverture ont atteint
+leur but, l’implémentation LXC étant désormais
+complètement oubliée, et de nouvelles runtimes étant
+apparues.</p>
+          <p class="defaut">L’implémentation de libcontainer
+sur le noyau Linux, créée par Docker (la société),
+est réalisée en langage Go, comme de nombreuses
+autres parties de Docker (le produit).</p>
+          <p class="defaut">Il est notable que c’est cette couche
+d’indirection qui a été utilisée
+pour réaliser une implémentation Windows de Docker,
+en commençant par une implémentation de libcontainer
+basée non plus sur LXC, mais sur les technologies correspondantes
+sous Windows, à savoir Server Silos à la place
+des namespaces et Windows Job Objects en remplacement des cgroups
+de Linux. La technologie Microsoft Drawbridge avait été envisagée
+comme fondation de la version Windows de Docker, mais elle s’est
+finalement révélée non adaptée.</p>
+          <p class="defaut">Conformément aux principes de normalisation,
+libcontainer a été intégré au projet
+Open Containers, dans lequel il a pris le nom de technologie runc.</p>
+        </div>
+        <div class="sect3" id="refTitle11">
+          <h3 class="title">c. containerd<var style="display:none"> containerd</var></h3>
+          <p class="defaut">La gestion de l’exécution du conteneur
+est désormais correctement ressortie du moteur&nbsp;Docker
+grâce à runc, qui permet de faire tourner des
+conteneurs quel que soit le moteur utilisé pour cela, du
+moment qu’il est compatible OCI.</p>
+          <p class="defaut">Toutefois, il restait encore du découpage à faire
+car le moteur Docker restait en charge de tout le reste. Or, des
+opérations telles que la mise en réseau de conteneurs
+ou la gestion&nbsp;des entrées/sorties sont,
+pour prendre uniquement ces exemples, d’un niveau beaucoup plus
+bas que, disons, le téléchargement et le stockage
+en cache local des images. Cette opération de séparation
+a été menée en 2016 et a consisté à créer
+une couche sous Docker Engine, qui a pris le nom de containerd.</p>
+          <p class="defaut">Le but de containerd est de fournir un démon
+qui pilote le lancement et le cycle de vie de multiples conteneurs,
+en pilotant les runtimes compatibles OCI comme runc. Ainsi,&nbsp;le
+moteur Docker ne mélange plus les fonctionnalités
+d’interaction avec l’utilisateur avec les fonctionnalités
+de gestion du cycle de vie des différents conteneurs, qui
+sont gérées par containerd.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP10.png" title="images/01EP10.png" src="IMAGES/01EP10.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Là encore, la modularisation a doublement
+atteint son but, avec une augmentation de la robustesse de l’ensemble,
+mais aussi avec l’apparition sur le marché d’alternatives
+spécialisées d’une couche donnée pour
+tel ou tel besoin. Certains de ces modules parmi les plus connus
+sont présentés ci-dessous. Le précédent schéma
+permettra d’éclairer le vocabulaire de runtime, souvent
+utilisé de manière uniforme alors qu’il se réfère
+parfois à la simple exécution des conteneurs et
+parfois à la couche supérieure de gestion du réseau,
+des images et des interactions avec ces conteneurs.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À noter qu’il est possible
+de piloter directement la couche containerd en utilisant un client
+en ligne de commande nommé <span class="courier11">ctr</span>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle12">
+        <h2 class="title">4. Architectures complémentaires</h2>
+        <div class="sect3" id="refTitle13">
+          <h3 class="title">a. rkt</h3>
+          <p class="defaut">La runtime rkt est une alternative au moteur
+d’exécution runc, à l’origine portée
+par CoreOS mais désormais dans le giron de RedHat suite
+au rachat du premier par le second.&nbsp;La gestion des images
+n’est pas nativement compatible avec OCI car elle se base sur un
+graphe de dépendances plutôt qu’une organisation
+en couches. Toutefois, un utilitaire permet de transformer à la
+volée les images compatibles OCI en images utilisables
+par rkt.</p>
+          <p class="defaut">Contrairement à runc qui gère
+le conteneur, rkt se base sur une unité dite pod qui, de
+la même manière que pour les pods Kubernetes,
+contient plusieurs applications partageant le même contexte
+d’exécution. Une autre différence importante avec
+Docker est que les pods rkt s’exécutent directement en
+tant que processus Linux, sans avoir besoin d’un démon
+pour les lancer ou les superviser. L’approche containerd sépare
+déjà le démon des shims qui gèrent
+les conteneurs eux-mêmes, mais le démon reste
+nécessaire pour démarrer ces entités.</p>
+          <p class="defaut">De nombreuses discussions ont cours sur Internet
+pour argumenter du bienfait de telle ou telle approche et de la
+supériorité technique de l’une ou de l’autre.
+Au final, quels que soient ses avantages supposés ou réels,
+rkt n’a pas réussi à se développer au-delà d’une
+tranche minimale des utilisateurs de conteneurs.</p>
+        </div>
+        <div class="sect3" id="refTitle14">
+          <h3 class="title">b. Container Runtime Interface</h3>
+          <p class="defaut">Kubernetes a commencé ses implémentations
+en lançant des conteneurs Docker, mais des demandes sont
+apparues pour exécuter une runtime rkt dans Kubernetes.
+Ainsi, la plateforme a été confrontée
+aux mêmes besoins de découplage de la sous-couche
+d’exécution des conteneurs dans ses pods et a répondu
+de la même manière qu’expliqué plus haut, à savoir
+par la mise en place d’une API standard, charge à chaque
+runtime&nbsp;souhaitant être utilisable de la respecter.</p>
+          <p class="defaut">Bien évidemment, afin de continuer à fonctionner,
+il était nécessaire pour le projet&nbsp;Kubernetes
+de fournir une implémentation de cette API, et c’est le
+but du projet CRI-O. Ce projet, qui ne fait pas partie des portions
+versées à la Cloud Native Computing&nbsp;Foundation,
+se base lui-même sur les standards OCI (avec une implémentation
+runc par défaut) et CNI (<span class="italic">Common Network Interface</span>)
+pour la partie réseau.<var style="display:none"> OCI</var></p>
+          <p class="defaut">Les projets rkt comme containerd ont également
+fourni des implémentations du contrat CRI de façon à pouvoir être
+utilisés dans Kubernetes.</p>
+        </div>
+        <div class="sect3" id="refTitle15">
+          <h3 class="title">c. Un foisonnement d’alternatives</h3>
+          <p class="defaut">Le monde des architectures de conteneurs est
+extrêmement mouvant et il serait trop long ici de décrire
+toutes ses composantes. De plus, une volonté d’exhaustivité aurait
+forcément amené à parler également
+des approches aux confins de la virtualisation, certains fournisseurs
+(comme Kata Containers) expérimentant des architectures
+hybrides&nbsp;combinant les bénéfices des
+conteneurs et de la virtualisation par hyperviseur. Le risque alors
+aurait été d’introduire de la confusion sur la
+différence entre Docker&nbsp;et la virtualisation, expliquée
+plus haut.</p>
+          <p class="defaut">Il paraissait toutefois important, même
+si le présent ouvrage se consacre à Docker, de
+montrer cette dynamique d’écosystème et de citer
+les principaux standards d’ouverture et approches alternatives.
+Nous renvoyons toutefois l’utilisateur à l’étude
+de documentation&nbsp;spécialisée pour creuser
+le sujet. Sur le sujet des approches hybrides, les interventions
+de Daniel Walsh (<a class="url" href="https://opensource.com/users/rhatdan" target="_blank">https://opensource.com/users/rhatdan</a>)
+sont d’une grande aide. Pour ce qui est des runtimes de conteneurs
+en général, Ian Lewis a écrit une série
+d’articles (<a class="url" href="https://www.ianlewis.org/en/container-runtimes-part-1-introduction-container-r" target="_blank">https://www.ianlewis.org/en/container-runtimes-part-1-introduction-container-r</a>)
+qui peuvent servir de référence.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle16">
+        <h2 class="title">5. Système de fichiers en couches</h2>
+        <div class="sect3" id="refTitle17">
+          <h3 class="title">a. Principe d’isolation des fichiers</h3>
+          <p class="defaut">Il a jusqu’ici été abondamment
+question de l’isolation des ressources, mais Docker se base également
+sur une autre technologie très importante de Linux, à savoir
+la gestion de fichiers par couches, que proposent certains systèmes
+de fichiers.</p>
+          <p class="defaut">D’une certaine manière, cette approche
+prolonge l’isolation en la plaçant au niveau de chaque
+fichier, mais nous allons voir qu’en plus de l’étanchéité,
+cette approche par couches permet la réutilisation, et
+donc une forte économie de ressources.</p>
+        </div>
+        <div class="sect3" id="refTitle18">
+          <h3 class="title">b. Approche par virtualisation</h3>
+          <p class="defaut">L’exemple pour illustrer cette approche sera
+celui d’une application traditionnelle composée de trois
+tiers&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">un frontal proposant
+une interface web,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">un serveur exposant des services
+web,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">une base de données.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Il est très courant, pour des raisons
+opérationnelles, de ne pas trop démultiplier les
+technologies supportées dans les systèmes logiciels.
+Aussi est-il logique d’imaginer que les trois tiers sont basés
+sur la même version de Linux (par exemple une CentOS&nbsp;7)
+et que le frontal et les services utilisent le même serveur
+web (par exemple un Apache Web Server 2.4.12).</p>
+          <p class="defaut">La spécificité de chaque
+serveur consiste dans le premier cas en une application web graphique,
+dans le deuxième cas en une application web exposant des
+services sous forme d’API, et dans le dernier cas en une base de
+données (PostgreSQL&nbsp;9 dans notre exemple).</p>
+          <p class="defaut">Dans une approche virtualisée, cela
+se traduirait par le montage suivant, volontairement simplifié à un
+seul serveur par tiers (nous aborderons la redondance et l’équilibre
+de charge en temps voulu).</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP11.png" title="images/01EP11.png" src="IMAGES/01EP11.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le gaspillage de ressources au niveau des
+fichiers est alors à comparer à celui provoqué par
+la répétition de la consommation de ressources
+système par trois machines virtuelles&nbsp;avec chacune
+leur système d’exploitation. Nous avons vu plus haut que
+l’approche&nbsp;de Docker consistait à assurer l’étanchéité au
+niveau des ressources de l’OS, et donc à mieux partager
+le CPU, la RAM, les accès réseau, la gestion des
+processus, la bande passante vers les disques, etc. Il se trouve
+que Docker permet également d’économiser au niveau
+des fichiers, en partageant ce qui est en commun tout en permettant
+de garder une forte étanchéité.</p>
+        </div>
+        <div class="sect3" id="refTitle19">
+          <h3 class="title">c. Utilité des systèmes de fichiers
+en couches</h3>
+          <p class="defaut">Dans la pratique, les conteneurs utilisent
+des images (il s’agit du terme consacré) avec des contenus
+de fichiers, et celles-ci sont composées en couches qui se
+cumulent les unes aux autres. Ainsi, il est possible de réaliser
+une mise en commun des fichiers, comme le montre le diagramme suivant.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP12.png" title="images/01EP12.png" src="IMAGES/01EP12.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Au lieu de dupliquer les fichiers du système
+ainsi que du serveur web sur deux ou trois machines virtuelles,
+les couches composant les images de conteneurs font référence
+les unes aux autres. Lorsqu’un conteneur de type frontal web est
+lancé, il se base sur une image Web GUI (<span class="italic">Graphical User Interface</span>) qui fait référence à l’image
+Apache, elle-même basée sur l’image CentOS. La
+mise en commun des niveaux intermédiaires permet&nbsp;d’obtenir
+des images très légères, les spécificités
+de chacune étant très faibles par rapport à la
+part qui reste similaire.</p>
+          <p class="defaut">En particulier, la différence entre
+le frontal web et le tiers de services web est limitée à quelques
+fichiers constitutifs du site et de l’API. Par exemple, l’image Web
+GUI contient&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">des fichiers <span class="courier11">.html</span>,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">des scripts JavaScript,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">des feuilles de style <span class="courier11">.css.</span></p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Tandis que l’image Web API contient, si on
+se trouve sur une pile Mono&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">le module Apache <span class="courier11">php-fpm</span>, pour faire fonctionner PHP
+sur le serveur web,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">des fichiers <span class="courier11">.php</span>,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">des librairies de dépendances éventuelles,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">un fichier <span class="courier11">php.ini</span> pour
+configurer la plateforme.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">L’image commune Apache, dont dépendent
+les deux précédentes, contient quant à elle&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">le fichier de configuration
+du serveur web <span class="courier11">/etc/apache2/apache2.con</span>f,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">les binaires dans <span class="courier11">/usr/sbin</span>,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">la documentation dans <span class="courier11">/usr/share/doc</span>,</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">etc.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">L’instanciation d’un conteneur fusionne dynamiquement
+toutes ces couches et présente un système de fichiers
+contenant la totalité de ce qui est nécessaire&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP13.png" title="images/01EP13.png" src="IMAGES/01EP13.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les économies de taille des images
+sont particulièrement appréciables dans le cas
+de leur diffusion par Internet où, au lieu de véhiculer
+des fichiers correspondant à des disques virtuels de plusieurs
+dizaines de gigaoctets (ce qui a toujours été une
+des limitations à l’utilisation de la virtualisation pour
+les tests et le débogage des applications), on peut désormais
+envoyer des fichiers de quelques dizaines de mégaoctets
+seulement.</p>
+        </div>
+        <div class="sect3" id="refTitle20">
+          <h3 class="title">d. Gestion des modifications de fichiers</h3>
+          <p class="defaut">Jusque-là, le système de
+fichiers par couches ne semble pas particulièrement spécial&nbsp;:
+il ne fait que rassembler des fichiers en provenance de plusieurs couches
+pour créer une seule image les présentant tous
+lors de l’instanciation d’un conteneur. Un cas particulier de traitement
+va révéler toute la puissance du concept, à savoir
+la gestion d’un fichier&nbsp;présent dans plusieurs
+couches.</p>
+          <p class="defaut">Dans notre exemple, il est imaginable que
+les deux applications web aient besoin de paramètres différents
+pour le serveur Apache sous-jacent. Le fichier <span class="courier11">/etc/apache2/apache2.conf</span> doit
+alors être différent dans les deux images Web
+GUI et Web API. Or, il est mis en commun dans la couche inférieure.
+Si le processus se contentait d’ajouter les fichiers les uns aux
+autres lors de la fusion des couches, il serait alors nécessaire&nbsp;de
+créer plusieurs couches pour les différentes configurations
+du serveur Apache, ce qui ferait perdre tout bénéfice
+de mise en commun.</p>
+          <p class="defaut">Mais les systèmes de fichiers en
+couches rendent possible de faire porter la seule modification&nbsp;de
+fichier dans les images de niveau supérieur, et ce sans supprimer
+le fichier&nbsp;de la couche Apache. Le fichier sera simplement écrasé avec
+les modifications spécifiques&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP14.png" title="images/01EP14.png" src="IMAGES/01EP14.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Nous verrons plus loin, lors de l’étude
+en détail des images, que la gestion des différentes
+versions, couplée à cette notion de fusion, permet
+de mettre en place de véritables arborescences d’images
+partageant au maximum les fichiers communs, optimisant ainsi fortement
+l’usage de ressources.</p>
+        </div>
+        <div class="sect3" id="refTitle21">
+          <h3 class="title">e. Dernière couche en écriture</h3>
+          <p class="defaut">Le troisième niveau de sophistication
+sur la gestion de fichiers se manifeste lorsque l’exécution
+des conteneurs apporte des modifications au système de
+fichiers. Dans&nbsp;l’exemple utilisé précédemment,
+les serveurs web peuvent créer des fichiers dans le répertoire&nbsp;<span class="courier11">/tmp</span>, et le conteneur de
+base de données va certainement écrire dans <span class="courier11">/var/lib/pgsql/data</span>,
+qui est l’emplacement dans lequel PostgreSQL positionne&nbsp;par
+défaut ses fichiers de données.</p>
+          <p class="defaut">C’est la mise en place d’une couche supplémentaire
+par Docker qui permet de gérer ces cas de figure&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP15.png" title="images/01EP15.png" src="IMAGES/01EP15.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPRbrkEy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Lors de l’exécution des conteneurs,
+toutes les modifications réalisées sur le système
+de fichiers seront dirigées dans une couche à part,
+ce qui permet très facilement lors de la fermeture du conteneur
+de choisir si les modifications doivent être abandonnées
+ou conservées.</p>
+          <p class="defaut">Dans le cas des serveurs web, où les
+fichiers temporaires peuvent être purgés sans
+problème, la surcouche peut être purement et simplement
+abandonnée. On qualifie alors le serveur du terme anglais
+"transient", dont la traduction la plus appropriée pourrait être
+"éphémère". Nous verrons par la suite
+que c’est le comportement standard de Docker&nbsp;lorsqu’un
+conteneur est arrêté.</p>
+          <p class="defaut">Bien entendu, dans le cas d’une base de données,
+comme le troisième conteneur dans notre exemple, les modifications
+de données réalisées doivent au contraire être
+gardées. Il est alors essentiel - a minima - de
+transformer la couche temporaire formée en une couche de
+fichiers définitive. En pratique, nous verrons plus loin
+qu’il existe des moyens plus adaptés de gérer
+ce cas de figure.</p>
+        </div>
+        <div class="sect3" id="refTitle22">
+          <h3 class="title">f. Technologies utilisées</h3>
+          <p class="defaut">Dans les sections précédentes,
+il a été question de manière générique
+de systèmes&nbsp;de fichiers par couches. La raison
+pour laquelle le nom de la technologie sous-jacente n’a pas été utilisé est
+que celle-ci peut être ajustée par paramétrage.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Au passage, il conviendra de ne pas
+confondre <span class="italic">Union File System</span>,
+qui est la traduction anglaise de la technologie générique
+de système de fichiers en couche, avec <span class="italic">UnionFS</span>, qui est une des implémentations
+particulières de cette technologie, utilisée dans
+les premières implémentations de Docker mais qui semble
+désormais abandonnée.</p>
+            </div>
+          </div>
+          <p class="defaut">À ce jour, il existe de nombreux
+plug-ins de stockage pour Docker, comme <span class="courier11">aufs</span> (<span class="italic">Another&nbsp;Union File System</span>), <span class="courier11">btrfs</span> (<span class="italic">B-tree file system</span>), <span class="courier11">zfs</span>, <span class="courier11">overlay2</span> ou <span class="courier11">devicemapper</span>. Certains systèmes
+de fichiers ne sont pas supportés en fonction de la distribution
+utilisée, et de nombreux efforts sont en cours pour adapter
+d’autres systèmes de fichiers incrémentaux. Nous
+ne détaillerons donc pas ce domaine changeant, et dont
+l’intérêt pour l’utilisateur final de Docker n’est
+pas immédiat. Si le choix d’un filesystem particulier
+répond à un besoin précis ou que la performance
+d’écriture de fichiers est d’une importance
+capitale pour un scénario donné, la consultation
+de la page <a class="url" href="https://docs.docker.com/storage/storagedriver/select-storage-driver/" target="_blank">https://docs.docker.com/storage/storagedriver/select-storage-driver/</a> vous
+guidera, en fonction de votre contexte, pour trouver la configuration
+optimale pour le système de fichiers utilisé.
+De manière générale, <span class="courier11">overlay2</span> est
+recommandé car supporté par toutes les distributions
+récentes de Linux et utilisable sans configuration particulière
+du noyau.</p>
+        </div>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

@@ -1,0 +1,207 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_139d392a-eb78-4a9c-8e56-5d759232b5a7" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Principe des conteneurs</h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Les apports de Docker</h2>
+        <p class="defaut">L’apport principal de Docker consiste, comme
+expliqué dans la section précédente,
+en une réduction drastique des ressources utilisées
+tout en conservant une étanchéité entre
+les applications. Mais, encore une fois, les technologies de compartimentation
+mémoire existaient bien avant Docker. Ce dernier a toutefois
+apporté un certain nombre de fonctionnalités supplémentaires
+qui ont permis leur adoption au-delà du cercle restreint
+des utilisateurs confirmés de Linux.</p>
+        <p class="defaut">Au premier rang de ces fonctionnalités
+se trouve la normalisation des conteneurs&nbsp;: Docker a eu
+du succès là où des approches purement
+techniques se sont arrêtées, car il a rendu extrêmement
+simple la récupération de conteneurs existants
+et leur création par des méthodes standards. Dans
+l’histoire de l’informatique, la normalisation et la standardisation
+ont quasiment toujours été des prérequis à la
+diffusion large d’une technologie donnée.</p>
+        <p class="defaut">L’API Docker est désormais standardisée
+par le biais de deux spécifications de l’Open Container
+Initiative, un consortium web ouvert de normalisation de la gestion
+des conteneurs auquel adhèrent Docker ainsi que de nombreuses autres
+grandes sociétés d’informatique. La première
+de ces spécifications concerne la gestion de l’exécution
+des conteneurs (et donc l’API pour les démarrer, les arrêter,
+etc.) et la seconde la définition des images.<var style="display:none"> Open Container Initiative</var></p>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Le lecteur trouvera plus d’informations
+concernant la normalisation des interfaces liées aux conteneurs
+sur : <a class="url" href="https://www.opencontainers.org/" target="_blank">https://www.opencontainers.org/</a></p>
+          </div>
+        </div>
+        <p class="defaut">Il est notable que Microsoft, pour son implémentation
+de la gestion de conteneurs dans Windows, a suivi scrupuleusement
+cette approche normalisée et fournit une API 100&nbsp;% compatible
+avec celle de Docker sous Linux, ce qui permet par exemple de piloter&nbsp;un
+serveur Docker sous Linux avec un client Docker pour Windows. C’est également
+ce respect des normes qui permet de réaliser tous les exemples
+du présent livre sous Linux sans que cela pose le moindre
+problème à un utilisateur de Windows, la transposition
+ne nécessitant aucune modification de commande, changement
+de nom de paramètre ou autre action de transposition.</p>
+        <p class="defaut">Bien que la normalisation ne soit pas le seul
+apport de Docker à la conteneurisation (la mise à disposition
+d’un ensemble d’images précompilées pour de nombreux
+logiciels du marché et la simplification des lignes de
+commandes pour gérer les conteneurs ont également
+participé au succès de la plateforme), il s’agit
+d’un point fondamental, qui a même influé sur
+le nom de la technologie et dont il convient d’expliquer le lien
+avec le transport de marchandises.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Principe des conteneurs industriels</h2>
+        <p class="defaut">Le nom de conteneur est en effet révélateur
+dans le sens où il permet de filer une métaphore&nbsp;de
+comparaison avec les conteneurs industriels utilisés pour
+le transport de fret. Jusqu’aux années 1950, les contenants
+pour le fret étaient la plupart du temps réalisés&nbsp;à façon,
+suivant la forme, le volume et la masse du contenu, ainsi que des
+capacités&nbsp;de réalisation d’un contenant
+par l’expéditeur. S’ensuivaient des tailles de colis très
+disparates, et donc une certaine difficulté à optimiser
+les chargements.<var style="display:none"> Conteneur:transport de fret</var></p>
+        <p class="defaut">En 1956, Malcom McLean, un entrepreneur américain
+en transports, développe un système de transfert
+simple de caisses entre les navires et les camions, évitant
+ainsi de transborder les marchandises une par une de la cale à la
+remorque. Le succès de l’essai se propage, et en 1967,
+l’ISO (<span class="italic">International Organization for Standardization</span>)
+normalise trois tailles standards de conteneurs pour le transport.
+Malgré la portée mondiale des modifications nécessaires,
+le transport maritime et routier de tous les continents est rapidement
+transformé par la standardisation des conteneurs. Celle-ci
+permet d’optimiser quasiment toute la chaîne de transport&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">Facilité du
+chargement, car n’importe quel expéditeur peut se procurer
+un conteneur et le charger à son rythme, puis contacter
+un transporteur, dont il sait qu’il acceptera&nbsp;son chargement.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Amélioration de la manutention
+du conteneur&nbsp;: la taille étant standard, les pinces
+de chargement n’ont plus à serrer la caisse (ou pire, être
+changées à chaque chargement différent),
+mais peuvent simplement utiliser des pièces de préhension
+qui s’insèrent&nbsp;dans les coins renforcés
+des conteneurs. La durée de vie de ces derniers est ainsi
+fortement allongée.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Augmentation de la vitesse de transport&nbsp;:
+toutes les marchandises contenues dans un bloc sont déplacées
+en même temps, au lieu de travailler colis par colis.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Stockage optimisé&nbsp;:
+les dimensions normalisées permettent un empilement et
+un ajustement des espaces de stockage sans perte de place. Les navires porte-conteneurs&nbsp;sont
+dimensionnés en fonction des conteneurs (et non l’inverse,
+synonyme de perte de place).</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Interchangeabilité partout
+dans le monde&nbsp;: un conteneur endommagé peut facilement être
+réparé ou remplacé sans retour à son
+expéditeur. Et un conteneur ne voyage jamais vide, même
+sur un trajet retour. Un certain nombre de conteneurs en service
+ont fait plusieurs tours du monde sans que leur propriétaire
+initial ne les revoie.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Docker et l’approche normalisée</h2>
+        <p class="defaut">Le produit Docker est apparu dans le paysage
+informatique début 2013, lorsque DotCloud, une entreprise
+de fourniture de PaaS (<span class="italic">Platform as a Service</span>) a
+publié en open source un ensemble d’outils jusqu’alors
+propriétaires.</p>
+        <p class="defaut">Le nom de Docker ainsi que son logo (une baleine
+transportant des conteneurs) annoncent&nbsp;clairement l’objectif
+que la société derrière le produit, désormais
+nommée Docker Incorporated, s’est fixé, et bien
+que le produit soit encore trop jeune pour qu’on puisse
+comparer son apport à celui de la standardisation des conteneurs
+industriels pour le transport, Docker est à ce jour très bien
+placé pour devenir dans les prochaines années
+le mode habituel de déploiement d’applications
+logicielles.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/01EP04.png" title="images/01EP04.png" src="IMAGES/01EP04.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmN0voADy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Pour filer la métaphore, voici les
+points forts que Docker peut mettre en avant pour justifier cette
+ambition&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">Facilité de
+chargement d’un processus dans un conteneur&nbsp;: un conteneur vide
+peut être récupéré et instancié en
+une ligne de commande (le logiciel Docker et un ordinateur connecté à Internet
+sont les seuls prérequis), et le lancement d’un processus
+dans le conteneur se fait exactement de la même manière
+que sur une machine locale.&nbsp;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Ce chargement peut être
+automatisé par la réalisation d’un fichier contenant
+un texte écrit dans un format décrivant les étapes
+de chargement du processus dans le conteneur.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Manutention du conteneur&nbsp;:
+toute personne ayant créé un conteneur par remplissage
+avec un processus configuré comme elle le souhaite peut
+ensuite diffuser le tout par Internet, en ayant la garantie que
+n’importe quelle personne pourra exécuter le conteneur.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Rapidité d’exécution&nbsp;:
+le conteneur regroupant tout le paramétrage, les livrables,
+les ressources et tout ce qui est utile au programme supporté,
+son lancement se fait quasi immédiatement et sans nécessiter
+de temps d’installation.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Interchangeabilité&nbsp;:
+toute personne exécutant le conteneur obtiendra exactement
+le même résultat que l’émetteur. Cette
+approche standard permet de garantir une même exécution
+des programmes, et ce quel que soit le système sous-jacent,
+pourvu qu’il soit doté du programme Docker.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Indépendance par rapport à l’infrastructure
+sous-jacente qui porte les conteneurs&nbsp;: ces derniers peuvent être
+exécutés indifféremment sur un serveur
+Docker local à une machine, sur un cluster de serveurs
+Docker installés sur des machines en réseau, à l’intérieur
+d’une plateforme sophistiquée utilisant Docker comme unité d’exécution
+de ses traitements, sur un cloud proposant la fonctionnalité de
+Container as a Service, etc.</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">La comparaison avec les conteneurs industriels
+normalisés est encore plus pertinente à ce jour,
+lors de l’écriture de la troisième édition
+du présent ouvrage. En effet, de la même manière
+que l’utilisation d’un conteneur tombe sous le sens et n’est même
+plus questionnée pour du transport de fret maritime, la mise
+en œuvre de conteneurs selon la norme OCI est une évidence
+pour le déploiement d’applications logicielles web complexes.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

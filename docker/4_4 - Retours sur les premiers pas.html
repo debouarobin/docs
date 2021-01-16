@@ -1,0 +1,1100 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_b3f49caa-e670-4165-9355-56c45993b48b" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Un second conteneur</h1>
+      <p class="defaut">Après ce premier lancement d’un conteneur
+de type <span class="courier11">hello-world</span>, ainsi que des
+digressions sur comment trouver des images déjà existantes
+sur le registre Docker Hub, nous allons passer à une deuxième étape
+consistant à lancer un conteneur un peu plus compliqué,
+avec lequel nous allons cette fois avoir une réelle interaction.
+L’image <span class="courier11">hello-world</span> se contentait
+d’afficher un texte. Cela nous a permis d’aborder en douceur ce
+qui se passait en toile de fond, mais il est bien évident
+qu’un simple affichage&nbsp;n’est pas très utile.</p>
+      <p class="defaut">Notre seconde manipulation consistera à écrire
+des fichiers dans un conteneur de type <span class="courier11">ubuntu</span>.
+L’image <span class="courier11">ubuntu</span>, comme son nom l’indique,
+contient simplement une installation minimaliste du système
+d’exploitation éponyme. Le fait que le nom ne soit pas
+préfixé signifie qu’il s’agit bien d’une image
+officielle.</p>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Récupération de l’image</h2>
+        <p class="defaut">Nous allons commencer par simplement télécharger
+l’image, ce qui nous amènera à approfondir la
+notion d’étiquette (<span class="italic">tag</span> en
+anglais) que nous avons abordée précédemment.</p>
+        <p><span class="bridgehead_niv4">Récupération d’une image
+dans sa dernière version</span></p>
+        <pre class="programlisting"><code class="hljs css"><span class="hljs-selector-tag">docker</span> <span class="hljs-selector-tag">pull</span> <span class="hljs-selector-tag">ubuntu</span><span class="hljs-selector-pseudo">:latest</span></code></pre>
+        <p class="defaut">Le téléchargement prendra
+quelques secondes, voire minutes, en fonction de votre connexion
+Internet. Toutefois, ce chargement d’image a lieu une fois pour
+toutes, et tout lancement suivant se basera sur cette image, y compris d’ailleurs - et
+c’est une des grandes forces de l’architecture par couches - toutes les
+images se basant sur celle-ci (et elles sont nombreuses, Ubuntu étant
+une distribution de base fréquemment utilisée
+pour d’autres images Docker, même si la tendance aujourd’hui
+est plus à utiliser des distributions plus légères
+pour ne pas surcharger les images avec des contenus inutiles).</p>
+        <p class="defaut">Le client Docker renvoie des informations
+sur le téléchargement en cours&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP60.png" title="images/03EP60.png" src="IMAGES/03EP60.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Une fois ce téléchargement
+réalisé, une commande permet de voir les images disponibles
+localement.</p>
+        <p><span class="bridgehead_niv4">Afficher les images Docker présentes
+sur la machine</span></p>
+        <pre class="programlisting"><code class="hljs">docker images</code></pre>
+        <p class="defaut">Le résultat sera un affichage comme
+suit&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP61.png" title="images/03EP61.png" src="IMAGES/03EP61.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Explication des tags<var style="display:none"> Tags</var></h2>
+        <p class="defaut">Nous voyons que le tag associé à l’image <span class="courier11">ubuntu</span> est <span class="courier11">latest</span>,
+comme nous avions précisé dans la commande <span class="courier11">pull</span>. Le tag est une sorte de marqueur
+de version de l’image. Toutefois, contrairement à un système
+de gestion de versions, il est possible d’avoir plusieurs tags pour
+une même version.<var style="display:none"> latest</var></p>
+        <p class="defaut">Par exemple, la dernière version
+que nous avons téléchargée est marquée
+du tag <span class="courier11">latest</span> pour caractériser
+ce fait, mais elle est aussi marquée du tag <span class="courier11">20.04</span> car il s’agit de cette version
+d’Ubuntu. Elle est également connue sous le tag de <span class="courier11">focal</span> (le nom de release de la version
+20.04 est <span class="italic">Focal Fossa</span>). Par
+le passé, une étiquette portait aussi une version à trois
+chiffres, mais si on suit la logique du Semantic Versioning, une
+personne souhaitant utiliser une version 20.04 prendrait nécessairement
+la dernière en date. Par contre, les étiquettes
+sur les dernières compilations existent encore, et dans
+notre exemple, il existe un tag <span class="courier11">focal-20200729</span>,
+qui correspond à la Focal Fossa du 29 juillet 2020.</p>
+        <p class="defaut">Par contre, il est intéressant de
+voir que, si la commande utilisée est <span class="courier11">docker pull
+ubuntu:focal-20200729</span>, le téléchargement
+est immédiat&nbsp;; et pour cause&nbsp;: l’image
+est la même, avec deux étiquettes qui pointent
+sur le même contenu. L’affichage du cache de registre
+local confirme d’ailleurs ceci, les identifiants hexadécimaux étant
+parfaitement identiques&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP62.png" title="images/03EP62.png" src="IMAGES/03EP62.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Nous retrouvons bien les deux tags associés à la
+même image (la colonne <span class="courier11">IMAGE ID</span> montre
+bien à chaque fois la même valeur <span class="courier11">4e2eef94cd6b</span>, qui est l’identifiant
+unique de l’image, ce qui prouve qu’il s’agit bien de la même image
+pour tous les tags).</p>
+        <p class="defaut">La liste renvoie également la date
+de création de l’image (pas la date de création de
+la copie sur le cache de la machine hôte, mais bien la
+date de build de cette machine par l’organisation en charge de sa
+maintenance), ainsi que la taille virtuelle. La taille virtuelle,
+dans ce cas particulier, correspond à la taille de la couche
+téléchargée, car l’image <span class="courier11">ubuntu</span> ne se base pas sur une autre
+image préexistante. Il est aisé de vérifier
+ceci en regardant le <span class="courier11">Dockerfile</span> sur <a class="url" href="https://registry.hub.docker.com/_/ubuntu/" target="_blank">https://registry.hub.docker.com/_/ubuntu/</a>,
+qui montre que la valeur de <span class="courier11">FROM</span> est <span class="courier11">scratch</span> (le code pour signifier aucune
+image)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP63.png" title="images/03EP63.png" src="IMAGES/03EP63.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Le lecteur attentif pourrait se demander
+pourquoi le tag <span class="courier11">latest</span> n’est pas
+associé à la version 20.10 qui est pourtant plus
+récente d’un semestre et est une version de production.
+C’est un choix de Canonical, l’éditeur
+d’Ubuntu qui entretient également l’image
+Docker, d’associer le tag <span class="courier11">latest</span> à la
+dernière version pour laquelle le support est assuré à long
+terme. Or, il se trouve que la dernière version Long Term
+Support est la 20.04, d’où l’affectation du tag <span class="courier11">latest</span> à cette dernière,
+même si d’autres versions sont effectivement plus récentes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Premier lancement</h2>
+        <p class="defaut">Un premier lancement sans aucune option peut être
+réalisé par la ligne de commande suivante.</p>
+        <p><span class="bridgehead_niv4">Lancement sans option d’un conteneur</span></p>
+        <pre class="programlisting"><code class="hljs">docker run ubuntu<var style="display:none"> docker run</var></code></pre>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Nous aurions pu également
+spécifier un tag derrière le nom de l’image à lancer.
+Par défaut,&nbsp;la commande <span class="courier11">run</span> utilisera
+le tag <span class="courier11">latest</span>, et la précédente commande
+est donc l’exact équivalent de <span class="courier11">docker
+run ubuntu:latest</span>.</p>
+          </div>
+        </div>
+        <p class="defaut">Du point de vue de l’opérateur, un
+peu d’attente, puis Docker rend la main. Rien ne semble s’être
+passé... Regardons donc si un conteneur est actif&nbsp;:</p>
+        <p><span class="bridgehead_niv4">Lister les conteneurs actifs</span></p>
+        <pre class="programlisting"><code class="hljs">docker ps</code></pre>
+        <p class="defaut">La liste est vide&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP64.png" title="images/03EP64.png" src="IMAGES/03EP64.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Pour mieux diagnostiquer ce qui s’est passé,
+nous allons plutôt appeler la commande <span class="courier11">ps</span> avec
+l’option permettant de lister tous les conteneurs, y compris ceux
+qui ne sont plus actifs.</p>
+        <p><span class="bridgehead_niv4">Lister tous les conteneurs, y compris
+les inactifs</span></p>
+        <pre class="programlisting"><code class="hljs">docker ps -a</code></pre>
+        <p class="defaut">Cette fois-ci, nous voyons bien dans la liste
+un conteneur lancé il y a une minute environ&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP65.png" title="images/03EP65.png" src="IMAGES/03EP65.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">C’est nécessairement celui qui vient
+d’être lancé, et la colonne <span class="courier11">STATUS</span> nous indique
+effectivement que le processus s’est arrêté de
+manière normale (code de sortie <span class="courier11">0</span>)
+il y a moins d’une minute, donc aussitôt après
+son lancement. La colonne <span class="courier11">COMMAND</span> nous
+renseigne sur le processus qui avait été lancé, à savoir un
+shell Bash.</p>
+        <p class="defaut">Si nous jetons un coup d’œil sur
+le <span class="courier11">Dockerfile</span> utilisé pour
+construire notre image <span class="courier11">ubuntu</span>, nous
+voyons en effet que le processus lancé par défaut
+est <span class="courier11">/bin/bash</span>.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP66.png" title="images/03EP66.png" src="IMAGES/03EP66.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Or, que se passe-t-il si on lance un processus
+de type shell sans lui associer une console pour lui passer des
+ordres&nbsp;? Il s’arrête tout simplement, en considérant qu’il
+a réalisé le travail qu’on lui a donné,
+c’est-à-dire, dans cet exemple précis, rien. C’est
+ce qui s’est passé sur notre premier lancement de conteneur.</p>
+        <p class="defaut">Ce premier conteneur ne servant donc à rien,
+nous allons le supprimer purement et simplement, en utilisant le
+libellé qui lui avait été attribué (nous
+pourrions également utiliser l’identifiant ou une partie
+significative de ce dernier).</p>
+        <p><span class="bridgehead_niv4">Supprimer un conteneur arrêté</span></p>
+        <pre class="programlisting"><code class="hljs">docker rm laughing_tharp</code></pre>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Lancement en mode interactif</h2>
+        <p class="defaut">Pour pouvoir réellement exploiter
+le conteneur instancié depuis l’image <span class="courier11">ubuntu</span>,
+et en particulier agir sur le processus de shell Bash qui est lancé,
+nous allons lancer le conteneur en mode interactif, c’est-à-dire
+lui allouer une console TTY qui nous permettra d’envoyer
+des instructions au conteneur et de recevoir les retours de son
+flux de sortie standard dans cette même console.</p>
+        <p><span class="bridgehead_niv4">Lancer un conteneur en mode interactif</span></p>
+        <pre class="programlisting"><code class="hljs">docker run -i -t ubuntu</code></pre>
+        <p class="defaut">Encore une fois, Docker rend la main de manière
+quasi immédiate, mais cette fois, l’invite de la ligne
+de commande est différente&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP67.png" title="images/03EP67.png" src="IMAGES/03EP67.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Nous ne sommes plus identifiés comme
+l’utilisateur courant sur la machine hôte, mais comme <span class="courier11">root</span> sur la machine nommée <span class="courier11">709a48cc6788</span> (ou tout autre identifiant
+de conteneur que Docker aura généré).
+Cet identifiant est utilisé à la fois pour désigner
+le conteneur et attribuer un nom à la machine qu’on ne
+peut qualifier de virtuelle, mais qui est bel et bien simulée
+par le changement d’espace de noms.</p>
+        <p class="defaut">Comme sur une machine qui serait effectivement
+distincte, nous pouvons appeler&nbsp;toute commande par le shell,
+par exemple <span class="courier11">ls</span> pour voir les fichiers présents&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP68.png" title="images/03EP68.png" src="IMAGES/03EP68.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Comme il s’agit bien d’un conteneur étanche
+par rapport à la machine hôte, et qu’il ne peut
+pas non plus affecter l’image à partir de laquelle il est
+créé, nous pouvons nous autoriser n’importe quelle
+commande qui, sur une vraie machine, serait potentiellement catastrophique,
+comme par exemple supprimer tout le répertoire <span class="courier11">/home</span>&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP69.png" title="images/03EP69.png" src="IMAGES/03EP69.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Attention bien sûr à vous
+assurer parfaitement d’être correctement positionné dans
+le conteneur, pour ne surtout pas réaliser une commande
+aussi dangereuse sur votre machine&nbsp;hôte. Le prompteur
+de la ligne de commande vous renseigne sur ce point, en affichant
+le nom de la machine.</p>
+          </div>
+        </div>
+        <p class="defaut">Une fois notre forfait accompli, revenons à la
+machine hôte en entrant la commande <span class="courier11">exit</span> (qui
+sort du shell courant, et donc arrête le conteneur puisque celui-ci
+n’a pour but que de faire tourner cet unique processus). Nous allons pouvoir
+observer de l’extérieur&nbsp;les dégâts
+commis, en utilisant la commande adéquate.</p>
+        <p><span class="bridgehead_niv4">Trouver la liste des modifications d’un
+conteneur par rapport à son image de lancement</span></p>
+        <pre class="programlisting"><code class="hljs scss">docker diff <span class="hljs-selector-attr">[identifiant du conteneur]</span></code></pre>
+        <p class="defaut">Dans notre exemple, nous obtenons les informations
+suivantes&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP70.png" title="images/03EP70.png" src="IMAGES/03EP70.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">La syntaxe utilisée est celle des
+diff/patch en Linux, donc <span class="courier11">D</span> pour
+les portions supprimées (ici, le répertoire <span class="courier11">/home</span>) et <span class="courier11">C</span> pour celles créées
+(dans notre cas, le dossier <span class="courier11">/root</span> ainsi
+que le fichier <span class="courier11">.bash_history</span> créé automatiquement dans
+ce dernier pour stocker l’historique des actions effectuées
+dans le shell, ce qui est un comportement standard de Linux).</p>
+        <p class="defaut">Heureusement, cette manipulation n’est pour
+l’instant écrite que dans la surcouche ajoutée
+par Docker pour gérer les modifications du système
+de fichiers, et elle n’a donc aucun impact sur la couche inférieure, à savoir
+l’image <span class="courier11">ubuntu</span> qui, quoi qu’on fasse,
+restera telle qu’avant. Nous pouvons d’ailleurs valider ceci en
+relançant la commande <span class="courier11">docker run
+-i -t ubuntu</span>, et constater que le répertoire <span class="courier11">/home</span> est bien présent&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP71.png" title="images/03EP71.png" src="IMAGES/03EP71.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Comme le montre le changement du nom de machine
+dans l’invite, nous sommes bien dans un second conteneur. On pourrait être
+tenté de dire que <span class="courier11">/home</span> est
+présent "de nouveau", mais cela ne refléterait
+pas vraiment la réalité. Si l’on retrouve maintenant
+les deux conteneurs qui ont été lancés,
+on peut dire que dans le premier, <span class="courier11">/home</span> n’existe
+plus. Mais en l’absence de modifications, il est présent
+dans le second car celui-ci a été instancié depuis
+la même image, qui, quant à elle, reste et restera
+toujours inchangée.&nbsp;</p>
+      </div>
+      <div class="sect2" id="refTitle4">
+        <h2 class="title">5. Persistance des modifications sous forme d’une image<var style="display:none"> Persistance</var></h2>
+        <p class="defaut">Nous venons de voir qu’une image n’était
+jamais modifiée par ce qu’on pouvait faire à l’intérieur
+d’un conteneur. Comme cela avait été expliqué en
+théorie auparavant, c’est une couche supplémentaire
+qui prend toutes les modifications, et celles-ci ne sont pas portées
+sur l’image à partir de laquelle le conteneur a été lancé.
+Mais supposons maintenant que nous souhaitions faire persister ces modifications
+au-delà du cycle de vie du conteneur, même quand
+celui-ci aura été détruit.</p>
+        <p class="defaut">Pour cela, il existe une commande qui va transformer
+la couche supérieure (qui avait été posée
+au-dessus des couches en lecture seule afin de recueillir les modifications)
+en une nouvelle image basée sur les couches d’en dessous,
+et qui pourra servir à créer à son tour
+d’autres conteneurs, soit schématiquement&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP72.png" title="images/03EP72.png" src="IMAGES/03EP72.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p><span class="bridgehead_niv4">Persister l’état d’un conteneur
+en une nouvelle image</span></p>
+        <pre class="programlisting"><code class="hljs scss">docker commit <span class="hljs-selector-attr">[identifiant ou nom du conteneur]</span> <span class="hljs-selector-attr">[nom de l’image]</span><var style="display:none"> docker commit</var></code></pre>
+        <p class="defaut">Dans notre cas&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP73.png" title="images/03EP73.png" src="IMAGES/03EP73.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">L’image créée se comporte
+exactement comme n’importe quelle autre image Docker. La seule différence
+de <span class="courier11">jpgouigoux/ubuntu_nohome</span> avec <span class="courier11">ubuntu</span> est qu’il ne s’agit pas d’une
+image officielle, et qu’elle n’a pas (encore) été poussée
+sur le registre Docker Hub pour consommation par d’autres personnes.</p>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Le chapitre Création et gestion
+d’images Docker est consacré à la création des
+images en détail, et montre en particulier comment uploader
+celles-ci dans le dépôt Docker Hub pour un partage
+privé ou public.</p>
+          </div>
+        </div>
+        <p class="defaut">Ceci veut dire en particulier qu’il est possible
+de lancer des conteneurs à leur tour basés sur
+cette image&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP74.png" title="images/03EP74.png" src="IMAGES/03EP74.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Si on condense sur le schéma les
+deux couches composant la nouvelle image en une seule, on se retrouve
+donc avec une représentation comme suit&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP75.png" title="images/03EP75.png" src="IMAGES/03EP75.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Bien sûr, cette image, une fois instanciée
+en un conteneur, va elle-même se voir attacher une surcouche
+pour contenir les modifications, et ainsi de suite. Cette approche
+par couches successives est une bonne pratique fondamentale dans
+l’exploitation de Docker et nous verrons par la suite les multiples
+avantages en termes de gestion et de performance qu’une découpe
+correctement réalisée apporte.</p>
+        <p class="defaut">Si vous ne souhaitez pas conserver l’image,
+une commande permet de l’effacer.</p>
+        <p><span class="bridgehead_niv4">Supprimer une image</span></p>
+        <pre class="programlisting"><code class="hljs scss">docker rmi <span class="hljs-selector-attr">[nom de l’image]</span></code></pre>
+        <p class="defaut">Attention, la commande ne peut aboutir que
+si plus aucun conteneur n’utilise l’image. Ainsi, il est possible
+de recevoir le message suivant si ce n’est pas le cas&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP76.png" title="images/03EP76.png" src="IMAGES/03EP76.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">La commande <span class="courier11">docker
+rm</span> vue plus haut permettra de supprimer le conteneur, puis
+la commande <span class="courier11">docker rmi</span> pourra être
+relancée de nouveau, cette fois avec succès&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP77.png" title="images/03EP77.png" src="IMAGES/03EP77.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Les deux identifiants longs affichés
+correspondent aux deux pointeurs sur les couches constituant l’image
+supprimée&nbsp;: celle de l’image de base <span class="courier11">ubuntu</span> et celle que nous avons créée
+par le commit. En pratique, l’image de base n’est pas supprimée
+car des étiquettes pointent encore dessus&nbsp;; seul
+le pointeur sur cette couche est supprimé.</p>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle5">
+        <h2 class="title">6. Prise en main du client Docker</h2>
+        <p class="defaut">Sans entrer dans le détail de toutes
+les options ni entamer des sujets complexes que nous allons traiter
+par la suite, nous allons nous attarder sur quelques options simples
+et utiles de la commande <span class="courier11">run</span>.</p>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">a. Ménage dans les conteneurs</h3>
+          <p class="defaut">Si vous répétez plusieurs
+fois les manipulations utilisées comme exemples afin d’apprendre&nbsp;l’utilisation
+correcte de Docker, il y aura certainement un moment où vous
+souhaiterez repartir de zéro et supprimer tous les conteneurs
+en cours. Plutôt que d’appeler la commande <span class="courier11">ps</span> puis plusieurs fois la commande <span class="courier11">rm</span> sur tous les conteneurs successifs,
+il est possible de coupler les résultats de la première
+sur l’exécution de la seconde, de façon à supprimer
+tous les conteneurs d’un seul coup.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Évidemment, ce genre de manipulation
+n’a de sens que sur une machine de développement, de test
+ou d’apprentissage, et en aucun cas sur un serveur de déploiement
+de conteneurs en production.</p>
+            </div>
+          </div>
+          <p class="defaut">Pour que cette commande unique fonctionne,
+il faut toutefois utiliser l’option <span class="courier11">-q</span> de
+la commande <span class="courier11">ps</span>, de façon à ce
+qu’elle n’affiche que les identifiants des conteneurs et aucune
+autre information&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP78.png" title="images/03EP78.png" src="IMAGES/03EP78.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Ce sont ces données qui seront ainsi
+passées à la commande <span class="courier11">rm</span>,
+qui supprimera tous les conteneurs avec les identifiants fournis.</p>
+          <p><span class="bridgehead_niv4">Supprimer tous les conteneurs</span></p>
+          <pre class="programlisting"><code class="hljs javascript">docker rm <span class="hljs-string">`docker ps -a -q`</span></code></pre>
+          <p class="defaut">Il est à noter que les options peuvent être
+jointes, et qu’il est donc possible dans notre cas de remplacer <span class="courier11">docker ps -a -q</span> par <span class="courier11">docker ps -aq</span>.</p>
+        </div>
+        <div class="sect3" id="refTitle7">
+          <h3 class="title">b. Ménage dans les images</h3>
+          <p class="defaut">Les temps de téléchargement
+ainsi que la consommation de bande passante et d’électricité font
+que ce type de ménage par le vide n’est bien sûr
+pas une excellente idée pour les images. Toutefois, il
+convient de signaler qu’il est possible de supprimer plusieurs images
+d’un coup, en appelant simplement la commande dédiée
+avec plusieurs paramètres.</p>
+          <p><span class="bridgehead_niv4">Supprimer plusieurs images</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker rmi <span class="hljs-selector-attr">[image 1]</span> <span class="hljs-selector-attr">[image 2]</span> ... <span class="hljs-selector-attr">[image n]</span></code></pre>
+        </div>
+        <div class="sect3" id="refTitle8">
+          <h3 class="title">c. Le grand ménage</h3>
+          <p class="defaut">Docker dispose également d’une
+commande <span class="courier11">system</span> et plus particulièrement d’une
+sous-commande <span class="courier11">prune</span> permettant de
+réaliser le ménage dans les conteneurs arrêtés,
+les images orphelines et d’autres ressources a priori non utilisées.</p>
+          <p><span class="bridgehead_niv4">Faire le ménage dans les objets
+Docker</span></p>
+          <pre class="programlisting"><code class="hljs perl">docker <span class="hljs-keyword">system</span> prune</code></pre>
+          <p class="defaut">L’affichage proposé par
+la commande est le suivant&nbsp;;</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP79.png" title="images/03EP79.png" src="IMAGES/03EP79.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’exécution de cette commande
+peut parfois prendre beaucoup de temps, mais c’est le prix à payer
+pour obtenir un nettoyage en profondeur. En fin d’exécution,
+la commande indique l’espace récupéré&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP80.png" title="images/03EP80.png" src="IMAGES/03EP80.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">d. Suppression automatique à la sortie</h3>
+          <p class="defaut">La vitesse d’instanciation des conteneurs
+rend possible de les utiliser pour des tâches très
+brèves, là où la lourdeur des machines
+virtuelles nous pousserait à économiser le nombre
+d’instances. Le cas d’école est le développeur
+lançant des tests unitaires et qui, plutôt que
+de lancer un script de réinitialisation d’une base de données,
+va simplement relancer un conteneur.</p>
+          <p class="defaut">Plutôt que de devoir régulièrement
+faire le ménage dans de nombreux conteneurs à la
+durée de vie limitée à une exécution,
+il est aussi simple d’indiquer dès le début que
+le conteneur doit être supprimé en sortie, lorsqu’il
+a réalisé sa tâche, grâce à l’option <span class="courier11">rm</span>.</p>
+          <p><span class="bridgehead_niv4">Lancer et supprimer un conteneur dès
+la sortie du processus</span></p>
+          <pre class="programlisting"><code class="hljs sql">docker run <span class="hljs-comment">--rm -it ubuntu</span></code></pre>
+          <p class="defaut">Dans l’exemple ci-dessus, dès que
+la commande <span class="courier11">exit</span> provoquera une
+sortie du processus <span class="courier11">/bin/bash</span> du
+conteneur, ce dernier sera arrêté, mais aussi
+supprimé.</p>
+        </div>
+        <div class="sect3" id="refTitle10">
+          <h3 class="title">e. Affectation d’un nom de conteneur</h3>
+          <p class="defaut">Une autre astuce pour faciliter la gestion
+des conteneurs est de leur affecter des noms significatifs lors
+du lancement, de façon à ne pas avoir à se
+référer à la sortie de la commande <span class="courier11">ps</span> pour connaître le nom
+qui leur a été affecté automatiquement.
+C’est à ceci que sert l’option <span class="courier11">--name</span> de
+la commande <span class="courier11">run</span>.</p>
+          <p><span class="bridgehead_niv4">Lancer un conteneur avec un nom donné</span></p>
+          <pre class="programlisting"><code class="hljs sql">docker run <span class="hljs-comment">--name=[nom fourni] [image à instancier]</span></code></pre>
+          <p class="defaut">Cette approche permet de supprimer plus facilement
+les conteneurs arrêtés, le recours à la
+commande <span class="courier11">ps</span> étant inutile
+(elle est montrée ci-dessous uniquement pour faire voir
+que le nom avait bien été affecté).</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP81.png" title="images/03EP81.png" src="IMAGES/03EP81.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle11">
+          <h3 class="title">f. Modification du point d’entrée par défaut</h3>
+          <p class="defaut">Nous avons vu précédemment
+que le fichier <span class="courier11">Dockerfile</span> de l’image <span class="courier11">ubuntu</span> contenait une instruction <span class="courier11">CMD</span> qui pointait sur <span class="courier11">/bin/bash</span>. C’est
+ce qui fait que lorsqu’on instancie un conteneur sur cette image,
+le processus correspondant à un shell Bash est lancé.
+Toutefois, il est possible de surcharger ce fonctionnement par défaut,
+et de demander&nbsp;à la commande <span class="courier11">run</span> de
+lancer une autre commande sur le conteneur une fois celui-ci démarré.<var style="display:none"> CMD</var></p>
+          <p><span class="bridgehead_niv4">Lancer un conteneur avec une commande
+donnée</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker run <span class="hljs-selector-attr">[image à instancier]</span> <span class="hljs-selector-attr">[commande à exécuter]</span></code></pre>
+          <p class="defaut">Dans notre cas, nous pourrions par exemple
+appeler la commande <span class="courier11">env</span> pour lister
+les variables d’environnement présentes dans le conteneur
+instancié depuis l’image <span class="courier11">ubuntu</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP82.png" title="images/03EP82.png" src="IMAGES/03EP82.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour être sûr que ce sont
+bien les variables d’environnement du conteneur et non celles de
+la machine hôte, nous pouvons relancer cette commande après la
+fin de l’exécution du conteneur, et constater que les résultats
+sont très différents&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP83.png" title="images/03EP83.png" src="IMAGES/03EP83.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle12">
+          <h3 class="title">g. Envoi de variables d’environnement<var style="display:none"> Variables d’environnement</var></h3>
+          <p class="defaut">Tant que nous sommes dans les variables d’environnement,
+des options existent pour injecter ces dernières dans le
+conteneur lancé. Tout d’abord, il est possible d’injecter
+une variable d’environnement existant sur la machine hôte
+en spécifiant simplement son nom.</p>
+          <p><span class="bridgehead_niv4">Injecter une variable d’environnement
+au démarrage d’un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs">docker run -e=[variable d’environnement] [image à instancier]</code></pre>
+          <p class="defaut">Par exemple, nous pourrions remonter la variable <span class="courier11">LOGNAME</span> dans un conteneur&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP84.png" title="images/03EP84.png" src="IMAGES/03EP84.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">L’exemple ci-dessus regroupe plusieurs
+options que nous venons de découvrir&nbsp;: <span class="courier11">--rm</span> permet de supprimer le conteneur
+dès la fin du processus et sa sortie&nbsp;; l’ajout
+d’une commande surchargée permet d’exécuter le
+processus voulu en surcharge de celui précisé par
+défaut dans l’image&nbsp;; enfin, nous montrons ici qu’il
+est possible de passer une variable d’environnement de l’hôte
+au conteneur. Au final, nous créons un conteneur en lui
+passant une variable d’environnement, lui demandons d’exécuter
+la commande <span class="courier11">env</span> qui affiche toutes celles-ci
+et précisons qu’il doit se détruire une fois la
+commande exécutée. Le tout est exprimé en
+une seule ligne de commande.</p>
+            </div>
+          </div>
+          <p class="defaut">Il est également possible de créer
+une variable d’environnement qui n’existe pas sur l’hôte.</p>
+          <p><span class="bridgehead_niv4">Ajouter une variable d’environnement au
+démarrage d’un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs">docker run -e=[variable d’environnement=valeur] [image à instancier]</code></pre>
+          <p class="defaut">Afin d’éviter la répétition
+du signe d’égalité, qui rend l’écriture
+un peu confuse, il est possible d’utiliser l’autre mode de gestion
+des options des commandes Docker, où ce symbole est simplement
+remplacé par un espace.</p>
+          <p><span class="bridgehead_niv4">Ajouter une variable d’environnement (syntaxe équivalente)</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker run -e <span class="hljs-selector-attr">[variable d’environnement=valeur]</span> <span class="hljs-selector-attr">[image à instancier]</span></code></pre>
+          <p class="defaut">Voici un exemple avec une variable qui servirait à spécifier
+au conteneur l’adresse IP d’une machine nécessaire pour
+la réalisation de sa tâche, par exemple un appel
+de service web hébergé par cette machine&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP85.png" title="images/03EP85.png" src="IMAGES/03EP85.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Enfin, comme il est souvent utile de passer
+des ensembles similaires de variables d’environnement&nbsp;à de
+nombreux conteneurs, une option bien pratique permet de prendre
+un fichier descriptif en entrée.</p>
+          <p><span class="bridgehead_niv4">Ajouter des variables d’environnement
+stockées dans un fichier au démarrage d’un
+conteneur</span></p>
+          <pre class="programlisting"><code class="hljs sql">docker run <span class="hljs-comment">--env-file=[nom du fichier contenant les paires] &nbsp;</span>
+[image à instancier]</code></pre>
+          <p class="defaut">Voici un exemple très simple d’utilisation
+de cette option&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP86.png" title="images/03EP86.png" src="IMAGES/03EP86.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle13">
+          <h3 class="title">h. Modification du hostname<var style="display:none"> Hostname</var></h3>
+          <p class="defaut">Pour finir, une dernière option très
+simple, et qui permet de modifier le nom de la machine (même
+s’il ne s’agit pas à proprement parler
+d’une machine, mais de la désignation du nom de
+machine dans un conteneur mémoire étanche d’une
+même machine).</p>
+          <p><span class="bridgehead_niv4">Modifier le hostname au démarrage
+d’un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker run -h <span class="hljs-selector-attr">[hostname à utiliser]</span> <span class="hljs-selector-attr">[image à instancier]</span></code></pre>
+          <p class="defaut">L’exemple ci-dessous montre un lancement
+de conteneur où les processus se référant
+au <span class="courier11">hostname</span> verront <span class="courier11">betelgeuse</span> au lieu de l’identifiant
+du conteneur, ce qui est le comportement par défaut comme
+on le voit sur la seconde commande, la troisième servant
+uniquement à montrer pour référence le <span class="courier11">hostname</span> de la machine hôte&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP87.png" title="images/03EP87.png" src="IMAGES/03EP87.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle14">
+        <h2 class="title">7. Manipulation des conteneurs</h2>
+        <p class="defaut">Après ces quelques options simples,
+nous finirons ce chapitre de prise en main de Docker&nbsp;avec
+quelques commandes un peu plus complexes, mais qui permettront de
+parfaire votre maîtrise de l’outil avant de rentrer
+au cours des chapitres suivants dans des usages plus réalistes - voire
+industriels - de l’outil.</p>
+        <div class="sect3" id="refTitle15">
+          <h3 class="title">a. Lancement en mode bloquant</h3>
+          <p class="defaut">Jusqu’à maintenant, nous
+avons surtout vu dans les exemples des lancements de conteneurs
+Docker en mode bloquant, c’est-à-dire que le shell à partir
+duquel nous lançons la commande <span class="courier11">docker
+run</span> se place en mode d’attente de la fin du processus
+et du conteneur Docker, et rend la main une fois ces derniers arrêtés.</p>
+          <p class="defaut">Ce mode de fonctionnement est particulièrement
+adapté aux images qui fournissent elles-mêmes
+un shell comme point d’entrée par défaut
+(ou n’importe quel processus avec une durée de
+vie limitée à son usage immédiat). En
+effet, comme l’utilisateur va entrer des commandes dans
+le conteneur, il n’est nul besoin qu’il puisse
+en même temps continuer à travailler sur la ligne
+de commande de l’hôte Docker. Le fait d’empêcher
+la poursuite des opérations dans le shell hôte
+peut même permettre d’éviter des erreurs
+de manipulation dues à la confusion entre les deux shells.</p>
+          <p class="defaut">Schématiquement, le circuit du contrôle
+par les consoles entrantes et sortantes est le suivant&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP88.png" title="images/03EP88.png" src="IMAGES/03EP88.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Voici la décomposition de ce qui
+se trame derrière cette simple commande <span class="courier11">docker run -i -t ubuntu</span>&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Le shell hôte
+crée un conteneur et le lance.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Les options <span class="courier11">-i</span> et <span class="courier11">-t</span> branchent les entrées
+et sorties du conteneur sur celles du shell de la machine hôte.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Le conteneur démarre le
+processus <span class="courier11">/bin/bash</span> qui
+utilise ces entrées/sorties.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">L’utilisateur du shell
+hôte a donc désormais la main sur le shell client.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Après ses manipulations,
+il entre à un moment donné la commande <span class="courier11">exit</span>.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Le processus s’arrête,
+Docker le détecte et stoppe le conteneur.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Si l’option <span class="courier11">--rm</span> était activée,
+le client Docker supprime le conteneur juste après l’avoir
+arrêté.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">L’utilisateur reprend la
+main sur le shell de la machine hôte.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Si l’on suit ces étapes
+sur le schéma, un seul trait plein est déroulé,
+et les traits en pointillés qui symbolisent une attente
+sont terminés lorsque toutes les étapes ont été exécutées.
+Nous ressortons donc comme nous sommes entrés&nbsp;: avec
+un seul processus qui est celui du shell hôte.</p>
+        </div>
+        <div class="sect3" id="refTitle16">
+          <h3 class="title">b. Lancement en arrière-plan</h3>
+          <p class="defaut">Ce mode de fonctionnement, idéal
+pour les conteneurs Docker embarquant un processus sur lequel l’utilisateur
+en charge du démarrage va interagir, n’est par
+contre pas du tout adapté lorsque le conteneur Docker démarre
+un processus à usage d’autres personnes, typiquement
+un serveur web ou une base de données. Ces processus n’écoutent
+en effet pas des entrées sur la console, mais des messages
+sur un port réseau,&nbsp;et ces derniers peuvent être
+multiples et complètement asynchrones par rapport&nbsp;au
+cycle de vie du conteneur.</p>
+          <p class="defaut">Imaginons que nous lancions un serveur web
+Nginx par la même commande <span class="courier11">docker
+run -i -t nginx</span>, en rajoutant simplement un paramètre
+qui est nécessaire pour que le port 80 exposé par
+l’image <span class="courier11">nginx</span> soit exposé sur
+la machine hôte sur le port 88 (le 80 est souvent déjà utilisé par
+le serveur web local), à savoir <span class="courier11">-p
+88:80</span>.<var style="display:none"> Nginx</var></p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Nous reviendrons plus en détail
+sur la gestion des ports dans la section suivante.</p>
+            </div>
+          </div>
+          <p class="defaut">Que va-t-il se passer&nbsp;? Comme nous
+lançons toujours le conteneur en mode bloquant, le processus
+va bien fonctionner, mais il ne rendra pas la main&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP89.png" title="images/03EP89.png" src="IMAGES/03EP89.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">On voit bien que l’invite de commandes
+n’est pas réapparue. Par contre, le serveur Nginx
+fonctionne bien&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP90.png" title="images/03EP90.png" src="IMAGES/03EP90.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">On a d’ailleurs bien vu défiler sur
+la ligne de commande les logs correspondant aux appels&nbsp;réalisés,
+en l’occurrence un <span class="courier11">GET http</span> sur
+la page racine (<span class="courier11">/</span>).</p>
+          <p class="defaut">Mais si nous souhaitons reprendre la main
+sur le shell hôte et utilisons la combinaison de touches [Ctrl]&nbsp;<b>C</b> pour ce faire, le processus va être
+interrompu, et le conteneur s’arrêter,&nbsp;comme nous
+pouvons le constater en lançant la commande <span class="courier11">ps</span> (plus de conteneur en cours)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP91.png" title="images/03EP91.png" src="IMAGES/03EP91.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour en avoir le cœur net, nous pouvons
+lancer également la commande <span class="courier11">docker
+ps -a</span> et vérifier que le conteneur existe bien,
+mais qu’il est en état <span class="courier11">Exited</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP92.png" title="images/03EP92.png" src="IMAGES/03EP92.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Cet état correspond au fait que la
+commande principale lancée dans le conteneur a terminé sa
+tâche, et est donc sortie avec un code de résultat,
+l’entier <span class="courier11">0</span> représentant
+un résultat normal, une sortie qui ne provient pas d’une
+erreur.</p>
+          <p class="defaut">Du coup, le serveur Nginx ne répond
+bien sûr plus&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP93.png" title="images/03EP93.png" src="IMAGES/03EP93.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La représentation graphique du flux
+de la ligne de commande qui correspond à ce lancement est
+la suivante&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP94.png" title="images/03EP94.png" src="IMAGES/03EP94.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Nous ne reprenons pas toutes les étapes,
+mais ce qui est le plus important est que, lorsque le conteneur
+a été démarré et qu’il a activé le
+processus <span class="courier11">nginx</span>, celui-ci lui a
+rendu la main (trait pointillé). Il agit en effet comme
+tout serveur web, en écoutant le port qu’on lui a confié et
+en lançant un ou plusieurs processus pour traiter ces requêtes,&nbsp;mais
+n’a nul besoin de garder la main sur le shell à partir
+duquel il a été lancé.</p>
+          <p class="defaut">Du coup, le conteneur considère qu’il
+a terminé son travail d’exécution de processus
+(après tout, le serveur Nginx a bel et bien été démarré,
+conformément à ce qu’on lui a demandé)
+et s’arrête donc. Encore une fois, si l’option <span class="courier11">--rm</span> est présente, le conteneur
+est même détruit. Mais le seul fait d’arrêter
+le conteneur a évidemment un effet sur le processus <span class="courier11">nginx</span>, qui voit son support se dérober,
+et s’éteint donc lui aussi.</p>
+          <p class="defaut">La réponse à ce problème
+est de lancer le conteneur en mode détaché. On
+parle parfois aussi de mode "arrière-plan".</p>
+          <p><span class="bridgehead_niv4">Lancer un conteneur en mode détaché</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker run -d <span class="hljs-selector-attr">[image à instancier]</span></code></pre>
+          <p class="defaut">Grâce à cette commande,
+le shell hôte reprend la main dès la fin de l’activité de
+lancement du conteneur, le serveur web fonctionne comme prévu,
+et un appel de la commande <span class="courier11">ps</span> montre
+que le conteneur est bien en statut actif (<span class="courier11">Up</span>)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP95.png" title="images/03EP95.png" src="IMAGES/03EP95.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La sortie de la commande <span class="courier11">ps</span> montre
+aussi que le port 80 a bien été redirigé sur le
+88, mais que le port 443 (HTTPS) n’a pas été redirigé.</p>
+          <p class="defaut">Ce qui s’est passé peut être
+schématisé comme suit&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP96.png" title="images/03EP96.png" src="IMAGES/03EP96.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Cette fois-ci, lorsque le processus <span class="courier11">nginx</span> est lancé, Docker sait
+par l’option <span class="courier11">-d</span> qu’il ne doit pas
+passer à l’arrêt du conteneur, mais simplement
+rendre la main à la ligne de commande hôte et
+laisser le conteneur vivre sa vie. Il y aura donc désormais
+deux processus qui se poursuivront&nbsp;: le shell hôte,
+mais aussi celui correspondant au serveur Nginx dans le conteneur.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Si vous obtenez un message contenant
+le texte <span class="courier11">port is already allocated</span>,
+il est possible que vous tentiez de lancer un deuxième
+conteneur sur le même port qu’un conteneur qui n’est pas
+arrêté. Il y a alors conflit, et Docker vous le
+signale. En fonction du contexte, il faudra stopper un des conteneurs ou
+choisir des ports différents.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle17">
+          <h3 class="title">c. Gestion correcte du cycle de vie des conteneurs</h3>
+          <p class="defaut">Nous voici donc avec un conteneur <span class="courier11">nginx</span> correctement lancé,
+et qui peut répondre à des requêtes sur
+le port HTTP redirigé, et ce sans contrainte liée
+au cycle de vie du shell hôte. C’est précisément
+ce que nous cherchions à atteindre, mais il faudra bien
+tout de même arrêter ce conteneur un jour ou l’autre,
+ne serait-ce que pour des raisons de maintenance ou de mise à jour
+des fichiers et traitements exposés.</p>
+          <p class="defaut">Bref, après avoir trouvé le
+moyen pour que le conteneur ne s’arrête pas dès
+le lancement du processus, il nous faut maintenant montrer comme
+l’arrêter explicitement.</p>
+          <p><span class="bridgehead_niv4">Arrêter un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs vbnet">docker <span class="hljs-keyword">stop</span> [conteneur]<var style="display:none"> docker <span class="hljs-keyword">stop</span></var></code></pre>
+          <p class="defaut">Dans notre cas, nous n’avions pas explicitement
+nommé le conteneur, donc nous pouvons utiliser son nom
+généré ou son identifiant, même
+partiel&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP97.png" title="images/03EP97.png" src="IMAGES/03EP97.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Schématiquement, ce qui se passe
+est l’enchaînement suivant&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP98.png" title="images/03EP98.png" src="IMAGES/03EP98.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La commande <span class="courier11">stop</span> envoie
+un signal <span class="courier11">SIGTERM</span> au processus,
+de façon à prévenir celui-ci qu’il doit
+s’arrêter. Ce dernier dispose alors d’une période
+de grâce, pendant laquelle&nbsp;il peut consommer quelques
+dernières ressources pour quitter proprement son activité.
+Si, à l’issue de cette période, le processus
+est toujours actif, un second signal&nbsp;est envoyé,
+de type <span class="courier11">SIGKILL</span> cette fois-ci, et donc
+beaucoup plus brutal, dans le sens où il coupera brusquement
+le processus.</p>
+          <p class="defaut">Il est d’ailleurs possible de ne pas laisser
+au processus le temps de s’arrêter correctement si on le
+souhaite, en employant directement la méthode <span class="courier11">kill</span>.</p>
+          <p><span class="bridgehead_niv4">Envoyer un signal à un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker kill -s <span class="hljs-selector-attr">[code du signal]</span> <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">Par défaut, le code du signal est <span class="courier11">SIGKILL</span>, ce qui correspond à un
+arrêt du processus ciblé.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention à utiliser cette
+méthode d’arrêt des conteneurs de manière
+parcimonieuse. Elle ne pose aucun problème pour des conteneurs
+de tests, mais ne doit pas être utilisée sur des
+serveurs de production, où les requêtes en cours de
+traitement ne doivent pas être brutalement détruites.</p>
+            </div>
+          </div>
+          <p class="defaut">Une des étapes logiques après
+l’arrêt d’un conteneur est sa suppression. Nous avons déjà montré plusieurs
+fois l’usage de la commande <span class="courier11">rm</span> à cette
+fin, mais une option intéressante&nbsp;mérite
+d’être expliquée.</p>
+          <p><span class="bridgehead_niv4">Supprimer un conteneur de manière
+forcée</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker rm -f <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">L’ajout de cette option permet de forcer la
+suppression d’un conteneur en envoyant au préalable le
+signal <span class="courier11">SIGKILL</span> au processus embarqué.
+Ainsi, elle permet de ne pas avoir de message d’erreur sur une suppression
+car le conteneur est encore actif. De fait, la commande <span class="courier11">rm -f</span> est équivalente à la
+commande <span class="courier11">kill</span> suivie d’une commande <span class="courier11">rm</span> simple.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À noter que les options <span class="courier11">--rm</span> et <span class="courier11">-d</span> sont
+incompatibles, ce qui a une certaine logique, dans le sens où la
+seconde consiste à abandonner la gestion du cycle de vie
+du conteneur. Étant donné que c’est quelqu’un
+d’autre qui décidera d’arrêter le conteneur, il
+est logique que ce soit lui qui se charge, si besoin est, de le
+supprimer, et que le processus de lancement n’ait plus à intervenir.</p>
+            </div>
+          </div>
+          <p class="defaut">Pour en finir avec les commandes principales
+pour la gestion du cycle de vie, il nous reste à présenter
+les commandes de démarrage d’un conteneur arrêté, ainsi
+que de redémarrage.&nbsp;</p>
+          <p><span class="bridgehead_niv4">Démarrer un conteneur arrêté</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker start <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p><span class="bridgehead_niv4">Redémarrer un conteneur en cours</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker restart <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">La commande de redémarrage est un
+raccourci permettant de lancer <span class="courier11">stop</span> puis <span class="courier11">start</span>. Comme pour <span class="courier11">stop</span>,
+il est possible de paramétrer la période de grâce à l’aide
+de l’option <span class="courier11">-t</span>. Ainsi, la commande
+suivante tentera un arrêt propre du processus serveur,
+et si celui-ci ne s’est pas arrêté au bout de 20&nbsp;secondes,
+il le terminera par un <span class="courier11">SIGKILL</span>,
+pour ensuite le relancer.</p>
+          <p><span class="bridgehead_niv4">Recycler un conteneur en spécifiant
+la période de grâce</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker restart -t 20 <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">L’utilisation typique de cette commande est
+la relance d’un processus fuyant de la mémoire s’étant
+bloqué ou se trouvant dans n’importe quelle condition détectée
+comme anormale. Le vocabulaire communément utilisé parle
+de "recyclage processus".</p>
+          <p class="defaut">Contrairement aux apparences, il s’agit d’un
+mode de fonctionnement tout à fait normal&nbsp;: il
+est en effet très complexe - et donc très
+coûteux - de garantir que du code serveur est
+sans faille. Les critères économiques dictent
+donc de préférer un recyclage de temps en temps,
+quitte à mettre en batterie plusieurs conteneurs qui ne
+seront pas recyclés en même temps de façon à garantir
+une continuité de service.</p>
+        </div>
+        <div class="sect3" id="refTitle18">
+          <h3 class="title">d. Exposition de fichiers</h3>
+          <p class="defaut">Pour revenir à notre serveur Nginx,
+le simple affichage d’une page par défaut est un usage
+extrêmement réduit. Nous pourrions bien sûr
+construire une image par-dessus l’image <span class="courier11">nginx</span> et
+rajouter des fichiers web au bon endroit, mais une fonctionnalité existe
+qui rend l’exposition de ces fichiers bien plus simple que cela.
+Il s’agit de la gestion&nbsp;des volumes.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">L’utilisation de cette seconde méthode
+ci-dessous a pour but de montrer comment utiliser un volume, mais
+n’est en aucun cas une recommandation de ne pas utiliser la première
+méthode. Bien que nécessitant quelques lignes de
+commande de plus, cette méthode de création d’une
+image sur mesure pour une version d’un site web a de nombreux avantages,
+y compris en termes de sécurité. En effet, les
+couches basses de l’image étant immuables, un serveur web
+utilisant plusieurs conteneurs qui se relancent à intervalles
+réguliers en repartant de l’image Docker peuvent être
+attaqués et même défacés (leur
+page modifiée par malveillance, en exploitant une faille).
+L’effet de l’attaque&nbsp;sera quasiment invisible, puisque
+le site repartira sans arrêt de la version officielle stockée
+dans l’image. Cette méthode a également l’avantage de
+rendre très simple la gestion des versions de sites institutionnels
+statiques.</p>
+            </div>
+          </div>
+          <p class="defaut">Nous rentrerons plus loin dans le détail
+des volumes, mais en première approche, nous allons utiliser
+l’option <span class="courier11">-v</span> de la commande <span class="courier11">run</span>&nbsp;:</p>
+          <p><span class="bridgehead_niv4">Remplacer une portion d’arborescence du
+conteneur par un emplacement hôte</span></p>
+          <pre class="programlisting"><code class="hljs css"><span class="hljs-selector-tag">docker</span> <span class="hljs-selector-tag">run</span> <span class="hljs-selector-tag">-v</span> <span class="hljs-selector-attr">[dossier hôte]</span>:<span class="hljs-selector-attr">[dossier sur conteneur]</span> ...</code></pre>
+          <p class="defaut">Dans notre exemple, nous allons mettre en
+correspondance le dossier <span class="courier11">/usr/share/nginx/html</span> (à savoir
+la localisation par défaut des fichiers à exposer par
+Nginx) avec un répertoire local dans lequel nous avons
+copié les fichiers descriptifs de la racine du site de
+l’auteur&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP99.png" title="images/03EP99.png" src="IMAGES/03EP99.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le lecteur ne connaissant pas encore Nginx
+se posera sûrement la question d’où trouver le
+chemin à utiliser pour faire pointer le serveur sur les
+fichiers locaux. La réponse est bien sûr sur Docker
+Hub, en l’occurrence sur la page dédiée à l’image
+officielle <span class="courier11">nginx</span>, à savoir <a class="url" href="https://hub.docker.com/_/nginx/" target="_blank">https://hub.docker.com/_/nginx/</a></p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Le répertoire local possède
+une forme inhabituelle car l’auteur lance les commandes depuis le
+Windows Subsystem for Linux, et les répertoires locaux
+sont montés dans l’arborescence&nbsp;Linux. La présence
+d’un espace dans le nom de ce répertoire est ce qui rend
+indispensable l’utilisation de guillemets pour ne pas créer
+de confusion sur les délimiteurs&nbsp;de la commande.</p>
+            </div>
+          </div>
+          <p class="defaut">Le résultat peut être constaté dans
+un navigateur&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP100.png" title="images/03EP100.png" src="IMAGES/03EP100.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les fichiers web déposés
+sur <span class="courier11">C:\Users\jpgou\Documents\Sites Web\Gouigoux.com\www</span>,
+et en particulier la page <span class="courier11">index.html</span>,
+sont bien utilisés par le conteneur nommé <span class="courier11">web</span> et basé sur l’image <span class="courier11">nginx</span>. Nous avons donc enrichi le
+fonctionnement par défaut de cette image sans avoir à créer une
+autre image. Il s’agit d’une des fonctionnalités les plus
+utiles de Docker.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Nous utilisons la valeur additionnelle&nbsp;:<span class="courier11">ro</span> du paramètre <span class="courier11">-v</span> pour spécifier que l’accès
+par le conteneur au dossier de la machine hôte est autorisé,
+mais seulement en lecture seule. Il s’agit d’une bonne pratique
+pour sécuriser d’éventuels effets de bord. Ainsi,
+quel que soit le comportement du serveur web, il ne sera pas en
+mesure de modifier ou supprimer des fichiers sur le répertoire
+servant de support au volume Docker.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle19">
+          <h3 class="title">e. Supervision des conteneurs<var style="display:none"> Supervision</var></h3>
+          <p class="defaut">Notre dernière étape dans
+ces "premiers pas avec Docker" consiste à assurer un premier
+niveau simple de supervision des conteneurs. Rien d’industriel pour l’instant,
+mais juste quelques commandes permettant de comprendre un peu mieux
+ce qui se passe sur un conteneur donné.</p>
+          <p class="defaut">La première est liée aux
+logs. Docker se branche sur les logs d’un conteneur lorsqu’il le
+démarre et permet de réaliser une redirection
+de ceux-ci pour les centraliser, les diriger à un endroit
+particulier, etc. Les usages sont multiples mais, dans un premier
+temps, une visualisation par ligne de commande correspond à une
+grande partie des besoins.</p>
+          <p><span class="bridgehead_niv4">Visualiser les logs d’un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker logs <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">Prenons un exemple sur un serveur Nginx sur
+lequel nous appellerions, après démarrage, une
+page inexistante&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP101.png" title="images/03EP101.png" src="IMAGES/03EP101.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les logs nous permettent de voir ce qui s’est
+passé en détail, là où le navigateur web
+se contenterait par exemple d’afficher une erreur 404 pour ne pas
+donner trop de détails&nbsp;aux simples clients. Bien
+sûr, le détail dépend du processus émetteur
+de ces informations.&nbsp;</p>
+          <p class="defaut">La seconde commande principale pour la supervision
+permet de suivre les processus. Le pluriel peut surprendre dans
+le sens où il a été expliqué plusieurs
+fois qu’un conteneur contenait un processus et un seul. La réalité est
+qu’il est important d’avoir un processus et un seul comme point
+d’entrée, mais qu’il est impossible d’empêcher
+celui-ci de démarrer d’autres processus une fois dans le conteneur.</p>
+          <p><span class="bridgehead_niv4">Explorer les processus d’un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker <span class="hljs-attribute">top</span> <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">C’est d’ailleurs ce qui se passe avec Nginx,
+qui a été démarré sous forme
+d’un processus maître lors du lancement du conteneur, mais
+qui a aussitôt créé un processus de travail
+pour bien décomposer ses responsabilités de serveur
+web, comme le montre la capture ci-dessous&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP102.png" title="images/03EP102.png" src="IMAGES/03EP102.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Une autre commande, apparue plus récemment,
+permet de suivre en temps réel ces consommations de ressources, à la
+manière justement de l’outil <span class="courier11">top</span> sous
+Linux. Il s’agit de la commande <span class="courier11">stats</span>.</p>
+          <p><span class="bridgehead_niv4">Suivre l’évolution des
+ressources utilisées par un conteneur</span></p>
+          <pre class="programlisting"><code class="hljs scss">docker stats <span class="hljs-selector-attr">[conteneur]</span></code></pre>
+          <p class="defaut">Dans notre exemple, la commande <span class="courier11">docker stats web</span> produirait un résultat
+similaire à ceci&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/03EP103.png" title="images/03EP103.png" src="IMAGES/03EP103.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmP2Y%2f5Wy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’affichage se rafraîchissant
+automatiquement, la combinaison de touches [Ctrl]&nbsp;<b>C</b> est nécessaire pour reprendre
+la main dans la console.</p>
+          <p class="defaut">Nous pourrions également citer la
+commande <span class="courier11">events</span> parmi les fonctionnalités
+de supervision, mais celle-ci est plutôt réservée à des
+usages experts, et nous renvoyons le lecteur à la documentation
+de Docker sur le sujet s’il souhaite pouvoir suivre des événements
+correspondant aux différentes étapes du cycle
+de vie des conteneurs et des images&nbsp;: <a class="url" href="https://docs.docker.com/reference/commandline/cli/#events" target="_blank">https://docs.docker.com/reference/commandline/cli/#events</a></p>
+        </div>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

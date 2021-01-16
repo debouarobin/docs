@@ -1,0 +1,629 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_d17a0b6c-4163-4650-82e7-c9059e9073cf" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Plateformes de déploiement de conteneurs</h1>
+      <p class="defaut">Dans le premier chapitre, les plateformes
+des principaux fournisseurs de services cloud ont été présentées,
+de façon à proposer aux lecteurs intéressés
+par cette approche une manière simple de disposer d’une
+machine virtuelle avec Docker préinstallé. L’objectif était
+de pouvoir rapidement mettre en œuvre les exercices et
+de ne pas avoir quoi que ce soit à déployer sur
+sa machine personnelle.</p>
+      <p class="defaut">À cette étape du livre,
+les concepts sont désormais acquis et la question est plus
+d’appliquer les connaissances acquises sur de véritables
+projets. La question du déploiement industriel de conteneurs
+Docker se pose, et les architectures cloud sont encore une fois
+une approche intéressante.</p>
+      <p class="defaut">En effet, plutôt que de gérer
+soi-même une plateforme complète de déploiement
+(ce qui est une tâche complexe, voire très complexe
+pour une plateforme Kubernetes), il est plus efficace dans la grande
+majorité des cas d’utiliser des plateformes gérées
+par des fournisseurs externes. Les sections ci-dessous montreront
+les offres des principaux acteurs sur le sujet.</p>
+      <p class="defaut">Acheter un service géré de
+déploiement de conteneurs Docker est comparable à une
+approche PaaS et diffère en tout cas fortement d’une approche
+IaaS, dans le sens où ce n’est plus seulement le système
+qui est géré par l’opérateur de service,
+mais toute la machinerie Docker, l’utilisateur ne gérant
+plus que l’image à lancer, les ports à ouvrir
+et les ressources à allouer, pour faire simple.</p>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Amazon Web Services</h2>
+        <div class="sect3" id="refTitle1">
+          <h3 class="title">a. Description des services</h3>
+          <p class="defaut">Amazon ECS pour <span class="italic">Elastic Container Service</span>est
+utilisable avec l’offre gratuite citée plus haut et recommandée
+pour mettre en œuvre simplement les exercices. On ne retrouve&nbsp;pas
+l’offre ECS dans la liste des services utilisables gratuitement,
+mais cela ne contredit en rien le fait qu’il est possible de l’utiliser
+dans le cadre de l’offre gratuite d’Amazon. En fait, le service
+dans sa globalité est facturé uniquement par rapport
+aux machines qu’il utilise et n’inclut aucun coût supplémentaire
+par rapport à ces dernières.&nbsp;<var style="display:none"> Elastic Container Service</var></p>
+          <p class="defaut">Sur un compte gratuit, le service est bien
+proposé lorsqu’on demande de créer une nouvelle
+ressource et que le mot-clé de recherche <span class="courier11">docker</span> est employé&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP18.png" title="images/08EP18.png" src="IMAGES/08EP18.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">CodeBuild est un service qui utilise
+des conteneurs pour les besoins d’une usine logicielle gérée,
+ce qui explique qu’il apparaisse dans les résultats d’une
+telle recherche.</p>
+            </div>
+          </div>
+          <p class="defaut">La page <a class="url" href="https://aws.amazon.com/fr/getting-started/tutorials/deploy-docker-containers/" target="_blank">https://aws.amazon.com/fr/getting-started/tutorials/deploy-docker-containers/</a> explique
+les différentes façons de déployer des
+conteneurs Docker sur AWS&nbsp;; nous allons reprendre les trois
+services proposés dans la liste pour détailler
+leur rôle dans l’écosystème de la plateforme.</p>
+        </div>
+        <div class="sect3" id="refTitle2">
+          <h3 class="title">b. Amazon ECR</h3>
+          <p class="defaut"><span class="italic">Elastic Container Registry</span> est
+une solution de gestion d’un registre d’images Docker, notion&nbsp;qui
+a été présentée précédemment
+avec Azure Container Registry. Les deux solutions&nbsp;sont
+fortement similaires. Cette similarité est d’ailleurs tout à fait
+logique car le mode de fonctionnement d’un registre Docker est assez
+contraint dans son API ainsi que dans son organisation avec des
+dépôts et des étiquettes. Toutefois,
+chaque implémentation peut amener sa touche d’innovation
+ou de fonctionnalités supplémentaires. Azure,
+par exemple, a mis en avant récemment les notions de gestion
+des autorisations, et on peut voir ci-dessous qu’Amazon met en avant
+deux fonctionnalités :<var style="display:none"> Elastic Container Registry</var></p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">L’immutabilité des
+balises&nbsp;: ceci permet, une fois qu’une image est associée à une
+balise,&nbsp;d’empêcher son changement de contenu.
+Cette option participe à une architecture distribuée
+immutable, en s’assurant dès le registre que les images
+ne pourront pas être différentes d’un node à l’autre
+d’un cluster. C’est une pratique recommandable pour une utilisation
+en production.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">L’analyse en mode push&nbsp;:
+cette option déclenche une analyse du contenu de l’image
+dès son envoi dans le registre et apporte donc un niveau
+de sécurisation supplémentaire sur d’éventuels
+contenus problématiques.</p>
+              </li>
+            </ul>
+          </div>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP19.png" title="images/08EP19.png" src="IMAGES/08EP19.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention&nbsp;: contrairement à la
+simple fonctionnalité de registre qui s’appuie sur une
+API standard et peut donc aisément être déménagée
+d’un service en ligne à un autre sans que cela ne nécessite
+autre chose que de migrer les contenus et éventuellement
+modifier&nbsp;une URL, toutes ces fonctionnalités additionnelles
+créent de la dépendance de l’utilisateur au service
+et rendent ensuite plus difficile d’en changer. Ce n’est pas nécessairement&nbsp;un
+problème, mais il est essentiel de faire son choix en toute
+connaissance de cause. Dans la seconde option ci-dessus, l’intégration
+d’un service dédié à l’analyse des images
+permettra par exemple d’avoir la garantie que cette fonctionnalité soit
+toujours la plus à jour possible, quitte à changer
+de logiciel, alors que le choix "intégré" confisque
+la capacité à le faire évoluer si le
+besoin s’en faisait sentir.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle3">
+          <h3 class="title">c. Amazon ECS</h3>
+          <p class="defaut">Le service le plus proche de Docker sur la
+plateforme Amazon est <span class="italic">Elastic Container Service<var style="display:none"> Elastic Container Service</var></span>.
+Il permet de choisir une image de conteneur et de la déployer dans
+un service sur un cluster, comme on le ferait sur n’importe quel
+orchestrateur. On peut donc d’une certaine manière décrire
+ECS comme un orchestrateur "as a service", piloté par une
+interface&nbsp;graphique dans la console Amazon.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP20.png" title="images/08EP20.png" src="IMAGES/08EP20.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La première étape de l’assistant
+montrée ci-dessus permet de choisir une image Docker.&nbsp;Les étapes
+suivantes permettent de jouer sur la composition du cluster et tous
+les paramétrages exposés par Docker. Comme cela
+ne fait pas apparaître de notion nouvelle par rapport à ce
+qui a déjà été exposé dans
+les chapitres précédents, elles ne sont pas détaillées.</p>
+        </div>
+        <div class="sect3" id="refTitle4">
+          <h3 class="title">d. Amazon Elastic Beanstalk<var style="display:none"> Amazon Elastic Beanstalk</var></h3>
+          <p class="defaut">La plateforme Amazon propose également
+un service d’applications en mode géré par le
+fournisseur de service, et pour lesquelles la définition
+applicative est fournie sous forme d’un ou plusieurs conteneurs&nbsp;:
+il s’agit du service Elastic Beanstalk.</p>
+          <p class="defaut">La première étape du service
+décrit l’application qui va être mise en ligne
+et permet de choisir la plateforme associée, qui peut être
+basée sur Docker ou sur un ensemble de conteneurs Docker.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP21.png" title="images/08EP21.png" src="IMAGES/08EP21.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Ensuite, la plateforme offre une myriade d’options
+permettant de gérer un déploiement industriel
+d’application&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP22.png" title="images/08EP22.png" src="IMAGES/08EP22.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Ce mode de fonctionnement est destiné à des
+concepteurs d’applications ayant besoin d’un déploiement
+de bon niveau industriel (gestion des mises à jour, surcouche
+de sécurité,&nbsp;monitoring, etc.) mais ne
+souhaitant pas avoir à configurer tous ces services.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention, la remarque sur la dépendance
+exprimée plus haut s’applique de manière encore
+plus forte ici. Une fois l’application déployée,
+les processus de maintenance calés&nbsp;sur ceux de
+la plateforme, les notifications par mail prises en compte par les
+utilisateurs, etc., il deviendra difficile de sortir de la plateforme.
+Le choix doit donc être réalisé&nbsp;de
+manière stratégique, en jugeant des apports de
+l’intégration par rapport au risque de dépendance.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle5">
+        <h2 class="title">2. Microsoft Azure</h2>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">a. Description des services</h3>
+          <p class="defaut">Le cloud de Microsoft a lui aussi exposé des
+services liés à Docker, et ce très rapidement
+lors de la disponibilité de la technologie. L’inconvénient
+de cette réactivité est toutefois que, sur une
+cible mouvante, certains usages sont amenés à disparaître
+rapidement. C’est le cas par exemple de la solution Azure Container
+Service, désormais obsolète.</p>
+          <p class="defaut">Mis en service en 2016, Azure Container Service
+proposait un service de cluster Docker&nbsp;géré par
+Azure, avec comme orchestrateurs possibles Swarm et DC/OS. À l’époque,
+l’absence de Kubernetes avait été notée
+comme un manque important de la plateforme. Plus tard, cette absence
+a été largement compensée car Kubernetes
+est non seulement disponible, mais il se trouve que le service ACS
+a carrément été remplacé par
+son équivalent uniquement tourné vers Kubernetes
+et logiquement nommé Azure Kubernetes Service. À compter
+du 31/01/2020, le service ACS initial n’était
+plus supporté par Microsoft.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Il est toujours possible, si vous
+en avez le besoin, de lancer des clusters Swarm ou DC/OS
+sur Azure, mais l’interface dans le portail n’est plus disponible
+et il sera nécessaire de se référer aux
+pages <a class="url" href="https://docs.microsoft.com/fr-fr/azure/container-service/dcos-swarm/container-service-swarm-mode-walkthrough" target="_blank">https://docs.microsoft.com/fr-fr/azure/container-service/dcos-swarm/container-service-swarm-mode-walkthrough</a> et <a class="url" href="https://docs.microsoft.com/fr-fr/azure/container-service/dcos-swarm/container-service-dcos-quickstart" target="_blank">https://docs.microsoft.com/fr-fr/azure/container-service/dcos-swarm/container-service-dcos-quickstart</a>,
+qui mettent clairement en avant toutefois que ces modes de fonctionnement
+sont désormais déconseillés,&nbsp;car dépréciés
+et sans aucun support possible.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle7">
+          <h3 class="title">b. Azure Kubernetes Service<var style="display:none"> Azure Kubernetes Service</var></h3>
+          <p class="defaut">AKS est donc désormais le service
+principal d’orchestrateur de conteneurs Docker sur la plateforme
+Azure. Comme pour Amazon, le service AKS en lui-même est
+gratuit et l’utilisateur ne paie que les instances sous-jacentes.
+Dans la liste des services gratuits, ceci est toutefois mis en avant
+de manière plus marquée.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP23.png" title="images/08EP23.png" src="IMAGES/08EP23.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La première page de l’assistant ne
+porte pas particulièrement de surprise par rapport à ce
+qui est attendu&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP24.png" title="images/08EP24.png" src="IMAGES/08EP24.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le gestionnaire est invité à entrer
+un nom de cluster et choisir le nombre de nœuds de type
+manager ainsi que la taille des machines associées. C’est
+dans l’étape suivante qu’il est possible d’ajouter des
+nœuds de type worker, et le service permet de répartir
+ces nœuds dans des pools, ce qui permet de les adapter à différents
+types de charge de travail&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP25.png" title="images/08EP25.png" src="IMAGES/08EP25.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour chaque pool, le gestionnaire peut sélectionner
+le nombre de machines et leur type, mais également le système
+(ce qui permet de créer un cluster hybride Windows/Linux
+si besoin) ainsi que le nombre maximum de pods par nœud,
+qui doit être choisi en lien avec la disponibilité des
+adresses IP sur chaque pool&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP26.png" title="images/08EP26.png" src="IMAGES/08EP26.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’onglet suivant permet de paramétrer
+les nombreuses options d’authentification au cluster, en s’appuyant
+sur l’infrastructure Azure ActiveDirectory si besoin. Ensuite, la
+mise en réseau permet de choisir des options avancées
+de gestion réseau de Kubernetes et en particulier le service
+correspondant à la norme Container Network Interface qu’on
+souhaite mettre en œuvre ainsi que le gestionnaire de stratégie
+réseau associé&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP27.png" title="images/08EP27.png" src="IMAGES/08EP27.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Pour ces concepts avancés
+de gestion réseau sur Kubernetes, nous nous permettons
+de renvoyer aux ouvrages sur le sujet des Éditions ENI.</p>
+            </div>
+          </div>
+          <p class="defaut">L’avant-dernière étape permet
+d’activer les intégrations du service Azure Kubernetes
+Service avec d’autres de la plateforme (encore une fois, avec l’augmentation
+de dépendance à l’ensemble que ceci entraîne,
+et qui doit être mis en balance avec le surcroît
+de productivité), à savoir&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Azure Container Registry&nbsp;:
+le cluster Kubernetes aura ainsi la possibilité de consommer
+des images de ce registre de manière sécurisée.<var style="display:none"> Azure Container Registry</var></p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Azure Monitor&nbsp;: permet
+de mettre en place une supervision des conteneurs tournant sur Kubernetes.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Azure Policy&nbsp;: protection
+centralisée des clusters Kubernetes, qui ne s’emploiera
+que dans des déploiements industriels.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Pour le branchement sur le cluster Kubernetes
+ainsi généré, nous renvoyons au chapitre
+sur les orchestrateurs où AKS avait été choisi
+pour traiter l’exemple d’utilisation de Kubernetes pour un déploiement
+d’application basée sur Docker.</p>
+        </div>
+        <div class="sect3" id="refTitle8">
+          <h3 class="title">c. Azure Cluster Service Fabric<var style="display:none"> Azure Cluster Service Fabric</var></h3>
+          <p class="defaut">Cluster Service Fabric est un autre service
+d’Azure en lien avec Docker, bien que de manière plus indirecte.
+Pour faire simple, le service consiste en un cadre de programmation
+et des outils permettant de rapidement développer des applications
+en architecture de microservices. Les cadres de programmation fournissent
+des SDK et modèles pour de nombreux frameworks de programmation
+(dont bien sûr .NET Core) et les outils intégrés
+automatisent la gestion des cycles de vie applicatifs, l’intégrité et
+la surveillance du cluster, les déploiements et la mise à l’échelle&nbsp;;
+bref, tout ce qui reste habituellement en charge de l’éditeur
+d’un service une fois qu’il a réalisé le développement.
+Un modèle de gestion des services avec état est également
+fourni, qui se base sur une base de données gérée
+pour chaque microservice par Fabric.</p>
+          <p class="defaut">Comme nous ne rentrerons pas dans les détails,
+le plus logique est de renvoyer à la présentation
+simplifiée de l’interface officielle&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP28.png" title="images/08EP28.png" src="IMAGES/08EP28.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Plus de détails sont disponibles
+sur l’aide en ligne, en commençant par exemple par la vue
+globale <a class="url" href="https://docs.microsoft.com/fr-fr/azure/service-fabric/service-fabric-overview" target="_blank">https://docs.microsoft.com/fr-fr/azure/service-fabric/service-fabric-overview</a></p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Ce type de service crée une
+forte dépendance de l’utilisateur de par son fort niveau
+d’intégration. Les remarques précédentes
+s’appliquent donc quant au choix qui est engageant.&nbsp;</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">d. Azure Container Instances<var style="display:none"> Azure Container Instances</var></h3>
+          <p class="defaut">Un service nommé Azure Container
+Instances est également disponible dans le cloud de Microsoft.
+Il permet de lancer des conteneurs en mode managé, mais
+sans que ceux-ci soient obligatoirement compris dans un orchestrateur qui
+se trouve sur la même plateforme.</p>
+          <p class="defaut">À première vue, le service
+peut paraître extrêmement peu sophistiqué,
+car il permet une utilisation on ne peut plus simple, en fournissant
+seulement l’image à exécuter et quelques paramètres
+d’exposition (non reproduits ci-dessous, mais correspondant aux étapes
+suivantes de l’assistant), le service sur Azure se chargeant de
+tout le reste&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP29.png" title="images/08EP29.png" src="IMAGES/08EP29.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’absence d’orchestrateur fait que chaque
+instance de service ne gère qu’une seule image, et même
+qu’une seule instance de conteneur par image, vu qu’aucun répartiteur
+de charge n’est prévu. Alors que le service ACS qui faisait
+beaucoup plus a été arrêté,&nbsp;l’utilisateur
+peut légitimement se poser la question de l’utilité d’ACI.
+En pratique, la simplicité apparente de ce dernier est
+le gage d’une modularité qui permet des usages sophistiqués.</p>
+          <p class="defaut">En effet, comme ACI est indépendant
+d’un orchestrateur, il peut être utilisé comme
+lanceur de conteneurs par des orchestrateurs fonctionnant sur un
+service séparé. Par exemple, il est possible de
+demander à une plateforme Kubernetes de faire porter ses
+charges de travail sur un Virtual Kubelet qui se basera sur Azure
+Container Instances. Ceci permet d’obtenir une élasticité complète, l’administrateur
+Kubernetes n’ayant plus besoin d’ajouter ou même de superviser
+des machines qui serviront de nœuds pour le service. Ce
+mode de fonctionnement est particulièrement intéressant
+pour des plateformes où de fortes charges de travail interviennent
+par pics&nbsp;: la charge standard est alors prise en compte
+par les nœuds fixes et toute surcharge est exécutée
+sur des instances de conteneurs distantes, avec une facturation à la
+seconde. Ce mode de fonctionnement hybride était jusqu’alors
+assez complexe à mettre en œuvre, et est désormais&nbsp;quasi
+transparent.</p>
+          <p class="defaut">Même sans orchestrateur complet,
+il reste possible dans ACI de monter des volumes correspondant à des
+espaces de stockage Azure ou des dépôts GitHub,
+de mettre en place des espaces d’échange entre conteneurs,
+de créer des groupes de conteneurs utilisant&nbsp;plusieurs
+images pour exposer une application (par exemple, le template <a class="url" href="https://github.com/Azure/azure-quickstart-templates/tree/master/201-aci-wordpress" target="_blank">https://github.com/Azure/azure-quickstart-templates/tree/master/201-aci-wordpress</a> permet
+de mettre en œuvre un blog WordPress avec sa base de données
+MySQL), soit les quelques fonctionnalités additionnelles
+au simple lancement d’une image et qui permettent de gérer une
+grande majorité des cas simples d’usages, sans avoir à recourir à la
+solution - complexe - d’une plateforme Kubernetes. La documentation
+complète de la grammaire YAML permettant ces mises en œuvre
+est disponible sur <a class="url" href="https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/container-instances/container-instances-reference-yaml.md" target="_blank">https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/container-instances/container-instances-reference-yaml.md</a> et, à titre
+d’information, la grammaire Resource Manager propriétaire
+d’Azure est également utilisable pour piloter ACI.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Encore une fois, le but ici n’est
+pas d’apprendre au lecteur comment utiliser des technologies de
+mise en œuvre de Docker, mais simplement de montrer divers
+moyens de mise en production de conteneurs, de façon qu’il
+connaisse un éventail de solutions parmi lequel piocher
+pour mettre les connaissances acquises sur Docker en production,
+ou à partir desquelles comparer d’autres approches. En
+cas de besoin de creuser plus particulièrement cette approche multiconteneur
+avec ACI, la page <a class="url" href="https://docs.microsoft.com/fr-fr/azure/container-instances/container-instances-multi-container-yaml" target="_blank">https://docs.microsoft.com/fr-fr/azure/container-instances/container-instances-multi-container-yaml</a> est
+un excellent début et permet de se familiariser en plus
+avec un autre outil qui peut être particulièrement
+utile lors de tests sur le cloud de Microsoft, à savoir
+Azure Shell.</p>
+            </div>
+          </div>
+          <p class="defaut">Le fait qu’ACI soit pilotable par une API
+REST (voir <a class="url" href="https://docs.microsoft.com/en-us/rest/api/container-instances/" target="_blank">https://docs.microsoft.com/en-us/rest/api/container-instances/</a> pour
+la documentation) le rend également précieux pour
+mettre en œuvre des comportements automatisés
+ou intégrer des manipulations de conteneurs esclaves dans
+une application plus large qui aurait besoin de contrôle
+complet sur leur cycle de vie.</p>
+          <p class="defaut">Enfin, il est à noter que les conteneurs
+d’ACI peuvent être lancés sur des instances de
+machines virtuelles disposant de capacité de GPU, ce qui
+permet d’accélérer très fortement des
+calculs à virgule flottante, qu’il s’agisse de charges
+de simulation en 3D, de calculs mathématiques parallélisés
+ou d’algorithmes d’intelligence artificielle.</p>
+          <p class="defaut">Bref, ACI, qui peut paraître un tout
+petit service avec des fonctionnalités très limitées,
+se révèle assez vite un outil simple mais extrêmement
+utile et robuste. La page à consulter pour plus d’information
+sur ce service est <a class="url" href="https://docs.microsoft.com/fr-fr/azure/container-instances/" target="_blank">https://docs.microsoft.com/fr-fr/azure/container-instances/</a></p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle10">
+        <h2 class="title">3. Google Cloud Platform<var style="display:none"> Google Cloud Platform</var></h2>
+        <div class="sect3" id="refTitle11">
+          <h3 class="title">a. Description des services</h3>
+          <p class="defaut">Pour Google comme pour Microsoft, conteneur
+est devenu synonyme de Kubernetes. Pour le premier, c’est d’ailleurs
+encore plus logique puisque le produit provient de son giron. Mais
+il existait également un service nommé Google Container
+Engine… qui pointe désormais sur Google Kubernetes
+Engine.</p>
+          <p class="defaut">Comme pour les autres plateformes, il est
+possible de créer un compte gratuit sur Google&nbsp;Cloud
+Platform (<a class="url" href="https://cloud.google.com/free/docs/gcp-free-tier" target="_blank">https://cloud.google.com/free/docs/gcp-free-tier</a>).
+Autre similarité&nbsp;avec les programmes des concurrents&nbsp;:
+certains services sont accessibles de manière gratuite
+et sans limite de temps, mais avec des limitations fortes de fonctionnalités
+ou de puissance. De la même manière, la carte
+de crédit reste nécessaire pour valider le compte
+même si l’utilisation dans les limites reste gratuite.
+Enfin, nul système&nbsp;de plafonnement intégré n’est
+disponible et il est essentiel de surveiller les ressources et,
+dès le début, mettre en place un budget avec des
+alertes.</p>
+          <p class="defaut">La page <a class="url" href="https://cloud.google.com/compute/docs/containers" target="_blank">https://cloud.google.com/compute/docs/containers</a> montre
+les différents modes d’utilisation possibles des conteneurs
+sur la plateforme de Google. On y retrouve&nbsp;la possibilité de
+mettre en place une plateforme complète de production avec
+Kubernetes ainsi qu’un service de gestion de registre d’image géré.
+Il existe également un moyen simple de déployer
+des conteneurs, qui réalise une sorte de synthèse
+entre l’approche ACI de Microsoft Azure et le déploiement
+de Docker et des conteneurs sur une instance de machine créée dans
+le cloud. Le fait que cette fonctionnalité soit directement&nbsp;intégrée
+dans le service de mise à disposition de machines virtuelles
+montre à quel point les conteneurs sont à la base
+de l’architecture de référence de Google.&nbsp;</p>
+        </div>
+        <div class="sect3" id="refTitle12">
+          <h3 class="title">b. Google Kubernetes Engine<var style="display:none"> Google Kubernetes Engine</var></h3>
+          <p class="defaut">Ce premier service permet la construction
+et le pilotage de A à Z d’un cluster Kubernetes, depuis
+la définition des ressources à utiliser pour les
+nœuds jusqu’à la configuration des charges de
+travail déployées sur le cluster&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP30.png" title="images/08EP30.png" src="IMAGES/08EP30.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La mise en place n’appelle pas de commentaires
+particuliers, hormis que, comme dans Azure Kubernetes Service, il
+est possible de mettre en place des pools de nœuds pour
+séparer correctement les charges de travail et adapter
+au mieux le dimensionnement des nœuds&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP31.png" title="images/08EP31.png" src="IMAGES/08EP31.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Comme prévu, les options réseau
+permettent d’adapter finement le comportement du cluster&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP32.png" title="images/08EP32.png" src="IMAGES/08EP32.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Quelques fonctionnalités particulières
+méritent d’être citées, car elles correspondront
+potentiellement à des services que certains auraient ciblés
+comme étant à installer, mais qui pourront être
+déployés directement par Google Cloud Platform
+(avec le couplage qui y sera bien sûr associé,
+comme indiqué plusieurs fois auparavant).</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP33.png" title="images/08EP33.png" src="IMAGES/08EP33.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le service mesh Istio peut ainsi être
+désormais installé directement dans le cluster
+Kubernetes,&nbsp;réduisant d’autant les manipulations
+et permettant de bénéficier d’une intégration
+complète dans le cluster.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention, il s’agit toutefois de
+fonctionnalités Beta, qui ne doivent pas être
+utilisées en production. Il est d’ailleurs étonnant
+de voir ces fonctionnalités mises en avant, alors que la
+plateforme est dans le même temps très conservatrice sur
+la version du moteur Kubernetes à utiliser en mode stable
+(une 1.16.13 à date d’écriture). Il est vrai toutefois
+qu’il est possible d’activer le choix d’une version dynamique selon
+un canal de mise à jour automatique, celui-ci étant alors
+calé à la même date sur une 1.17.9.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle13">
+          <h3 class="title">c. Google Compute Engine<var style="display:none"> Google Compute Engine</var></h3>
+          <p class="defaut">La plateforme Google est celle qui abstrait
+le plus la fonctionnalité de démarrage d’un conteneur,
+qu’on souhaite gérer soi-même l’infrastructure
+ou bien laisser la plateforme s’en charger. Ainsi, le déploiement
+d’une charge utile est réalisé indifféremment
+avec Google Compute Engine ou Google Kubernetes Engine&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP34.png" title="images/08EP34.png" src="IMAGES/08EP34.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les paramètres classiques sont attendus,
+comme le choix de l’image, des variables d’environnement éventuelles à passer,
+etc. Nous renvoyons à <a class="url" href="https://cloud.google.com/compute/docs/containers/deploying-containers" target="_blank">https://cloud.google.com/compute/docs/containers/deploying-containers</a> et <a class="url" href="https://cloud.google.com/compute/docs/containers/configuring-options-to-run-containers" target="_blank">https://cloud.google.com/compute/docs/containers/configuring-options-to-run-containers</a> pour
+la liste des options disponibles dans ce mode de fonctionnement.</p>
+        </div>
+        <div class="sect3" id="refTitle14">
+          <h3 class="title">d. Google Container Registry<var style="display:none"> Google Container Registry</var></h3>
+          <p class="defaut">Comme pour ses concurrents, Google Cloud Platform
+dispose évidemment d’un service en ligne de registre pour
+les images Docker, qu’on peut accéder depuis la console
+ou sur <a class="url" href="https://cloud.google.com/container-registry" target="_blank">https://cloud.google.com/container-registry</a>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP35.png" title="images/08EP35.png" src="IMAGES/08EP35.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Rien ne se démarque particulièrement
+des autres offres, un registre restant une fonctionnalité relativement
+simple et standardisée. Un système d’analyse des
+failles des images déposées est également
+disponible&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP36.png" title="images/08EP36.png" src="IMAGES/08EP36.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Cette section est toutefois l’occasion de
+parler du service embarqué de construction d’image de GCP.
+Il est ainsi possible depuis la ligne de commande <span class="courier11">gcloud</span> de déclencher un build
+d’image Docker depuis un fichier <span class="courier11">Dockerfile</span> et
+de pousser automatiquement le résultat dans GCR, ce qui
+peut présenter un intérêt pour les environnements
+fortement automatisés&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP37.png" title="images/08EP37.png" src="IMAGES/08EP37.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Pour les détails de cette
+fonctionnalité ainsi que de la gestion du cloud GCP par
+une ligne de commande, nous renvoyons à la documentation
+associée et en particulier sur la page <a class="url" href="https://cloud.google.com/cloud-build/docs/quickstart-docker" target="_blank">https://cloud.google.com/cloud-build/docs/quickstart-docker</a>.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle15">
+          <h3 class="title">e. Google Cloud Run<var style="display:none"> Google Cloud Run</var></h3>
+          <p class="defaut">Pour les développeurs souhaitant
+ne pas avoir à gérer quoi que ce soit en lien avec
+l’infrastructure,&nbsp;la plateforme Google permet d’aller encore
+plus loin et de s’appuyer uniquement sur une interface graphique
+de spécification de l’image à déployer
+et des conditions de mise à disposition, tout le reste étant
+réalisé de manière masquée.
+Google&nbsp;Cloud Run permet cette mise en œuvre transparente
+qui, couplé à l’offre Always Free avec deux millions
+de requête par mois, commence à s’approcher de
+l’idéal pour un particulier souhaitant de la manière la
+plus simple exposer un développement sur Internet.</p>
+          <p class="defaut">L’exposition d’un service ne requiert que
+deux pages d’assistant avant la mise en ligne, sachant qu’il est
+possible de jouer sur de nombreuses options, dont le déploiement
+en continu en fonction des images compilées (mais uniquement dans
+Google Cloud Build, le support de l’intégration à d’autres
+plateformes n’étant pas disponible)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP38.png" title="images/08EP38.png" src="IMAGES/08EP38.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’initiative KNative, dont Google Cloud Run
+est l’implémentation Google, pousse donc au bout le concept
+d’une plateforme "serverless" de déploiement des conteneurs
+qui permet de ne plus avoir à se soucier d’autre chose
+que du contenu de l’image et son utilisation. La boucle entre le
+code source, sa compilation dans une image, son envoi dans le registre,
+la mise à jour du service et l’exposition sur Internet
+avec la gestion de la montée en charge est ainsi bouclée.</p>
+          <p class="defaut">Des fonctionnalités complexes à mettre
+en œuvre comme le blue/green deployment (capacité à déployer
+deux versions différentes d’une même
+fonctionnalité en parallèle, permettant ainsi
+de mesurer les préférences des utilisateurs par
+l’analyse de leur comportement sur l’application)
+sont alors simplifiées à l’extrême, deux
+lignes de commande suffisant à les lancer :</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP39.png" title="images/08EP39.png" src="IMAGES/08EP39.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPwBY%2fUy7jYiAs%3d"></div>
+          </div>
+        </div>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

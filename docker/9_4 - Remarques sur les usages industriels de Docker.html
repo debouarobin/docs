@@ -1,0 +1,706 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_d403f0d2-4a10-4713-a891-29d2da33639f" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Remarques sur les usages industriels de Docker</h1>
+      <p class="defaut">Cette dernière section de l’ouvrage
+a pour but d’élargir le sujet de Docker vers de nouveaux
+usages en dehors de ceux traditionnels qui nous ont servi d’exemples
+jusqu’à maintenant. Lorsque Docker est utilisé dans
+un contexte industriel, de nombreuses questions additionnelles se
+posent. Les contextes foisonnant, il est bien sûr impossible
+d’aborder toutes les spécificités dans un livre,
+et a fortiori dans une section de conclusion, mais quelques remarques peuvent
+toutefois être formulées qui montreront quelques
+directions de l’écosystème.</p>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Supervision mixte</h2>
+        <p class="defaut">La supervision est un des domaines sur lesquels
+la présence de Docker dans les infrastructures&nbsp;nécessite
+de repenser les approches traditionnelles. Typiquement, la supervision était
+découpée en deux zones relativement séparées,
+avec le monitoring des ressources physiques ou virtuelles d’un côté,
+et la surveillance applicative des événements
+métier, temps de réponse utilisateur et autres
+critères opérationnels de l’autre.</p>
+        <p class="defaut">On pourrait voir Docker comme obligeant à avoir
+une troisième couche de supervision sur le nombre de conteneurs,
+leur répartition sur le cluster, leur durée de
+vie moyenne, leur état de santé, etc., et les
+logiciels mis en place dans ce sens complètent effectivement
+la panoplie de l’administrateur. Toutefois, il ne s’agit pas que
+d’une couche supplémentaire à gérer.
+En effet, un des manques dans la supervision traditionnelle est
+justement de faire le lien entre les deux couches précédemment
+citées&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">Si une alerte mémoire
+apparaît sur un serveur, il est souvent difficile de savoir à l’avance
+si elle va avoir un impact sur l’application et quel sera cet impact.
+Une des difficultés principales de l’administrateur système
+est de faire le tri entre les alertes et de savoir lesquelles peuvent
+poser des problèmes aux applications et donc aux utilisateurs
+(celles-ci doivent être traitées au plus vite,
+voire de manière automatisée si possible) et lesquelles
+concernent uniquement la technique et n’auront pas d’impact&nbsp;sur
+l’usage (et dans ce cas, elles peuvent être gérées
+plus tard).</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">À l’inverse, un administrateur
+applicatif qui perçoit un ralentissement sur les usages
+utilisateurs ou des erreurs a souvent le plus grand mal à déterminer
+quelle est la cause racine de ceci. Est-ce que le ralentissement
+vient d’une surcharge applicative temporaire&nbsp;? Ou bien
+un manque de ressources vient-il polluer le bon fonctionnement du
+système&nbsp;? Le meilleur scénario est celui où ce
+ralentissement vient d’un afflux&nbsp;d’utilisateurs et où il
+est pris automatiquement en charge par l’élasticité de
+l’infrastructure qui va rapidement s’adapter. Le pire scénario
+est celui où, par exemple, le stockage des fichiers temporaires
+sature et l’application s’arrête. Entre les deux, l’administrateur de
+l’application n’a souvent que peu d’idées de la différence.</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Ces deux remarques illustrent la difficulté de
+rassembler les deux couches de supervision, et il se trouve qu’une
+couche intermédiaire sur les conteneurs peut, si elle est
+bien gérée, apporter de la vision sur le comportement
+du système plutôt qu’un simple surcroît
+de complexité avec une troisième batterie d’indicateurs à surveiller
+ou d’alertes à détecter. Pour cela, il convient
+de croiser les niveaux de supervision, et la présence d’une
+strate intermédiaire rend les choses plus simples.</p>
+        <p class="defaut">Dans le dernier cas évoqué,
+une supervision des conteneurs montrerait par exemple que quelques
+conteneurs seulement souffrent du manque d’espace disque temporaire,
+et la supervision applicative montrant un ralentissement ou un arrêt
+du service aux usagers aurait tôt fait de définir
+les services qui posent problème, par exemple parce qu’ils
+se relanceraient automatiquement à une fréquence élevée.</p>
+        <p class="defaut">La lecture des logs ciblés des services
+correspondants permettrait alors de retrouver plus rapidement le
+problème racine que dans des logs applicatifs monolithiques énormes
+où il est complexe de trouver le problème précis.
+Le lien serait alors plus rapidement&nbsp;fait avec le manque
+de ressources, confirmé par une analyse de la supervision
+système et une corrélation qui peut même être automatisée
+avec les alertes sur l’espace disque disponible.</p>
+        <p class="defaut">De même, le fait de tracer un identifiant
+unique d’interaction dans des architectures de microservices permet,
+en une seule interrogation dans des logs centralisés, de
+retrouver&nbsp;le parcours applicatif complet d’une requête
+dans toutes ses dépendances. La mise en œuvre
+de ce genre de pratique est de plus assez simple&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">Toute interaction
+utilisateur génère un identifiant unique (GUID)
+qui sera véhiculé dans l’ensemble des fonctionnalités
+de code.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Tout appel à un microservice
+reçoit alors cet identifiant, typiquement dans un en-tête
+HTTP de type "vendor".</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Les microservices appelés
+en dépendance véhiculent systématiquement
+cet en-tête au suivant.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Tous les logs sont enregistrés
+dans une pile centrale comme ELK et sont systématiquement
+accompagnés de ce GUID, dans une approche de semantic logging.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Le support, pour tracer une interaction
+posant problème, n’a besoin que du GUID fourni par l’utilisateur
+pour retrouver la totalité du cheminement des appels dans
+le système.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Le microservice en cause est alors
+aisément retrouvé grâce au système
+d’indexation des logs, et la correction peut être ciblée
+sur le service, voire le conteneur posant problème.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Intégration de bases de données</h2>
+        <p class="defaut">L’intégration de base de données
+a longtemps été un sujet difficile pour Docker,
+car elle nécessitait de mettre en œuvre des volumes,
+et aussi car le fonctionnement mémoire&nbsp;des moteurs
+de base de données est en général extrêmement
+optimisé et nécessite&nbsp;des appels système
+qui ne se raccordent pas facilement au comportement recommandé&nbsp;de
+Docker.</p>
+        <p class="defaut">Pour donner un exemple, le comportement standard
+de SQL Server est de s’attribuer dès son lancement le plus
+possible de mémoire disponible sur un serveur, et la configuration
+doit être adaptée pour limiter cette façon
+de faire incompatible avec les bonnes pratiques de Docker consistant à limiter
+dans des conteneurs restreints les ressources disponibles, de façon à mieux
+occuper un nœud par la fragmentation des processus.</p>
+        <p class="defaut">De plus, les bases de données, surtout
+SQL, ne sont pas du tout prévues pour fonctionner de manière
+distribuée et reposent toujours sur une approche très centralisée.
+Seul le monde NoSQL s’aventure dans la distribution des moteurs de
+bases de données et l’approche n’est pas simpliste. Il
+faut par exemple bien prendre en compte les notions&nbsp;de
+shards, de replicas, de gestion éventuelle de verrous et
+de concurrence a posteriori. À l’inverse, Docker est parfaitement à l’aise
+dans ces environnements distribués&nbsp;; il en est
+même d’ailleurs un des facilitateurs majeurs.</p>
+        <p class="defaut">Si l’on rajoute qu’un mauvais paramétrage
+d’une base de données dans un écosystème
+Docker ou une mauvaise gestion des volumes peut amener à la
+perte de données alors que la persistance de ces dernières
+est justement la responsabilité principale des bases de
+données, il est compréhensible que le mélange
+des deux approches soit complexe.</p>
+        <p class="defaut">Il existe toutefois une solution élégante à cette
+opposition, à savoir la mise en place d’Operators Kubernetes&nbsp;;
+il s’agit de descripteurs de paramétrages des bases de
+données dans un cluster Docker qui sont réalisés
+par les éditeurs de bases de données eux-mêmes.
+Grâce à un Operator ElasticSearch, par exemple, il
+est possible de monter un cluster du moteur d’indexation sur un
+cluster Kubernetes en n’ayant qu’à fournir
+quelques paramètres de comportement. Toute la gestion des
+paramètres complexes permettant de faire fonctionner le logiciel
+en mode distribué sur le logiciel est prise en charge par
+les experts qui ont créé l’Operator.
+Le gestionnaire n’a alors qu’à modifier les quelques paramètres
+nécessaires comme l’attribution de ressources ou l’identifiant
+du cluster d’indexation&nbsp;pour obtenir une solution élastique
+et intégrée dans Kubernetes.</p>
+        <p class="defaut">Il y a de bonnes chances pour que cette façon
+de faire devienne un standard de gestion dans les prochaines années
+et que la gestion "manuelle" de bases de données distribuées
+ne soit bientôt plus qu’une pratique ancienne.</p>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Cluster hybride<var style="display:none"> Hybride</var></h2>
+        <p class="defaut">Les exemples montrés dans le livre
+l’ont été sur des clusters homogènes
+où toutes les machines formant un cluster Swarm se trouvaient
+sur le même réseau, mais il est possible de mettre
+en place, moyennant bien sûr un certain effort, des réseaux
+Swarm hybrides composés de machines sur différents
+emplacements, en plus de présenter différents
+systèmes d’exploitation comme vu plus haut.</p>
+        <p class="defaut">Ce type d’approche est particulièrement
+intéressant pour obtenir à la fois la sécurité et
+la performance liée à la proximité des
+données, mais aussi la souplesse et la réactivité d’un
+cloud externe.</p>
+        <p class="defaut">Les attributs peuvent être efficacement
+utilisés pour router tel ou tel conteneur sur les machines
+distantes ou celles locales, voire dans tel ou tel cloud en fonction
+de considérations de performance, de prix, de sécurité ou
+de robustesse.</p>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Docker en usine logicielle<var style="display:none"> Usine logicielle</var></h2>
+        <p class="defaut">Nous avons montré dans un chapitre
+précédent comment utiliser Docker pour déployer&nbsp;une
+application. Mais Docker est également très utile
+dans les usines logicielles&nbsp;: il participe au fonctionnement
+fluide de l’ALM (<span class="italic">Application Lifecycle Management</span>,
+soit la gestion du cycle de vie des logiciels, de la conception
+au décommissionnement) en s’intégrant de tout
+un tas de manières à ces outils.<var style="display:none"> Application Lifecycle Management</var></p>
+        <p class="defaut">Il se trouve que les points d’intégration
+sont multiples, Docker étant une sorte de couteau suisse
+qui va aider à lever des points de difficulté divers&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">produire des images
+en sortie de build&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">supporter des machines de compilation&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">utiliser des conteneurs pour les
+tests&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">mettre en œuvre plus facilement
+une intégration continue&nbsp;;</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Nous allons nous pencher dans cette section
+sur ces usages, plutôt destinés aux administrateurs
+et gestionnaires d’outillage pour les développeurs. Le schéma
+ci-dessous montre les différentes étapes typiques
+d’un cycle de vie d’une application logicielle, de la conception
+du code source à son déploiement, en entourant
+les étapes sur lesquelles nous avons montré l’usage
+de Docker jusqu’à maintenant&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP40.png" title="images/08EP40.png" src="IMAGES/08EP40.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOVSo7ey7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Ces deux usages (les deux les plus à gauche étant
+similaires) correspondent à&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">La mise en œuvre
+de Docker pour faciliter le déploiement sur un environnement
+cible, en maîtrisant l’équivalence complète
+entre les environnements, qu’ils soient de développement,
+de test ou de production. Ceci correspond à la flèche
+entre l’outil d’installation et les environnements, ainsi que ces
+derniers, qui utilisent Docker.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">L’utilisation de Docker pour implémenter
+un registre d’images Docker. Pour être précis,
+nous avons expliqué le fonctionnement d’un registre comme
+dépôt des images Docker, surtout dans le cas d’un
+registre public. En ce qui concerne le registre&nbsp;interne,
+le fonctionnement est le même, sauf que le registre n’est
+pas exposé à l’extérieur (contrairement à un
+registre public ou même privé, ce dernier étant
+exposé&nbsp;à l’extérieur mais sécurisé,
+alors que le registre public est ouvert à n’importe quel
+utilisateur potentiel).</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Nous allons voir dans les sections ci-dessous
+que Docker peut servir dans presque toutes les autres étapes
+de l’usine logicielle. Le sujet avait été abordé dans
+les deux premières éditions du présent
+ouvrage, mais il s’est encore enrichi depuis&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">utilisation de Docker
+pour instancier rapidement des esclaves de build&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">portage de l’usine de production
+logicielle sur Docker pour pouvoir la relancer et la reparamétrer
+rapidement, y compris en mode externe sur une reprise après
+incident lourd (incendie, etc.)&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">meilleure intégration dans
+les processus de build de la possibilité de générer des
+images Docker comme livrables&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">gestion des images Docker dans les
+dépôts de livrables comme Artifactory&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">automatisation des tests d’intégration
+sur des conteneurs jetables&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">intégration de "sidecars"
+dans les déploiements Docker pour ajouter des fonctionnalités à la
+runtime&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">registres intelligents détectant
+dès le dépôt des images les possibles
+failles de sécurité, erreurs applicatives ou défauts
+de configuration&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">support des multiplateformes par
+le biais du support intégré dans les images Docker&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">alignement de la gestion des versions
+de livrables sur les étiquettes Docker et dans certains
+cas immutabilité des images pour assurer la stabilité et
+la reproductibilité des applicatifs&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">etc.</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Les usages permis par le strict découplage
+des responsabilités opéré par Docker sont
+légion dans le domaine de l’intégration et du
+déploiement continu. Il n’y a d’ailleurs plus un seul acteur
+majeur sur ce domaine qui n’utilise pas ou ne supporte pas Docker.</p>
+        <div class="sect3" id="refTitle4">
+          <h3 class="title">a. Déploiement</h3>
+          <p class="defaut">L’utilisation "primaire" logique de Docker
+dans une usine logicielle est bien sûr que les images Docker
+sont la cible des livrables et le modèle des déploiements applicatifs.
+Docker est alors le résultat de la production des développeurs
+et la brique de base pour le déploiement assuré par
+les administrateurs. Son aspect en boîte noire normalisée
+est alors un constituant fondamental de l’approche DevOps, qui permet
+aux deux groupes de travailler efficacement ensemble car le partage
+des responsabilités est strict et explicite, autour d’une
+norme qui est la Runtime Specification issue de l’Open Container
+Initiative&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Les développeurs
+utilisent un <span class="courier11">Dockerfile</span> ou toute
+autre méthode de build pour produire une image compatible à la
+norme Image Format du même consortium OCI. Quels que soient
+les langages, les façons de faire, le livrable sera utilisable
+dans n’importe quelle plateforme.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Les administrateurs de plateformes
+ont un contrat également simple, à savoir qu’ils
+fournissent des ressources, et en échange les conteneurs
+vont produire un comportement applicatif sur les ports exposés.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Une autre spécification standard
+pour la composition des tâches Docker (en gros, une normalisation
+du format Docker Compose pour une utilisation sur n’importe quel
+orchestrateur)&nbsp;est également en cours. Amazon
+et Azure participent à l’approche, ce&nbsp;qui donne
+une certaine garantie sur la solidité de la spécification
+finale. La page <a class="url" href="https://github.com/compose-spec/compose-spec" target="_blank">https://github.com/compose-spec/compose-spec</a> donne
+plus de détails sur le sujet.</p>
+        </div>
+        <div class="sect3" id="refTitle5">
+          <h3 class="title">b. Compilation</h3>
+          <p class="defaut">Une des principales utilisations "secondaires"
+de Docker dans l’usine logicielle consiste à produire des
+images Docker en sortie, plutôt que des livrables "standards"
+qui seront ensuite déployés par un outil d’installation.
+Cette tâche se situe au niveau de l’ALM entouré ci-dessous&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP41.png" title="images/08EP41.png" src="IMAGES/08EP41.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOVSo7ey7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">L’intérêt est que l’automatisation
+de la tâche force à préparer les <span class="courier11">Dockerfile</span> en même temps
+que le code source, ce qui permet de ne pas oublier des points importants
+comme l’ouverture de ports, la déclaration d’un volume,
+etc. Ces points sont connus du développeur du service,
+mais si un opérationnel est en charge de la génération
+du <span class="courier11">Dockerfile</span>, il risque plus facilement
+d’en oublier.</p>
+          <p class="defaut">L’automatisation est également intéressante
+pour le gain de temps et la réduction du nombre d’erreurs
+sur la compilation des images. Elle permet que le livrable sorte
+de l’usine logiciel sous une forme "clés en main".</p>
+          <p class="defaut">Par contre, cet aspect pratique vient au détriment
+de la sécurité&nbsp;: parfois, l’utilisateur
+de vos conteneurs souhaitera savoir comment ils ont été créés
+et être sûr de ce qu’il y a dedans. Bien évidemment,
+lorsque c’est vous qui mettez en place l’environnement sur vos propres
+conteneurs, la question de confiance ne se pose pas de la même
+manière&nbsp;: il ne reste alors à gérer
+que la sécurité du mode de transport des images
+de votre usine logicielle à l’environnement cible. Mais
+lorsque l’usine cible n’est pas la vôtre, le destinataire
+est en droit de demander un niveau de garantie sur l’exactitude
+de l’image. Pour cela, le registre Docker a commencé dans
+les dernières versions à mettre en place un système de
+hash pour valider à terme que l’image reçue est
+bien exactement celle attendue.</p>
+          <p class="defaut">La première étape de mise
+en œuvre, la plus simple et immédiate, consiste à rajouter
+un <span class="courier11">Dockerfile</span> dans les dépôts
+de code. Le positionnement à la racine est le plus logique.&nbsp;</p>
+          <p class="defaut">Ensuite, il est possible de gérer
+l’appel de <span class="courier11">docker build</span> à la
+main, en utilisant un script dédié dans votre
+ALM. Des plug-ins sont désormais éprouvés pour
+réaliser cette opération, par exemple sous Jenkins.
+Une alternative, si votre code peut être public, est d’utiliser
+le système de webhooks (technique permettant d’associer
+des appels d’URL à des événements)
+pour générer automatiquement des images Docker
+lors des modifications de votre code dans un compte GitHub ou Bitbucket,
+comme cela a été montré dans le chapitre
+sur la création de vos propres images. L’externalisation
+totale de l’usine logicielle est une source d’économies
+importantes si votre modèle de propriété intellectuelle
+le permet.</p>
+        </div>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">c. Infrastructure de l’usine logicielle</h3>
+          <p class="defaut">Docker est également très
+utile pour héberger tous les processus d’une usine logicielle.
+Dans ce cas, son utilisation correspond aux zones ci-dessous&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP42.png" title="images/08EP42.png" src="IMAGES/08EP42.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOVSo7ey7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Un des premiers intérêts
+de déployer tous les serveurs de gestion de code source,
+d’intégration&nbsp;continue, de build, etc. est la
+souplesse de l’ALM. Il est ainsi possible d’augmenter très
+facilement le nombre de machines de build, et ce en utilisant mieux
+les ressources que par la mise en œuvre de machines virtuelles
+(plus lourdes), voire physiques (plus lourdes et plus complexes à installer).
+La mise à l’échelle est alors fortement&nbsp;simplifiée.</p>
+          <p class="defaut">Mais il devient également possible
+d’étanchéifier des portions d’une ALM, là où le
+surcoût en infrastructure le rendait impossible. La séparation
+claire de portions d’ALM est une bonne méthode pour permettre
+une migration en douceur vers une approche de propriété intellectuelle
+différente.</p>
+          <p class="defaut">Enfin, le redémarrage après
+incident sur une architecture de conteneurs est également
+amélioré par la capacité des conteneurs à être
+très rapidement remontés sur un cluster même
+distant (l’ALM utilise beaucoup de ressources et de bande passante,
+et son positionnement&nbsp;en local ou sur un cloud privé est encore
+l’option majoritaire, car elle favorise les meilleures performances).</p>
+          <p class="defaut">Récemment, de nombreux outils de
+gestion d’ALM sont apparus dans le sillage de Windows,
+ainsi que des outils surcouche de déploiement ou de gestion des
+conteneurs comme Rancher. Il est désormais possible de
+mettre en place une ALM complète dans le cloud. Ceci favorise énormément
+le partage des bonnes pratiques. La mise en place d’une ALM était
+encore trop souvent une activité artisanale, et elle bénéficie
+donc fortement de l’industrialisation apportée par une
+standardisation des modules et de leur interaction par leur fonctionnement
+dans des conteneurs.</p>
+          <p class="defaut">La réalisation des <span class="courier11">Dockerfile</span> pour mettre en œuvre
+cette approche ne pose pas de difficultés particulières,
+les applications composant une ALM étant en général
+des applications&nbsp;serveur comme les autres, exposant des
+API, utilisant des ressources fichiers&nbsp;et en particulier
+des fichiers temporaires. Ces derniers ont un intérêt à être
+placés sur un volume dédié, qu’on pourra
+ensuite facilement faire porter par des disques durs rapides pour
+améliorer la performance de l’ensemble. Surtout, ces espaces
+de stockage&nbsp;pourront avoir une moindre robustesse (la perte
+de fichiers temporaires n’est pas grave) et donc un coût moindre.</p>
+          <p class="defaut">Le seul conseil à donner dans cette
+section est le même que dans la plupart des usages de Docker, à savoir
+de commencer par vérifier si une image n’existe pas déjà et,
+s’il ne s’agit pas d’une image de confiance, de bien valider que
+le contenu du <span class="courier11">Dockerfile</span> est conforme à ce
+que vous en attendez.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention : si vous compilez des images
+Docker dans le cadre de votre build mais que ce processus lui-même
+fonctionne dans un conteneur Docker, vous êtes dans une
+situation de type "Docker in Docker", qui nécessite de
+fonctionner en mode privilégié. <a class="url" href="https://github.com/jpetazzo/dind" target="_blank">https://github.com/jpetazzo/dind</a> explique
+la manipulation associée.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle7">
+          <h3 class="title">d. Gestion des tests</h3>
+          <p class="defaut">L’usine logicielle traditionnelle lance plusieurs
+niveaux de tests en sortie de build. Les tests unitaires et smoke
+tests (tests superficiels mais très rapides, effectués&nbsp;préalablement
+aux campagnes de tests plus approfondies, pour éviter une
+perte de temps lors d’un défaut majeur affectant
+de nombreux tests) sont intégrés dans le build
+lui-même, mais les tests d’intégration et les
+tests système&nbsp;sont réalisés
+de manière asynchrone, sur demande ou lors des heures creuses
+mais dans tous les cas avant une release.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP43.png" title="images/08EP43.png" src="IMAGES/08EP43.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOVSo7ey7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Docker peut faire valoir un énorme
+avantage pour les tests, à savoir que remettre un environnement
+dans un état donné est aussi simple pour lui que
+de relancer un conteneur sur une couche d’image en lecture seule.
+Il est ainsi possible de mettre facilement en place un environnement
+de tests, lancer des tests qui vont le modifier parfois en profondeur,
+puis simplement abandonner la couche en écriture qui a été écrite
+et relancer&nbsp;un conteneur pour reproduire exactement le
+même environnement de test qu’au début.</p>
+          <p class="defaut">Au lieu de recourir à des astuces
+alambiquées comme restaurer des archives de bases de données
+ou modifier les drivers pour qu’ils n’appliquent pas réellement
+les modifications dans les bases de données, il est plus
+simple de lancer un conteneur, le supprimer en fin de campagne de
+tests et recommencer le tout.</p>
+          <p class="defaut">La vitesse de lancement d’un conteneur est
+même telle qu’elle ouvre des usages auparavant inimaginables,
+comme restaurer un environnement vierge non pas entre chaque campagne
+de tests, mais carrément entre chaque test. Une telle approche était
+purement impossible sur des machines virtuelles, même avec
+une gestion optimisée des clichés (snapshots)
+de VM. Elle devient facile avec des conteneurs.</p>
+          <p class="defaut">Afin de se constituer une base solide d’environnements
+de test, il convient avant tout d’avoir une bonne maîtrise
+des tests eux-mêmes. Il est inutile d’espérer
+tirer parti des conteneurs Docker pour améliorer les campagnes
+de tests si celles-ci n’ont pas été correctement
+mises en œuvre à partir de cas de tests détaillés,
+issus d’exigences formelles.</p>
+          <p class="defaut">Lors de la mise en place des environnements,
+les modifications manuelles avec <span class="courier11">commit</span>&nbsp;de
+l’image sont très pratiques pour créer un nouvel
+environnement pour des tests différents. Par contre, il
+devient rapidement utile de mettre en place un bon classement&nbsp;de
+ces environnements.</p>
+        </div>
+        <div class="sect3" id="refTitle8">
+          <h3 class="title">e. Utilisation pour les machines supports de tests</h3>
+          <p class="defaut">La suite logique de l’indépendance
+des campagnes de tests consiste à utiliser Docker pour
+monter un environnement de test d’intégration,
+voire même pour les tests système.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP44.png" title="images/08EP44.png" src="IMAGES/08EP44.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOVSo7ey7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Bien qu’il soit une bonne pratique de s’éloigner
+le plus possible de la notion d’environnement de production / recette / tests / intégration / préproduction / etc.,
+ces notions sont encore très courantes, et la capacité qu’offre
+Docker de rapidement dupliquer un environnement complet en exportant
+des conteneurs sous forme d’images est un plus.</p>
+          <p class="defaut">En particulier, l’étanchéité des
+ressources par rapport à l’hôte permet de simplifier
+les manipulations de plusieurs environnements. Pour ne prendre qu’un exemple,
+si un environnement&nbsp;utilise un port, il est en général
+complexe de faire porter un second environnement&nbsp;copie
+du premier sans paramétrage, afin de ne pas risquer de
+conflit de port. Ceci peut amener des problèmes lorsque
+la propagation du changement de port dans les services appelant
+n’est pas maîtrisée et qu’un service de la production
+finit&nbsp;par être appelé par un autre depuis
+un environnement de test.</p>
+          <p class="defaut">L’étanchéité des
+conteneurs les uns par rapport aux autres, ainsi que la capacité de
+rediriger&nbsp;de manière simplissime un port sur un
+autre, un répertoire sur un autre ou même de changer à la
+volée les variables d’environnement, sont bien sûr
+d’énormes avantages dans ces situations.</p>
+        </div>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">f. Registre pour l’ALM</h3>
+          <p class="defaut">La mise en œuvre d’un registre d’images
+a occupé une section dédiée du présent
+ouvrage,&nbsp;car il s’agit d’une étape importante
+dans l’adoption des conteneurs par une entreprise. Nous ne reviendrons
+pas ici sur la mise en œuvre d’un registre, mais sur l’intégration&nbsp;à l’usine
+logicielle de ce registre, ou, pour être plus précis,
+de ces registres, car il convient de faire la différence
+entre un registre interne contenant toutes les versions en cours
+des images, et un registre public destiné à être
+exploité par les clients de l’entreprise et n’exposant bien
+sûr que des versions correctement testées et validées.</p>
+          <p class="defaut">Pour le registre public, deux options sont
+possibles. La première façon de faire, la plus
+simple, consiste à ouvrir un compte sur Docker Hub pour
+publier ses images. Simplicité et faible coût
+sont au rendez-vous, mais un compte payant sera nécessaire
+pour garder privé plus d’un dépôt. Pour
+des besoins simples (PME, indépendants, etc.), cela peut
+suffire. Pour des usages plus industriels, les questions de propriété intellectuelle,
+de disponibilité et de réduction des droits d’accès
+feront que la solution sera plutôt de créer et
+gérer son propre registre.</p>
+          <p class="defaut">Du côté du consommateur
+des images, il peut également être intéressant
+de monter un registre privé servant de cache local, de
+façon que les administrateurs puissent obtenir&nbsp;les
+différentes images validées par leurs soins, qu’elles viennent
+d’un éditeur ou du monde open source. Ce cache sert alors
+potentiellement de tampons, en n’exposant&nbsp;à la
+consommation interne que les images qui ont été avalisées
+par le service qualité.</p>
+          <p class="defaut">L’intérêt réside également
+dans le fait que la bande passante est réduite et que la
+validation du hash peut être réalisée
+une bonne fois pour toutes, la corruption de l’image par un attaquant étant
+un scénario moins probable sur le réseau interne.</p>
+          <p class="defaut">Enfin, les questions de sécurité font
+qu’en général les serveurs de production ne
+peuvent pas accéder simplement à Internet, ce
+qui rend la présence d’un registre local obligatoire.</p>
+          <p class="defaut">La représentation de cette option
+est la suivante&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/08EP45.png" title="images/08EP45.png" src="IMAGES/08EP45.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOVSo7ey7jYiAs%3d"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle10">
+        <h2 class="title">5. Docker comme une commodité</h2>
+        <p class="defaut">Pour conclure, Docker est en passe de devenir
+un support ubiquitaire, et sa facilité d’utilisation permet
+de mettre en place de nouvelles fonctionnalités au-delà du
+simple déploiement d’applications web. Le fait de pouvoir
+démarrer et arrêter très rapidement de
+nouvelles charges applicatives change radicalement la façon
+de travailler dans certains domaines.</p>
+        <p class="defaut">Par exemple, la mise en place de plateformes
+d’intelligence artificielle ou de manipulation de Big Data est devenue
+extrêmement simple de par la possibilité de démarrer,
+de manière quasi transparente pour l’analyse, une usine
+de calcul d’une puissance qui nécessitait auparavant, en
+plus d’un investissement financier important, une expertise pour
+la mise en place et la maintenance qui pouvait coûter encore
+plus cher. Il y a quelques années à peine, les
+formations Big Data commençaient par le montage d’un cluster
+Hadoop… et passaient une grande partie du temps dessus
+avant d’attaquer la réelle valeur de la formation, à savoir
+d’analyser les données portées par le cluster.
+Dorénavant,&nbsp;une connexion à Azure suffit
+pour manipuler des données dans un notebook Jupiter sans
+même avoir à se rappeler qu’un cluster tourne
+derrière. Seuls son paramétrage&nbsp;initial
+et sa facturation rappellent à l’utilisateur que les calculs nécessitent
+une infrastructure.</p>
+        <p class="defaut">Un autre exemple, parmi tant d’autres mais
+particulièrement révélateur de l’ubiquité de
+Docker, est montré dans la vidéo <a class="url" href="https://www.youtube.com/watch?v=JPkCPq7C5Wg" target="_blank">https://www.youtube.com/watch?v=JPkCPq7C5Wg</a> qui
+présente la création d’une base de données
+SQL Server dans Azure Data Studio directement depuis un notebook
+de calcul qui pilote le démarrage d’un conteneur Docker
+avec la base de données sur la machine locale de l’analyste,
+pourvu bien sûr que Docker for Windows soit installé.
+Dans ce cas, Docker est devenu carrément invisible pour
+l’analyste&nbsp;: il ouvre son studio d’analyse de données
+et une feuille de calcul décrivant les manipulations de
+données à réaliser&nbsp;; l’échange
+avec un système de persistance est pour lui complètement
+transparent et Docker ne sera tout simplement pas visible, car il
+ne sert que de support au démarrage d’un processus temporaire.
+Le temps gagné en préparation du poste, ingestion
+de la donnée, paramétrage de la consommation est
+alors particulièrement intéressant pour des professions dont
+la valeur est dans l’extraction de connaissances depuis la donnée
+et pas dans les manipulations techniques autour de celles-ci, qui
+prennent encore souvent une majorité de leur temps.</p>
+        <p class="defaut">L’utilisation de Docker comme support de routes
+dans les middlewares de type Enterprise Service Bus est une autre
+exploitation particulièrement utile de la simplicité de
+mise en œuvre de Docker et de sa capacité à monter
+en charge. Une des principales difficultés dans la gestion
+des ESB et en particulier dans leur montée en charge est
+de lutter contre les dépendances avec les ressources d’infrastructure&nbsp;:
+il est parfois complexe de mettre en relation le ralentissement
+d’une route particulière avec le manque de ressources sur
+une instance de broker particulière. Démarrer
+une instance de Docker&nbsp;pour chaque route exposée
+avec des affectations de ressources précises permet de
+mettre le doigt de manière extrêmement rapide
+sur un problème éventuel et, surtout, de tenir la
+promesse de robustesse portée par la structure de l’ESB
+mais souvent mise à mal par le manque de maîtrise
+des ressources physiques disponibles.</p>
+        <p class="defaut">Bref, Docker a à peine commencé à manifester
+son plein potentiel dans les usages&nbsp;!</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

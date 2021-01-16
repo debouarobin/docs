@@ -1,0 +1,1750 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_9ed8e700-45a9-45c7-bf18-6e798ff0c3d6" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Utilisation d’un Dockerfile<var style="display:none"> Dockerfile</var></h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Intérêt des fichiers Dockerfile</h2>
+        <p class="defaut">La "recette" dont nous venons de parler se
+présente sous la forme d’un fichier texte nommé <span class="courier11">Dockerfile</span>, utilisant une grammaire
+particulière à Docker. Ce fichier contient toutes
+les opérations nécessaires à la préparation
+d’une image Docker. Ainsi, au lieu de construire une image par des
+opérations manuelles dans un conteneur suivie par une commande <span class="courier11">commit</span> (voire plusieurs si l’on procède
+en étapes) comme nous l’avons évoqué ci-dessus,
+nous allons pouvoir compiler une image depuis une description textuelle
+de ces opérations.</p>
+        <p class="defaut">Voici par exemple le contenu du fichier <span class="courier11">Dockerfile</span> correspondant à l’image officielle
+MongoDB en ligne 3.6 (un système de gestion de base de
+données NoSQL) telle qu’elle peut être retrouvée
+sur le registre Docker Hub à la date d’écriture
+de ce livre (version 3.6.19 de MongoDB, disponible sur <a class="url" href="https://registry.hub.docker.com/_/mongo/" target="_blank">https://registry.hub.docker.com/_/mongo/</a>)&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs perl">FROM ubuntu:xenial&nbsp;
+&nbsp;
+<span class="hljs-comment"># add our user and group first to make sure their IDs get assigned&nbsp;</span>
+consistently, regardless of whatever dependencies get added<b>&nbsp;
+RUN groupadd -r mongodb &amp;&amp; useradd -r -g mongodb mongodb</b>&nbsp;
+&nbsp;
+RUN set -eux; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-get update; \<b>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-get install -<span class="hljs-keyword">y</span> --<span class="hljs-keyword">no</span>-install-recommends \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ca-certificates \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;jq \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;numactl \</b>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">if</span>&nbsp;! command -v ps &gt; <span class="hljs-regexp">/dev/null</span>; then \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apt-get install -<span class="hljs-keyword">y</span> --<span class="hljs-keyword">no</span>-install-recommends procps; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;fi; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rm -rf /var/lib/apt/lists/*&nbsp;
+&nbsp;
+<span class="hljs-comment"># grab gosu for easy step-down from root &nbsp;</span>
+(https:<span class="hljs-regexp">//github</span>.com/tianon/gosu/releases)&nbsp;
+ENV GOSU_VERSION <span class="hljs-number">1.12</span>&nbsp;
+<span class="hljs-comment"># grab "js-yaml" for parsing mongod’s YAML config files &nbsp;</span>
+(https:<span class="hljs-regexp">//github</span>.com/nodeca/js-yaml/releases)&nbsp;
+ENV JSYAML_VERSION <span class="hljs-number">3.13</span>.<span class="hljs-number">1</span>&nbsp;
+&nbsp;
+RUN set -ex; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;savedAptMark=<span class="hljs-string">"$(apt-mark showmanual)"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-get update; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-get install -<span class="hljs-keyword">y</span> --<span class="hljs-keyword">no</span>-install-recommends \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wget \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">if</span>&nbsp;! command -v gpg &gt; <span class="hljs-regexp">/dev/null</span>; then \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apt-get install -<span class="hljs-keyword">y</span> --<span class="hljs-keyword">no</span>-install-recommends gnupg dirmngr; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;savedAptMark=<span class="hljs-string">"$savedAptMark gnupg dirmngr"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;elif gpg --version | <span class="hljs-keyword">grep</span> -<span class="hljs-keyword">q</span> ’^gpg (GnuPG) <span class="hljs-number">1</span>\.’; then \&nbsp;
+<span class="hljs-comment"># "This package provides support for HKPS keyservers." (GnuPG 1.x only)&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apt-get install -<span class="hljs-keyword">y</span> --<span class="hljs-keyword">no</span>-install-recommends gnupg-curl; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;fi; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rm -rf /var/lib/apt/lists/*; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;dpkgArch=<span class="hljs-string">"$(dpkg --print-architecture | awk -F- ’{ print $NF }’)"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;wget -O /usr/<span class="hljs-keyword">local</span>/bin/gosu &nbsp;
+<span class="hljs-string">"https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-&nbsp;
+$dpkgArch"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;wget -O /usr/<span class="hljs-keyword">local</span>/bin/gosu.asc &nbsp;
+<span class="hljs-string">"https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-&nbsp;
+$dpkgArch.asc"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;export GNUPGHOME=<span class="hljs-string">"$(mktemp -d)"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;gpg --batch --keyserver hkps:<span class="hljs-regexp">//keys</span>.openpgp.org --<span class="hljs-keyword">recv</span>-<span class="hljs-keyword">keys</span> &nbsp;
+B42F6819007F00F88E364FD4036A9C25BF357DD4; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;gpg --batch --verify /usr/<span class="hljs-keyword">local</span>/bin/gosu.asc /usr/<span class="hljs-keyword">local</span>/bin/gosu; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;command -v gpgconf &amp;&amp; gpgconf --<span class="hljs-keyword">kill</span> all ||&nbsp;:; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rm -r <span class="hljs-string">"$GNUPGHOME"</span> /usr/<span class="hljs-keyword">local</span>/bin/gosu.asc; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;wget -O /js-yaml.js <span class="hljs-string">"https://github.com/nodeca/js-yaml/raw/$&nbsp;
+{JSYAML_VERSION}/dist/js-yaml.js"</span>; \<b>&nbsp;
+<span class="hljs-comment"># TODO some sort of download verification here</span></b><span class="hljs-comment">&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-mark auto ’.*’ &gt; <span class="hljs-regexp">/dev/null</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-mark manual $savedAptMark &gt; <span class="hljs-regexp">/dev/null</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-get purge -<span class="hljs-keyword">y</span> --auto-remove -o &nbsp;
+APT::AutoRemove::RecommendsImportant=false; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;
+<span class="hljs-comment"># smoke test&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">chmod</span> +<span class="hljs-keyword">x</span> /usr/<span class="hljs-keyword">local</span>/bin/gosu; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;gosu --version; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;gosu nobody true&nbsp;
+&nbsp;
+RUN <span class="hljs-keyword">mkdir</span> /docker-entrypoint-initdb.d&nbsp;
+&nbsp;
+ENV GPG_KEYS <span class="hljs-number">2930</span>ADAE8CAF5059EE73BB4B58712A2291FA4AD5&nbsp;
+RUN set -ex; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;export GNUPGHOME=<span class="hljs-string">"$(mktemp -d)"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">for</span> key in $GPG_KEYS; <span class="hljs-keyword">do</span> \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gpg --batch --keyserver ha.pool.sks-keyservers.net --&nbsp;
+<span class="hljs-keyword">recv</span>-<span class="hljs-keyword">keys</span> <span class="hljs-string">"$key"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;done; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;gpg --batch --export $GPG_KEYS &gt; <span class="hljs-regexp">/etc/apt</span><span class="hljs-regexp">/trusted.gpg.d/mongodb</span>.gpg; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;command -v gpgconf &amp;&amp; gpgconf --<span class="hljs-keyword">kill</span> all ||&nbsp;:; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;rm -r <span class="hljs-string">"$GNUPGHOME"</span>; \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;apt-key list&nbsp;
+&nbsp;
+<span class="hljs-comment"># Allow build-time overrides (eg. to build image with MongoDB &nbsp;</span>
+Enterprise version)&nbsp;
+<span class="hljs-comment"># Options for MONGO_PACKAGE: mongodb-org OR mongodb-enterprise&nbsp;</span>
+<span class="hljs-comment"># Options for MONGO_REPO: repo.mongodb.org OR repo.mongodb.com&nbsp;</span>
+<span class="hljs-comment"># Example: docker build --build-arg MONGO_PACKAGE=mongodb-&nbsp;</span>
+enterprise --build-arg MONGO_REPO=repo.mongodb.com .&nbsp;
+ARG MONGO_PACKAGE=mongodb-org&nbsp;
+ARG MONGO_REPO=repo.mongodb.org&nbsp;
+ENV MONGO_PACKAGE=${MONGO_PACKAGE} MONGO_REPO=${MONGO_REPO}&nbsp;
+&nbsp;
+ENV MONGO_MAJOR <span class="hljs-number">3.6</span>&nbsp;
+ENV MONGO_VERSION <span class="hljs-number">3.6</span>.<span class="hljs-number">19</span>&nbsp;
+<span class="hljs-comment"># bashbrew-architectures:amd64 arm64v8&nbsp;</span>
+RUN echo <span class="hljs-string">"deb http://$MONGO_REPO/apt/ubuntu &nbsp;
+xenial/<span class="hljs-subst">${MONGO_PACKAGE%-unstable}</span>/$MONGO_MAJOR multiverse"</span> | tee &nbsp;
+<span class="hljs-string">"/etc/apt/sources.list.d/<span class="hljs-subst">${MONGO_PACKAGE%-unstable}</span>.list"</span>&nbsp;
+&nbsp;
+RUN set -<span class="hljs-keyword">x</span> \&nbsp;
+<span class="hljs-comment"># installing "mongodb-enterprise" pulls in "tzdata" which prompts for input&nbsp;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; export DEBIAN_FRONTEND=noninteractive \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; apt-get update \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp;<b>apt-get install -<span class="hljs-keyword">y</span> \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-server=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-shell=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-mongos=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-tools=$MONGO_VERSION \</b>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; rm -rf /var/lib/apt/lists/* \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; rm -rf /var/lib/mongodb \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; mv /etc/mongod.conf /etc/mongod.conf.orig&nbsp;
+&nbsp;
+RUN <span class="hljs-keyword">mkdir</span> -p /data/db /data/configdb \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; <span class="hljs-keyword">chown</span> -R mongodb:mongodb /data/db /data/configdb<b>&nbsp;
+VOLUME /data/db /data/configdb</b>&nbsp;
+&nbsp;
+COPY docker-entrypoint.sh /usr/<span class="hljs-keyword">local</span>/bin/<b>&nbsp;
+ENTRYPOINT [<span class="hljs-string">"docker-entrypoint.sh"</span>]&nbsp;
+&nbsp;
+EXPOSE <span class="hljs-number">27017</span>&nbsp;
+CMD [<span class="hljs-string">"mongod"</span>]</b></code></pre>
+        <p class="defaut">Les lignes passées en gras correspondent
+aux actions auxquelles un administrateur sans connaissance experte
+de MongoDB aurait certainement pensé, ce qui montre, par
+différence, la richesse additionnelle du fichier descriptif
+de l’image officielle. Les opérations les plus simples
+mises en œuvre dans ce fichier de génération
+d’image sont les suivantes&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">La mise en place d’un
+utilisateur et d’un groupe dédiés.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">L’installation des dépendances.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Un commentaire de rappel comme quoi
+une vérification du téléchargement devrait être
+réalisée (par très rassurant de voir
+que la sécurité est laissée pour plus
+tard dans une image officielle d’une version récente de
+la base de données NoSQL la plus utilisée dans
+le monde…).</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">L’installation proprement dite de
+l’application serveur.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">La définition des volumes
+pour les données ainsi que pour la configuration.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">L’utilisation d’un <span class="courier11">ENTRYPOINT</span> dédié,
+qui permet de spécifier le script à lancer&nbsp;lors
+du démarrage du conteneur (nous reviendrons plus longuement sur
+cette commande par la suite).</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">L’exposition du port sur lequel
+le processus reçoit les commandes (ce qui nécessite
+de connaître le fonctionnement de ce processus).</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">La mise en œuvre d’un processus
+par défaut.</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Encore une fois, il aurait été possible
+de trouver toutes ces manipulations par une recherche&nbsp;dans
+la documentation ou sur les forums. Mais la présence d’un <span class="courier11">Dockerfile</span> produit par des experts
+de MongoDB, tout en nous laissant valider les commandes, est un énorme
+avantage de Docker.</p>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Un regard critique reste nécessaire
+sur les fichiers <span class="courier11">Dockerfile</span>, sous
+peine de ne pas être plus en sécurité que
+dans le cas de la simple instanciation d’une image de provenance
+inconnue. En particulier, tout appel à des URL externes (par <span class="courier11">curl</span>, typiquement) devrait être
+soigneusement vérifié. C’est le sens du <span class="courier11">TODO</span> relevé dans le fichier,
+et qui est un manque de sécurité qui devrait être vérifié sur
+une mise en production, au minimum en vérifiant que le
+domaine associé est sûr et que le contenu sur
+lequel l’URL pointe ne comporte pas de problème de sécurité.</p>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Utilisation d’un fichier Dockerfile</h2>
+        <p class="defaut">Bien que, dans le cas d’une image officielle,
+le fichier <span class="courier11">Dockerfile</span> serve surtout
+au producteur pour réaliser l’image et montrer publiquement
+la façon dont celle-ci a été réalisée
+(le lien entre les deux étant assuré en particulier
+par le fait que c’est Docker Hub qui s’occupe de compiler les images),
+il est tout à fait possible d’utiliser soi-même
+ce fichier pour créer une image.</p>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Sur la machine hôte, créez
+un répertoire nommé par exemple <span class="courier11">mongogb</span>.</p>
+        </div>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Placez-vous dans ce répertoire.</p>
+        </div>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Recopiez les deux fichiers que vous retrouverez
+sur <a class="url" href="https://github.com/docker-library/mongo/tree/master/3.6" target="_blank">https://github.com/docker-library/mongo/tree/master/3.6</a></p>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Cette URL est celle contenant le fichier <span class="courier11">Dockerfile</span>, qu’on peut retrouver directement
+depuis la page du registre Docker Hub concernant l’image officielle
+de MongoDB. Le plus simple pour recopier les fichiers est de lancer
+une commande <span class="courier11">wget</span> sur les adresses
+qui sont obtenues en cliquant sur le bouton <b>Raw</b> dans
+la page d’affichage par GitHub des contenus des fichiers.</p>
+          </div>
+        </div>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Si nécessaire, affectez les droits
+de lecture sur les deux fichiers et les droits d’exécution
+sur <span class="courier11">docker-entrypoint.sh</span>.</p>
+        </div>
+        <p class="defaut">Le second fichier (en plus de <span class="courier11">Dockerfile</span>) est le fichier <span class="courier11">docker-entrypoint.sh</span> auquel fait référence
+le <span class="courier11">Dockerfile</span> (commande <span class="courier11">ENTRYPOINT</span>, que nous allons expliquer
+plus bas). Il est nécessaire pour que le conteneur lance
+le serveur MongoDB sous l’utilisateur dédié au
+lieu de <span class="courier11">root</span>. Il utilise pour cela
+l’utilitaire <span class="courier11">gosu</span> qui avait été précédemment
+installé par une commande <span class="courier11">RUN</span> du <span class="courier11">Dockerfile</span>.</p>
+        <p class="defaut">La partie du contenu de ce fichier correspondant à cette
+commande est la suivante&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs perl"><span class="hljs-comment">#!/bin/bash&nbsp;</span>
+set -Eeuo pipefail&nbsp;
+&nbsp;
+(...)&nbsp;
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">exec</span> gosu mongodb <span class="hljs-string">"$BASH_SOURCE"</span> <span class="hljs-string">"$@"</span>&nbsp;
+&nbsp;
+(...)&nbsp;
+&nbsp;
+<span class="hljs-keyword">exec</span> <span class="hljs-string">"$@"</span></code></pre>
+        <div class="manip">
+          <p><span class="icon-manip">&nbsp;</span>Lancez la commande de compilation de l’image.</p>
+        </div>
+        <p><span class="bridgehead_niv4">Compiler un fichier Dockerfile</span></p>
+        <pre class="programlisting"><code class="hljs scss">docker build <span class="hljs-selector-attr">[emplacement du Dockerfile]</span><var style="display:none"> docker build</var></code></pre>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP01.png" title="images/04EP01.png" src="IMAGES/04EP01.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Le processus peut prendre quelques minutes,
+en fonction de la bande passante disponible sur l’accès
+Internet, ainsi que de la présence préalable de
+certaines couches de l’image. En fin de processus, un message <span class="courier11">Writing</span> image suivi d’un identifiant
+devrait apparaître, signifiant le succès de la
+commande. Il suit le résumé de toutes les étapes
+décrites dans le fichier <span class="courier11">Dockerfile</span>,
+en l’occurrence neuf instructions <span class="courier11">RUN</span> et
+une instruction <span class="courier11">COPY</span> (les instructions
+de paramétrage de l’image comme <span class="courier11">CMD</span>, <span class="courier11">VOLUME</span> ou <span class="courier11">PORT</span> sont
+bien utilisées par la compilation mais pas prises en compte
+dans ce log)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP02.png" title="images/04EP02.png" src="IMAGES/04EP02.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">L’image créée n’a pour l’instant
+pas un nom très explicite. Nous la recherchons donc par
+son identifiant qui reprend le début du hash SHA256 montré en
+fin de log, et la renommons à l’aide de la commande <span class="courier11">docker tag</span>&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP03.png" title="images/04EP03.png" src="IMAGES/04EP03.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Il aurait également été possible,
+plutôt que de renommer après coup, de donner directement
+un nom à l’image en utilisant l’option <span class="courier11">-t</span> de
+la commande <span class="courier11">build</span>.</p>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Anatomie d’un fichier Dockerfile</h2>
+        <p class="defaut">Dans le chapitre précédent,
+nous avions déjà procédé à une
+rapide analyse d’un fichier <span class="courier11">Dockerfile</span>,
+en l’occurrence celui de l’image <span class="courier11">hello-world</span>.
+Celui-ci était à la hauteur de la simplicité de
+l’image, avec seulement trois lignes. Nous allons ici analyser un
+peu plus en détail le <span class="courier11">Dockerfile</span> de
+l’image <span class="courier11">mongo</span>, afin d’entrer un
+peu plus profondément dans la grammaire et les fonctionnalités
+du langage de description d’une image Docker.</p>
+        <div class="sect3" id="refTitle3">
+          <h3 class="title">a. FROM<var style="display:none"> FROM</var></h3>
+          <pre class="programlisting"><code class="hljs vbnet"><span class="hljs-keyword">FROM</span> ubuntu:xenial</code></pre>
+          <p class="defaut">Les fichiers <span class="courier11">Dockerfile</span> commencent
+toujours par la commande <span class="courier11">FROM</span>, qui permet
+de définir une image de base par-dessus laquelle la nouvelle
+image sera construite. Dans notre exemple, l’image de base est une
+Ubuntu, version Xenial. Dans les versions précédentes,
+l’image <span class="courier11">mongo</span> était construite
+sur une base Debian, en mode slim.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Les images "slim" sont des images
+de base Docker avec un système volontairement allégé&nbsp;de
+modules qui ne sont normalement pas nécessaires dans les usages
+de conteneurs. Ceci permet d’alléger les téléchargements.
+Certaines distributions sont même créées
+spécifiquement pour ces besoins de légèreté, comme
+par exemple les images Alpine.</p>
+            </div>
+          </div>
+          <p class="defaut">Si cette image n’est pas présente
+sur la machine hôte, elle sera téléchargée
+lors du lancement de la commande <span class="courier11">build</span>.</p>
+          <p class="defaut">Dans les rares cas où une image est
+construite sans partir d’une image existante, la grammaire à utiliser
+est <span class="courier11">FROM scratch</span>. Le nom ne correspond
+pas réellement à une image de base, mais l’expression
+"from scratch" en anglais signifie "à partir de rien",
+et est donc particulièrement adaptée dans ce cas
+particulier.</p>
+        </div>
+        <div class="sect3" id="refTitle4">
+          <h3 class="title">b. RUN<var style="display:none"> RUN</var></h3>
+          <p class="defaut">La commande <span class="courier11">RUN</span> est
+une des plus utilisées dans les <span class="courier11">Dockerfile</span>.
+Elle permet en effet&nbsp;de lancer n’importe quel processus
+qui va participer à l’élaboration de l’image en
+cours de compilation.</p>
+          <p class="defaut">Dans notre exemple, la commande <span class="courier11">RUN</span> est utilisée plusieurs
+fois, pour&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Lancer une commande <span class="courier11">curl</span> permettant de récupérer
+des fichiers sur Internet.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Utiliser <span class="courier11">echo</span> pour écrire
+des données dans un fichier qui se retrouvera dans l’image.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Manipuler les différentes
+commandes du gestionnaire de paquets Aptitude, afin d’installer
+certains modules.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Lancer des commandes de gestion
+des fichiers et répertoires en fonction des besoins.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Le fichier <span class="courier11">Dockerfile</span> correspondant à l’image
+officielle <span class="courier11">mongo</span> ne contient toutefois
+qu’un seul des deux types d’appels de la commande <span class="courier11">RUN</span>, à savoir celui utilisant
+un seul paramètre.</p>
+          <p class="defaut">Il existe une seconde syntaxe d’utilisation
+de RUN, utilisant plusieurs paramètres.</p>
+          <p><span class="bridgehead_niv4">Lancer une opération <span class="courier11">RUN</span> au format exec</span></p>
+          <pre class="literallayout"><code class="hljs javascript">RUN [<span class="hljs-string">"exécutable"</span>, <span class="hljs-string">"paramètre 1"</span>, ..., <span class="hljs-string">"paramètre N"</span>]</code></pre>
+          <p class="defaut">Cette façon de faire est à utiliser
+si vous souhaitez utiliser un autre shell, en écrivant
+alors par exemple&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs javascript">RUN [<span class="hljs-string">"/bin/bash"</span>, <span class="hljs-string">"-c"</span>, <span class="hljs-string">"echo message"</span>]</code></pre>
+          <p class="defaut">Elle sert également dans les cas
+où il est tout simplement inutile de passer par un shell
+(typiquement car il n’y a pas de besoin de remplacement de variable). La
+grammaire sera alors simplement&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs javascript">RUN [<span class="hljs-string">"echo"</span>, <span class="hljs-string">"message"</span>]</code></pre>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Nous reviendrons plus loin sur la
+différence entre l’approche shell et l’approche exec, qui
+se retrouve dans les opérateurs <span class="courier11">CMD</span> et <span class="courier11">ENTRYPOINT</span> également.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle5">
+          <h3 class="title">c. ENV<var style="display:none"> ENV</var></h3>
+          <pre class="programlisting"><code class="hljs css"><span class="hljs-selector-tag">ENV</span> <span class="hljs-selector-tag">MONGO_MAJOR</span> 3<span class="hljs-selector-class">.6</span> &nbsp;
+<span class="hljs-selector-tag">ENV</span> <span class="hljs-selector-tag">MONGO_VERSION</span> 3<span class="hljs-selector-class">.6</span><span class="hljs-selector-class">.19</span></code></pre>
+          <p class="defaut">La commande <span class="courier11">ENV</span> permet
+de déterminer des variables d’environnement, qui seront
+disponibles non seulement pour le reste de l’opération
+de compilation du <span class="courier11">Dockerfile</span>, mais
+aussi dans les conteneurs qui seront ensuite lancés depuis
+l’image générée.</p>
+          <p class="defaut">Pour bien expliquer ce concept important,
+voici tout d’abord un exemple d’utilisation des variables d’environnement à l’intérieur
+du <span class="courier11">Dockerfile</span>&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl">RUN set -<span class="hljs-keyword">x</span> \&nbsp;
+<span class="hljs-comment"># installing "mongodb-enterprise" pulls in "tzdata" which prompts </span>
+<span class="hljs-keyword">for</span> input&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; export DEBIAN_FRONTEND=noninteractive \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; apt-get update \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; apt-get install -<span class="hljs-keyword">y</span> \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-server=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-shell=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-mongos=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${MONGO_PACKAGE}-tools=$MONGO_VERSION \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; rm -rf /var/lib/apt/lists/* \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; rm -rf /var/lib/mongodb \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; mv /etc/mongod.conf /etc/mongod.conf.orig</code></pre>
+          <p class="defaut">Cette utilisation permet de centraliser les
+paramètres, et ainsi de rendre plus facilement évolutifs
+les <span class="courier11">Dockerfile</span>, en évitant
+dans ce cas précis de remplacer une version&nbsp;et
+d’oublier une autre occurrence plus loin dans le fichier.</p>
+          <p class="defaut">Voici maintenant la manifestation du second
+impact de la commande <span class="courier11">ENV</span>, qu’on
+peut observer en démarrant un conteneur sur l’image <span class="courier11">Docker mongo</span> et en inspectant son
+contenu par la commande adéquate&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP04.png" title="images/04EP04.png" src="IMAGES/04EP04.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Si nous démarrons un conteneur, nous
+retrouvons bien les variables d’environnement dans son contexte
+d’exécution.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Il est bien sûr possible
+de passer des variables d’environnement uniquement au moment du
+lancement du conteneur, sans qu’elles fassent partie de la définition
+de l’image. L’option <span class="courier11">--env</span> de la
+commande <span class="courier11">docker run</span> est disponible à cet
+effet.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle6">
+          <h3 class="title">d. VOLUME<var style="display:none"> VOLUME</var></h3>
+          <pre class="programlisting"><code class="hljs powershell">RUN mkdir -p /<span class="hljs-keyword">data</span>/db /<span class="hljs-keyword">data</span>/configdb \&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&amp;&amp; chown -R mongodb:mongodb /<span class="hljs-keyword">data</span>/db /<span class="hljs-keyword">data</span>/configdb&nbsp;
+VOLUME /<span class="hljs-keyword">data</span>/db /<span class="hljs-keyword">data</span>/configdb</code></pre>
+          <p class="defaut">Une section complète du prochain
+chapitre sera consacrée à la gestion des volumes,
+qui est un sujet important. Dans la présente section, nous
+allons simplement expliquer la problématique des données,
+comment nous pouvons tirer parti de la définition du volume
+ci-dessus pour ne pas perdre de données de MongoDB, puis
+revenir brièvement sur l’importance de l’option <span class="courier11">-v</span> dans la commande de suppression
+des conteneurs.</p>
+          <p class="defaut">Dans le précédent chapitre,
+nous avons rapidement abordé la notion de volume, en associant à une
+image <span class="courier11">nginx</span> un répertoire&nbsp;<span class="courier11">www</span> qui contenait les fichiers statiques à exposer
+par le serveur web. Cette manipulation permettait de garder une
+image neutre et de ne pas avoir à la reconstruire ou à valider
+des modifications à chaque changement des fichiers web.</p>
+          <p class="defaut">Dans le cas d’un serveur de base de données
+comme MongoDB, il est encore plus important que les fichiers de
+données soient découplés du conteneur
+de base de données lui-même. En effet, autant
+il n’est pas problématique de relancer le processus de
+serveur <span class="courier11">mongod</span>, autant repartir
+de zéro pour les données contenues - et
+perdre toutes les données entrées par les utilisateurs - est potentiellement
+un énorme problème.<var style="display:none"> MongoDB</var></p>
+          <p class="defaut">Nous illustrons ce problème ci-dessous
+en montrant deux lancements, le premier inscrivant de la donnée,
+et le second conteneur constatant son absence. Dans un premier temps,
+nous démarrons un conteneur avec une base de données
+MongoDB exposée sur le port local 27017&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP05.png" title="images/04EP05.png" src="IMAGES/04EP05.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">À l’aide d’un client MongoDB (nous
+utiliserons ici Robo 3T), nous nous connectons à l’instance
+de base de données que nous venons de créer&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP06.png" title="images/04EP06.png" src="IMAGES/04EP06.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Puis, nous créons une base de données
+nommée test dans le serveur (clic droit sur la connexion
+et commande <b>Create Database</b>)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP07.png" title="images/04EP07.png" src="IMAGES/04EP07.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">À l’intérieur de cette base
+de données, une collection est ajoutée, qui prend
+le nom de <span class="courier11">Personnes</span> (clic droit
+sur la liste des collections et menu <b>Create Collection…</b>)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP08.png" title="images/04EP08.png" src="IMAGES/04EP08.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Enfin, nous insérons un document à l’aide
+de la commande contextuelle correspondante sur la collection que
+nous venons de créer&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP09.png" title="images/04EP09.png" src="IMAGES/04EP09.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La donnée de test est bien présente
+dans la base de données&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP10.png" title="images/04EP10.png" src="IMAGES/04EP10.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Imaginons maintenant que nous supprimons le
+conteneur, puis que nous relançons un conteneur avec le
+même nom&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP11.png" title="images/04EP11.png" src="IMAGES/04EP11.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">En relançant le client (il faut en
+effet faire attention aux effets de cache), on se rend compte que
+la base de données <span class="courier11">test</span> n’est
+plus accessible et que les données saisies sont perdues&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP12.png" title="images/04EP12.png" src="IMAGES/04EP12.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le conteneur, bien que du même nom, était
+bien une instance différente comme la différence
+d’identifiant dans la fenêtre de commandes le montrait bien.
+Il s’agit donc d’un nouveau processus du point de vue du système,
+et comme nous n’avons pas fait pointer les deux applications sur
+le même répertoire pour les données,
+il n’y a aucune raison qu’elles soient partagées (le comportement
+par défaut contraire serait même très
+problématique pour la confidentialité des données).</p>
+          <p class="defaut">Afin de produire un résultat sans
+perte de données, le changement à opérer
+est minime&nbsp;: il suffit de mettre en correspondance le volume <span class="courier11">/data/db</span> exposé par
+l’image avec un répertoire dans lequel les données
+seront en sécurité. Dans notre cas, nous allons
+utiliser un répertoire <span class="courier11">donnees</span> situé sur
+la machine hôte.</p>
+          <p class="defaut">Les manipulations illustrées ci-dessous
+ne comprennent qu’une option <span class="courier11">-v</span> en plus
+sur les commandes <span class="courier11">run</span> (ainsi que
+la création du répertoire, bien sûr), mais
+elles aboutissent à un résultat essentiel, à savoir
+que le second conteneur voit bien les données entrées
+dans le premier&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP13.png" title="images/04EP13.png" src="IMAGES/04EP13.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention à ne pas utiliser
+un nom de répertoire seul, car on pourrait croire qu’il va être
+pris en compte, mais si seul un identifiant est fourni, Docker créera
+automatiquement un volume nommé du même nom (nous
+reviendrons plus loin sur cette notion).</p>
+            </div>
+          </div>
+          <p class="defaut">On peut au passage constater que les données
+ont bien été écrites dans le répertoire
+fourni&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP14.png" title="images/04EP14.png" src="IMAGES/04EP14.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Encore une fois, nous ne montrons ici qu’une
+première approche des volumes. Une section complète
+leur est consacrée plus loin. Le but était juste
+de montrer à quoi servait le mot-clé <span class="courier11">VOLUME</span> dans le fichier <span class="courier11">Dockerfile</span>, en l’occurrence spécifier
+une partie du système de fichiers du conteneur auquel le
+droit est reconnu d’être exposé à l’extérieur.
+Il est ainsi possible de le mettre en correspondance avec un répertoire
+de la machine hôte, comme nous venons de le faire, ou encore
+de le mettre en lien avec un conteneur dédié à la
+gestion d’un volume, comme nous le verrons plus tard.</p>
+          <p class="defaut">Que se passait-il lorsque nous omettions de
+réaliser ce pointage d’un volume sur un répertoire
+donné&nbsp;? Tout simplement, Docker le faisait pour
+nous en créant un répertoire contrôlé par
+ses soins sur la machine hôte lors du démarrage
+du conteneur.</p>
+          <p class="defaut">Un appel à <span class="courier11">docker
+inspect</span> nous permet de retrouver l’emplacement de ce répertoire
+et son contenu, géré par MongoDB&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP15.png" title="images/04EP15.png" src="IMAGES/04EP15.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Ce répertoire n’était toutefois
+pas réutilisé pour un second conteneur, car Docker
+aurait&nbsp;alors rompu la règle d’étanchéité.
+Mais, par défaut, il n’était pas non plus supprimé,
+afin de donner une possibilité de récupérer
+les données si nécessaire. C’est une sécurité&nbsp;appréciable,
+mais il est facile de se retrouver ensuite avec beaucoup de volumes&nbsp;dits
+orphelins, c’est-à-dire de l’espace disque consommé par
+ces volumes créés automatiquement, mais pas supprimés lorsque
+le conteneur est arrêté. C’est la raison pour
+laquelle il est recommandé, lors d’expérimentations
+avec Docker, de bien utiliser l’option <span class="courier11">-v</span> sur <span class="courier11">docker rm</span>, de façon que les
+volumes soient automatiquement supprimés&nbsp;lorsqu’ils
+ne sont plus utilisés par aucun conteneur.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Dans le fichier <span class="courier11">Dockerfile</span> montré,
+un second volume est défini (<span class="courier11">/data/configdb</span>)
+qui permet de faire pointer MongoDB sur un contenu de configuration
+par le même mécanisme que pour les données.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle7">
+          <h3 class="title">e. COPY<var style="display:none"> COPY</var></h3>
+          <pre class="programlisting"><code class="hljs perl">COPY docker-entrypoint.sh /usr/<span class="hljs-keyword">local</span>/bin/</code></pre>
+          <p class="defaut">La commande <span class="courier11">COPY</span> permet
+de récupérer des fichiers locaux à la
+machine sur laquelle la commande <span class="courier11">docker
+build</span> est lancée et de les intégrer dans l’image
+en cours de création. Dans notre exemple, le fichier <span class="courier11">docker-entrypoint.sh</span> se trouvait au
+même endroit que le fichier <span class="courier11">Dockerfile</span> livré par les
+mainteneurs de l’image officielle de MongoDB. Comme ce fichier est
+nécessaire à l’exécution lorsque
+le conteneur sera lancé, la commande <span class="courier11">COPY</span> le
+recopie dans un répertoire et crée un lien dessus
+depuis&nbsp;la racine de l’image compilée.</p>
+          <p class="defaut">En pratique, les fichiers qui se trouvent
+au même emplacement que le fichier <span class="courier11">Dockerfile</span>&nbsp;sont
+copiés dans ce qu’on appelle le contexte, et donc chargés par
+la commande <span class="courier11">build</span>. Il est donc essentiel
+de ne pas placer son fichier <span class="courier11">Dockerfile</span> dans
+un répertoire avec des fichiers qui ne seront pas utiles à la construction
+de l’image. Le plus simple est de créer un répertoire
+dédié, comme ce qui peut être observé sur
+les images du registre, qui sont construites à partir d’un
+dépôt GitHub ne contenant que le nécessaire.</p>
+          <p class="defaut">Parfois, il est difficile d’obtenir un répertoire
+complètement vierge de tout fichier inutile, justement
+parce que c’est le même répertoire qui est utilisé pour les
+développements par Git. L’astuce consiste alors à ajouter
+un fichier nommé .<span class="courier11">dockerignore</span> au
+même endroit que le fichier <span class="courier11">Dockerfile</span>,
+et à déclarer dans le premier les fichiers et
+répertoires à ignorer au chargement de contexte. Nous
+reviendrons un peu plus loin dans le présent chapitre sur
+le mode de fonctionnement du contexte et sur le contenu de ce fichier <span class="courier11">.dockerignore</span>.</p>
+        </div>
+        <div class="sect3" id="refTitle8">
+          <h3 class="title">f. ENTRYPOINT<var style="display:none"> ENTRYPOINT</var></h3>
+          <pre class="programlisting"><code class="hljs javascript">ENTRYPOINT [<span class="hljs-string">"/docker-entrypoint.sh"</span>]</code></pre>
+          <p class="defaut">Le mot-clé <span class="courier11">ENTRYPOINT</span> permet
+de définir la commande qui va être exécutée lors
+du démarrage d’un conteneur, c’est-à-dire le processus
+primaire qui sera porté par ce dernier. Comme pour la commande <span class="courier11">RUN</span>, le fonctionnement peut suivre
+indifféremment deux syntaxes&nbsp;:</p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Dans la grammaire <span class="courier11">ENTRYPOINT</span> suivi d’un tableau JSON
+(comme dans notre exemple ci-dessus, bien que le tableau soit réduit à une
+seule entrée), le premier paramètre&nbsp;contient
+la commande à exécuter, et les suivants les paramètres
+de cette commande.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Dans la grammaire <span class="courier11">ENTRYPOINT</span> suivi d’une chaîne,
+un shell est démarré et le contenu de cette chaîne
+lui est passé pour interprétation. Attention,
+dans ce cas, les signaux envoyés au conteneur par la commande <span class="courier11">kill</span> ne seront pas passés.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Il n’y a pas d’intérêt
+particulier à détailler tout le contenu de ce
+fichier <span class="courier11">docker-entrypoint.sh</span>&nbsp;qui
+avait juste avant été copié dans l’image
+(ce qui est un prérequis pour qu’il puisse être
+utilisé ici).</p>
+          <p class="defaut">Un point intéressant par rapport à Docker
+est que le fichier finit par l’instruction suivante, qui fait que
+si aucune condition n’a été réalisée,
+ce qui est exécuté est la commande qui aura été passée
+en paramètre&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs python"><span class="hljs-keyword">exec</span> <span class="hljs-string">"$@"</span></code></pre>
+          <p class="defaut">C’est ce qui nous permet par exemple d’écrire
+la commande suivante&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP16.png" title="images/04EP16.png" src="IMAGES/04EP16.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Dans l’exemple précédent,
+nous sommes bien entrés dans le script <span class="courier11">docker-entrypoint.sh</span>,
+mais en lui passant <span class="courier11">/bin/bash</span> comme
+paramètre. Comme cela ne correspondait pas à une
+des conditions <span class="courier11">if</span>, c’est la toute
+dernière ligne qui a été lancée,
+soit <span class="courier11">exec "$@"</span>.</p>
+          <p class="defaut">La deuxième partie de la grammaire
+exprime que tous les paramètres doivent être repris&nbsp;(<span class="courier11">$1</span> correspond au premier, <span class="courier11">$2</span> au second, etc. et <span class="courier11">$@</span> à la
+liste complète). Ce qui est exécuté est
+donc <span class="courier11">exec /bin/bash</span>,
+ce qui explique que nous avons pu prendre la main sur l’invite de
+commandes (avec l’option <span class="courier11">-it</span> sur <span class="courier11">docker run</span>, bien sûr) et
+regarder le contenu du fichier du conteneur lancé. On constate
+qu’après <span class="courier11">exit</span>, le conteneur
+est arrêté, ce qui est logique car nous étions
+en mode interactif et le processus <span class="courier11">/bin/bash</span> (qui était
+le processus principal) a été terminé.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Il est de bonne pratique qu’un conteneur
+n’accueille qu’un seul processus (en dehors évidemment
+des processus utilitaires, dont l’usage est de diagnostiquer le
+fonctionnement, par exemple). Ce processus a pour numéro
+de PID 1, et c’est lui qui recevra les signaux envoyés
+par la commande <span class="courier11">kill</span>. Cette remarque
+explique en particulier la limitation&nbsp;du démarrage
+par un shell que nous avons abordé un peu plus haut&nbsp;:
+comme c’est le shell qui reçoit alors les signaux, l’exécutable
+qu’il a démarré ne recevra par exemple rien lors
+d’une commande <span class="courier11">docker stop</span>.</p>
+            </div>
+          </div>
+          <p class="defaut">Si nous lançons un conteneur sur
+l’image MongoDB sans préciser de paramètre, c’est
+celui précisé par le mot-clé <span class="courier11">CMD</span> du <span class="courier11">Dockerfile</span> qui
+sera utilisé. Sans trop anticiper sur la suite, il se trouve
+que dans notre exemple, sa valeur est <span class="courier11">mongod</span>.</p>
+          <p class="defaut">Il est possible de modifier la valeur d’<span class="courier11">ENTRYPOINT</span> lors du lancement du conteneur,
+en utilisant l’option <span class="courier11">--entrypoint</span>,
+mais ce n’est pas une bonne pratique. <span class="courier11">ENTRYPOINT</span> est
+censé être la partie stable de la commande de
+démarrage de processus à exécuter. La
+partie variable, quant à elle, correspond à tout
+ce qui se trouve en fin de commande <span class="courier11">docker
+run</span> (juste après le nom de l’image à utiliser).
+Dans la majorité des cas, ce sont d’ailleurs les paramètres par
+défaut spécifiés par le mot-clé <span class="courier11">CMD</span> dans le <span class="courier11">Dockerfile</span> qui
+seront utilisés.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À noter également
+que la logique impose de n’avoir qu’un seul <span class="courier11">ENTRYPOINT</span> dans
+un fichier <span class="courier11">Dockerfile</span>. Dans la pratique,
+Docker n’émet pas d’erreur s’il y en a plusieurs, mais
+il ne prendra en compte que le dernier d’entre eux.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle9">
+          <h3 class="title">g. EXPOSE<var style="display:none"> EXPOSE</var></h3>
+          <pre class="programlisting"><code class="hljs">EXPOSE 27017</code></pre>
+          <p class="defaut">Le mot-clé <span class="courier11">EXPOSE</span> permet
+d’exposer un port réseau à l’extérieur,
+un peu comme le fait le mot-clé <span class="courier11">VOLUME</span> avec
+des pans du système de fichiers. De la même manière
+qu’il n’est pas obligatoire de brancher le volume sur un répertoire
+de la machine hôte, il n’est pas obligatoire de mettre
+en correspondance le port exposé avec un port de la machine&nbsp;hôte,
+mais cette commande permet de le faire, en utilisant l’option <span class="courier11">-p</span> de la commande <span class="courier11">docker
+run</span>.</p>
+          <p class="defaut">Nous avions déjà montré un
+premier exemple d’utilisation de cette option lors de la manipulation
+de l’image Nginx dans le chapitre précédent, et
+reviendrons plus en détail&nbsp;dans un chapitre suivant
+sur la gestion du réseau avec Docker.</p>
+        </div>
+        <div class="sect3" id="refTitle10">
+          <h3 class="title">h. CMD<var style="display:none"> CMD</var></h3>
+          <pre class="programlisting"><code class="hljs javascript">CMD [<span class="hljs-string">"</span><b><span class="hljs-string">mongod</span></b><span class="hljs-string">"</span>]</code></pre>
+          <p class="defaut">Nous avons déjà abordé le
+rôle du mot-clé <span class="courier11">CMD</span> lors
+de l’explication de celui nommé <span class="courier11">ENTRYPOINT</span>, à savoir
+de passer au processus spécifié par <span class="courier11">ENTRYPOINT</span> les paramètres
+par défaut, en l’absence de paramètres explicitement spécifiés
+en fin de commande <span class="courier11">docker run</span>.</p>
+          <p class="defaut">Dans notre exemple sur l’image officielle
+de MongoDB, la valeur étant <span class="courier11">mongod</span>,
+c’est la seconde condition <span class="courier11">if</span> qui était
+sélectionnée, et l’exécution finissait
+donc par&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs python"><span class="hljs-keyword">exec</span> gosu mongodb <span class="hljs-string">"$@"</span></code></pre>
+          <p class="defaut">La liste de paramètres étant
+juste <span class="courier11">mongod</span>, la commande effectivement
+lancée était la suivante&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs python"><span class="hljs-keyword">exec</span> gosu mongodb mongod</code></pre>
+          <p class="defaut">En pratique, cela revient à lancer
+le processus <span class="courier11">mongod</span> sous l’identité de
+l’utilisateur <span class="courier11">mongodb</span>, bref à démarrer
+notre serveur dans un mode plus sécurisé qu’en
+le démarrant en <span class="courier11">root</span>.</p>
+          <p class="defaut">Afin de bien expliquer l’articulation de <span class="courier11">CMD</span> et <span class="courier11">ENTRYPOINT</span>,
+qui est essentielle, nous allons revenir dessus avec un exemple
+très simple.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle11">
+        <h2 class="title">4. Notre premier Dockerfile<var style="display:none"> Dockerfile</var></h2>
+        <div class="sect3" id="refTitle12">
+          <h3 class="title">a. Fonctionnalité souhaitée</h3>
+          <p class="defaut">Cet exemple sera celui d’une image qui, une
+fois instanciée sous forme de conteneur, émettra
+des signaux textuels sur la console de sortie à intervalles réguliers.
+On parle alors de heartbeat (battement de cœur en anglais)
+pour désigner ce type de fonctionnalité, qui a
+pour but de rendre visible l’arrêt d’une fonctionnalité informatique
+par l’arrêt des messages réguliers. Ce mode de fonctionnement,
+qui s’appuie sur une remontée&nbsp;régulière
+d’une preuve d’activité, est plus sûr que l’attente
+d’un message d’arrêt.&nbsp;Ce dernier pourrait en effet
+ne jamais survenir si la panne en question a été trop
+brutale pour que le système ait le temps de prévenir
+de sa mise hors service.</p>
+          <p class="defaut">Le message sera paramétrable au démarrage
+du conteneur, avec une valeur par défaut portée
+par <span class="courier11">CMD</span>. Nous utiliserons <span class="courier11">ENTRYPOINT</span> de telle manière
+que l’émission de message puisse être arrêtée,
+puis reprise.</p>
+        </div>
+        <div class="sect3" id="refTitle13">
+          <h3 class="title">b. Création et test du script</h3>
+          <p class="defaut">Avant même de parler du fichier <span class="courier11">Dockerfile</span>, nous allons créer
+un script shell permettant de réaliser l’émission
+d’un message régulier.</p>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Créez un répertoire, nommé par
+exemple <span class="courier11">repeater</span>, dans lequel tous
+les fichiers que nous allons utiliser seront stockés.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Placez-vous dans ce répertoire.</p>
+          </div>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Créez un fichier <span class="courier11">heartbeat.sh</span> et
+insérez-y le contenu suivant&nbsp;:</p>
+          </div>
+          <pre class="programlisting"><code class="hljs perl"><span class="hljs-comment">#!/bin/bash&nbsp;</span>
+<span class="hljs-keyword">if</span> [ -z <span class="hljs-string">"$HEARTBEATSTEP"</span> ]; then&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;echo <span class="hljs-string">"La variable d’environnement HEARTBEATSTEP doit être valuée"</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>&nbsp;
+fi&nbsp;
+&nbsp;
+<span class="hljs-keyword">while</span> true;&nbsp;
+<span class="hljs-keyword">do</span>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;echo $1 \($(date +%H:%M:%S)\);&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="hljs-keyword">sleep</span> <span class="hljs-string">"$HEARTBEATSTEP"</span>;&nbsp;
+done</code></pre>
+          <div class="manip">
+            <p><span class="icon-manip">&nbsp;</span>Sauvegardez le fichier.</p>
+          </div>
+          <p class="defaut">Un premier test nous permet de valider le
+comportement attendu si la variable <span class="courier11">HEARTBEATSTEP</span>,
+qui règle la durée entre chaque message, n’existe
+pas&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP17.png" title="images/04EP17.png" src="IMAGES/04EP17.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour un test fonctionnel, nous pouvons passer
+temporairement la variable d’environnement comme ceci&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP18.png" title="images/04EP18.png" src="IMAGES/04EP18.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Pour interrompre le déroulement
+du script, la combinaison de touches à utiliser est [Ctrl]&nbsp;<b>C</b>.</p>
+            </div>
+          </div>
+          <p class="defaut">Pour information, il est également
+possible de fixer la variable d’environnement une fois pour toute
+la session du shell en cours. C’est d’ailleurs ce qui se passera
+lorsque nous injecterons la valeur de la variable d’environnement
+par le <span class="courier11">Dockerfile</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP19.png" title="images/04EP19.png" src="IMAGES/04EP19.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le script assurant le fonctionnement du processus étant
+prêt, nous allons ensuite faire le nécessaire
+pour que ce processus soit exécuté "en boîte
+noire" dans un conteneur Docker, et donc créer une image.</p>
+        </div>
+        <div class="sect3" id="refTitle14">
+          <h3 class="title">c. Création du Dockerfile</h3>
+          <p class="defaut">Pour cela, l’étape suivante consiste à écrire
+un fichier <span class="courier11">Dockerfile</span> qui va nous
+permettre de créer une image lançant le script
+avec le paramétrage correct. Comme vu plus haut, ce fichier
+est une suite d’instructions qui pilotent la compilation d’une image
+et permettent de définir son comportement final. La suite
+de cette section décrit&nbsp;chacune de ces instructions,
+et donc des lignes composant ce fichier. Avant toute autre manipulation,
+il convient donc de créer un fichier <span class="courier11">Dockerfile</span> vide,
+que nous placerons aux côtés du précédent,
+dans le répertoire <span class="courier11">repeater</span>,
+et dans lequel les lignes ci-dessous seront recopiées au
+fur et à mesure des explications fournies.</p>
+          <p class="defaut">En premier, nous établissons que
+l’image de base sera une <span class="courier11">ubuntu</span> (nous
+utilisons la dernière version, l’intérêt
+de se bloquer sur une version particulière pour éviter
+les effets&nbsp;de bord étant quasi nul pour notre
+exemple)&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs vbnet"><span class="hljs-keyword">FROM</span> ubuntu:latest</code></pre>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Le choix d’une image de base
+est un sujet complexe, qui peut dépendre de nombreux paramètres
+et des usages qui seront faits de votre image. Pour la plupart des
+usages standards, des images allégées existent
+comme Alpine, ClearOS et de nombreuses autres. Il est important
+de choisir l’image de base la plus légère
+possible parmi celles qui vous offrent les fonctionnalités
+voulues. De plus, si vous créez plusieurs images (ce qui
+est bien sûr le cas dans les architectures de microservices),
+alors il y a un avantage supplémentaire à choisir une
+image de base identique pour tous vos services, quitte à ce
+qu’elle soit un tout petit peu plus lourde, car elle sera
+mise en cache une seule fois pour toutes vos images. Dans le cas
+du présent exemple, le choix d’une image plus complète
+s’est imposé car les manipulations ne sont pas
+celles traditionnellement réalisées sur un serveur,
+et baser le contenu sur une image Alpine conduisait à une
+erreur d’exécution, un fichier nécessaire
+n’étant pas inclus.</p>
+            </div>
+          </div>
+          <p class="defaut">Ensuite, nous avons une information sur la
+personne maintenant cette image. Cette commande est optionnelle,
+mais recommandée si vous partagez l’image. Le format d’écriture
+est le suivant&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl">LABEL maintainer=<span class="hljs-string">"jp.gouigoux@free.fr"</span></code></pre>
+          <p class="defaut"><var style="display:none"> MAINTAINER</var>Certains fichiers <span class="courier11">Dockerfile</span> contiennent
+encore l’ancienne grammaire utilisant le mot-clé dédié <span class="courier11">MAINTAINER</span>, mais celle-ci est dépréciée
+au profit de l’usage de l’ajout de labels, qui
+peuvent ensuite être lus par le biais de la commande <span class="courier11">docker inspect</span>.</p>
+          <p class="defaut">Nous entrons ensuite dans la partie fonctionnelle
+du <span class="courier11">Dockerfile</span>, avec une première
+commande permettant de récupérer le fichier <span class="courier11">heartbeat.sh</span> précédemment
+créé et de le copier dans l’image sous le nom
+d’<span class="courier11">entrypoint.sh</span>, et au niveau de
+la racine&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">COPY heartbeat.sh /entrypoint.sh</code></pre>
+          <p class="defaut">Nous reviendrons un peu plus loin sur la notion
+de contexte de compilation d’image, mais pour l’instant, le plus
+simple est de considérer que les fichiers nécessaires à la
+compilation doivent être au même endroit que le
+fichier <span class="courier11">Dockerfile</span>. De même,
+la commande <span class="courier11">docker build</span> peut être
+lancée depuis un autre répertoire que celui contenant
+le fichier <span class="courier11">Dockerfile</span> grâce à l’option
+adéquate de la ligne de commande, mais pour cette première
+manipulation, le plus pédagogique est de fonctionner entièrement
+dans le répertoire <span class="courier11">repeater</span> créé pour
+l’occasion.</p>
+          <p class="defaut">Le fichier <span class="courier11">entrypoint.sh</span> doit
+pouvoir être exécuté dans le conteneur.
+Il convient donc de modifier ses droits pour ajouter cette caractéristique.</p>
+          <pre class="programlisting"><code class="hljs perl">RUN <span class="hljs-keyword">chmod</span> +<span class="hljs-keyword">x</span> /entrypoint.sh</code></pre>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À titre d’information et
+pour aider au débogage éventuel, si cette commande est
+omise, un message d’erreur <span class="courier11">Cannot start
+container [...]&nbsp;: exec: "/entrypoint.sh":
+permission denied</span> sera émis lorsqu’on tentera d’exécuter
+un conteneur avec l’image construite.</p>
+            </div>
+          </div>
+          <p class="defaut">La commande suivante est utilisée
+pour donner une valeur d’intervalle par défaut à notre
+système. Nous utiliserons un écart de deux secondes
+entre chaque message, mais comme nous le montrerons plus tard, il
+restera possible de jouer sur cette valeur après la construction
+de l’image.</p>
+          <pre class="programlisting"><code class="hljs">ENV HEARTBEATSTEP 2</code></pre>
+          <p class="defaut">Les deux dernières commandes sont
+celles qu’il est important de bien expliquer à nouveau. <span class="courier11">ENTRYPOINT</span> correspond à la
+commande qui va activer le processus principal dans le conteneur,
+en l’occurrence le script d’écriture de message&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs javascript">ENTRYPOINT [<span class="hljs-string">"/entrypoint.sh"</span>]</code></pre>
+          <p class="defaut">Quant au mot-clé <span class="courier11">CMD</span>,
+il permet de passer le paramètre par défaut à la
+commande lancée par <span class="courier11">ENTRYPOINT</span>.
+Dans notre cas, nous souhaitons que l’utilisateur de l’image puisse
+passer facilement le message à envoyer depuis la commande <span class="courier11">docker run</span>. Par contre, si rien n’est
+passé, nous afficherons le texte <span class="courier11">heartbeat</span>,
+et ceci nécessite&nbsp;donc de déclarer ce
+paramètre derrière le mot-clé <span class="courier11">CMD</span>&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs javascript">CMD [<span class="hljs-string">"heartbeat"</span>]</code></pre>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention, bien qu’il soit possible
+d’écrire les paramètres des instructions <span class="courier11">ENTRYPOINT</span> et <span class="courier11">CMD</span> sous
+forme de simples chaînes et non de collections JSON avec
+les crochets et les guillemets, le comportement n’est pas le même
+que dans l’autre format pour ce qui relève&nbsp;de
+l’interaction entre les deux commandes. Ce niveau de détail
+ne relève pas du présent ouvrage introductif à Docker,
+et nous renvoyons le lecteur cherchant une expertise à ce
+sujet à la page de documentation associée, à savoir <a class="url" href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact" target="_blank">https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact</a></p>
+            </div>
+          </div>
+          <p class="defaut">Le fichier <span class="courier11">Dockerfile</span> étant
+prêt, nous pouvons désormais nous placer dans le
+répertoire contenant les deux fichiers.</p>
+        </div>
+        <div class="sect3" id="refTitle15">
+          <h3 class="title">d. Génération de l’image</h3>
+          <p class="defaut">La génération de l’image
+est réalisée par la commande <span class="courier11">docker
+build</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP20.png" title="images/04EP20.png" src="IMAGES/04EP20.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Dans les précédentes versions
+de Docker, la commande <span class="courier11">build</span> montrait
+autant d’opérations que d’instructions dans le fichier <span class="courier11">Dockerfile</span>, et les couches d’images étaient
+de la même manière empilée les unes par-dessus
+les autres pour chaque instruction. Désormais, seules les
+opérations nécessitant réellement la
+création d’une couche apparaissent dans la compilation,
+et les opérations de pur paramétrage comme <span class="courier11">ENV</span>, <span class="courier11">CMD</span> ou <span class="courier11">LABEL</span>, qui n’ont finalement de conséquences
+que sur les métadonnées de l’image et pas réellement sur
+son contenu binaire, sont rendues invisibles dans le log de compilation.</p>
+          <p class="defaut">En fait, la notion même de couche
+intermédiaire de compilation est désormais cachée,
+comme on peut le voir en utilisant l’option <span class="courier11">-a</span> sur
+la commande <span class="courier11">docker images</span>, qui ne
+ramène bien qu’une seule image (l’image finale) pour <span class="courier11">jpgouigoux/repeater</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP21.png" title="images/04EP21.png" src="IMAGES/04EP21.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le nouveau moteur de compilation, dit BuildKit,
+est basé sur une implémentation open source disponible
+dans le cadre du projet Moby et apportant des gains de performance
+ainsi que des fonctionnalités nouvelles. Par exemple, il gère
+mieux le cache des images et ne recompile pas une couche qui suit
+une étape modifiée mais sans impact sur la suivante,
+comme l’ajout d’un <span class="courier11">LABEL</span>. Depuis
+peu, il est désormais l’implémentation par défaut
+de la commande <span class="courier11">docker build</span>. Dans
+le cas, a priori peu probable, où l’utilisation de l’ancienne
+implémentation serait nécessaire, la variable
+d’environnement <span class="courier11">DOCKER_BUILDKIT</span> peut être
+passée à <span class="courier11">0</span>. Il
+faudra ensuite bien la repasser à <span class="courier11">1</span> ou la
+supprimer pour revenir au comportement désormais standard… et
+ne pas oublier de passer un coup de <span class="courier11">docker
+system prune</span> pour supprimer les images intermédiaires
+que ce mode de fonctionnement désormais obsolète
+générait.</p>
+          <p class="defaut">L’image étant prête, nous
+allons pouvoir lancer un premier conteneur basé dessus.</p>
+        </div>
+        <div class="sect3" id="refTitle16">
+          <h3 class="title">e. Lancement du conteneur</h3>
+          <p class="defaut">Dans un premier temps, un conteneur est lancé en
+mode interactif, et sans paramètre, de façon à vérifier
+le comportement de base de l’image&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP22.png" title="images/04EP22.png" src="IMAGES/04EP22.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Le comportement est tel qu’attendu&nbsp;:
+en l’absence de paramètre, le message qui ressort est <span class="courier11">heartbeat</span>, et le signal est émis
+toutes les deux secondes.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Si vous obtenez une erreur de type <span class="courier11">exec format error</span>, une des raisons
+possibles est l’oubli du "shebang" dans le fichier de script (la
+première ligne), ce qui empêche le shell de savoir
+comment l’exécuter. Mais cette erreur arrive également
+dans de nombreuses autres situations, par exemple si vous essayez
+de lancer une image 64 bits sur une machine&nbsp;hôte
+32 bits. Si vous obtenez un message d’erreur comme quoi
+un fichier système est manquant, il est possible que cela
+vienne de l’image de base que vous utilisez. Lorsque celles-ci
+sont trop allégées, des fichiers nécessaires à votre
+usage peuvent venir à manquer. Il faut alors se référer à la
+documentation de l’image utilisée pour savoir&nbsp;ce
+qui est présent (et garanti de le rester) et ce qui est
+absent.</p>
+            </div>
+          </div>
+          <p class="defaut">Attention, la combinaison [Ctrl]&nbsp;<b>C</b> n’arrêtera pas le fonctionnement
+du script. Pour reprendre la main sur la ligne de commande initiale,
+il faudra entrer la combinaison [Ctrl]&nbsp;<b>P</b>, [Ctrl]&nbsp;<b>Q</b> (on parle d’opération de
+détachement du conteneur). En appelant la commande <span class="courier11">docker ps</span> après cette manipulation, il
+est visible que le conteneur est encore actif&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP23.png" title="images/04EP23.png" src="IMAGES/04EP23.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Cette constatation est corroborée
+par un appel à la commande <span class="courier11">docker logs</span>,
+qui montre des messages bien après que nous sommes ressortis
+de l’exécution interactive du script (il s’exécute
+quant à lui toujours dans le conteneur)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP24.png" title="images/04EP24.png" src="IMAGES/04EP24.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La commande <span class="courier11">docker
+attach [identifiant du conteneur]</span> peut être
+utilisée pour se rattacher au conteneur. Cette commande
+réalise l’opération inverse de la combinaison
+de touches précédemment citée, et permet
+de se replacer dans la console associée à l’exécution
+du conteneur.</p>
+        </div>
+        <div class="sect3" id="refTitle17">
+          <h3 class="title">f. Arrêt et relance du conteneur</h3>
+          <p class="defaut">Une autre manifestation du fait que le processus
+tourne bien en continu même si la console n’est pas attachée à sa
+sortie standard est qu’une tentative de suppression du conteneur
+sans l’option <span class="courier11">--force</span> aboutit à une
+erreur&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP25.png" title="images/04EP25.png" src="IMAGES/04EP25.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Pour arrêter le conteneur, la commande
+suivante peut être utilisée&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs vbnet">docker <span class="hljs-keyword">stop</span> -t <span class="hljs-number">1</span> repeater</code></pre>
+          <p class="defaut">Le paramètre fourni correspond au
+délai de grâce entre le premier signal <span class="courier11">SIGTERM</span> de demande d’arrêt
+qui sera envoyé au processus dans le conteneur et le second
+signal <span class="courier11">SIGKILL</span> qui forcera l’arrêt
+effectif. Le délai peut être très court dans
+notre cas, car le processus n’a pas grand-chose à interrompre
+et éventuellement nettoyer.</p>
+          <p class="defaut">La commande inverse permet de relancer le
+conteneur, ce qui aboutira au démarrage d’un processus
+de heartbeat en retour dans notre exemple&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs sql">docker <span class="hljs-keyword">start</span> repeater</code></pre>
+          <p class="defaut">Cette manipulation est bien sûr visible
+dans le log, où on peut constater un saut dans les heures
+de génération de signal&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP26.png" title="images/04EP26.png" src="IMAGES/04EP26.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle18">
+          <h3 class="title">g. Une méthode moins brutale</h3>
+          <p class="defaut">Au lieu de terminer le processus, ce qui nécessite
+un redémarrage complet, il est possible de "congeler" ce
+dernier en jouant sur la commande <span class="courier11">freeze</span> du <span class="courier11">cgroup</span> correspondant, ce qui est réalisé par
+le client Docker au moyen de la commande <span class="courier11">pause</span>&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">docker pause repeater</code></pre>
+          <p class="defaut">La commande inverse, permettant de laisser
+repartir le processus existant (ce qui est fondamentalement différent
+de relancer une seconde exécution), est la suivante&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs">docker unpause repeater</code></pre>
+          <p class="defaut">L’effet sur la production de signaux dans
+notre exemple est bien sûr similaire, même si
+la façon de jouer sur les ressources est radicalement différente&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP28.png" title="images/04EP28.png" src="IMAGES/04EP28.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle19">
+          <h3 class="title">h. Gestion des paramètres</h3>
+          <p class="defaut">Pour les tests de paramétrage, nous
+allons désormais lancer l’image en mode détaché,
+ce qui correspond plus à la logique de notre exemple. Bien
+sûr, dans ce cas, rien n’est affiché sur la ligne
+de commande et seule la consultation du log Docker nous permettra
+de vérifier que le conteneur fonctionne correctement&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP29.png" title="images/04EP29.png" src="IMAGES/04EP29.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">La commande <span class="courier11">docker
+rm</span> permet de supprimer le conteneur qui avait été préalablement
+lancé, l’option <span class="courier11">-f</span> permettant
+de forcer son arrêt comme vu plus haut, opération
+qui est nécessaire à la suppression, et l’option <span class="courier11">-v</span> permettant de supprimer les éventuels
+volumes de données (dans ce cas, il n’y en a pas,
+mais pour des tests, c’est une option usuelle pour éviter
+de laisser des volumes orphelins, tandis qu’elle est bien
+sûr à proscrire dans un environnement de développement).</p>
+          <p class="defaut">Le mode de fonctionnement étant expliqué pour
+les lancements suivants, nous pouvons essayer d’ajouter un paramètre à la
+commande <span class="courier11">docker run</span> pour vérifier
+qu’il est bien passé en remplacement de la valeur fournie
+par le mot-clé <span class="courier11">CMD</span> du <span class="courier11">Dockerfile</span>, et enfin véhiculé dans
+le script pointé par <span class="courier11">ENTRYPOINT</span>,
+qui l’utilise à son tour pour valuer le message à envoyer&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP30.png" title="images/04EP30.png" src="IMAGES/04EP30.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Notez l’utilisation des guillemets
+pour passer un seul paramètre avec des espaces. Il aurait&nbsp;également été possible
+de modifier le fichier de script en utilisant <span class="courier11">$@</span> au
+lieu de <span class="courier11">$1</span>, ce qui aurait
+eu pour effet d’utiliser pour la génération du
+message tous les paramètres passés (séparés
+par un espace) au lieu d’utiliser le premier.</p>
+            </div>
+          </div>
+          <p class="defaut">L’autre point de variation était
+l’intervalle d’envoi des messages. Nous avions considéré que
+ce mode de paramétrage était plus adapté à un
+positionnement dans une variable&nbsp;d’environnement, de valeur
+par défaut établie à deux secondes par
+le mot-clé <span class="courier11">ENV</span> dans le <span class="courier11">Dockerfile</span>, mais que nous pouvons
+modifier par l’option <span class="courier11">--env</span> lors
+du lancement du conteneur par la commande <span class="courier11">docker
+run</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP31.png" title="images/04EP31.png" src="IMAGES/04EP31.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Attention à ne pas confondre entre
+les variables d’environnement sur le shell lançant la commande <span class="courier11">docker</span> et celles qui sont effectivement
+injectées dans le processus du conteneur par Docker. Par
+exemple, on voit ci-dessous que la définition d’une variable
+d’environnement locale n’a aucun effet sur le fonctionnement du
+processus démarré par Docker, car ce dernier n’injecte
+que les valeurs explicitement spécifiées&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP32.png" title="images/04EP32.png" src="IMAGES/04EP32.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle20">
+          <h3 class="title">i. Reconstruction de l’image et cache</h3>
+          <p class="defaut">La modification de la variable d’environnement
+est l’occasion de mettre en avant les capacités d’amélioration
+de la robustesse de fonctionnement fournies par les conteneurs Docker.
+En effet, il est possible de modifier la variable d’environnement,
+et en même temps, la valeur par défaut est assurée
+par le <span class="courier11">Dockerfile</span>. Il devient alors
+possible de simplifier le script <span class="courier11">heartbeat.sh</span>, en
+enlevant les premières lignes qui avaient pour but de prévenir
+de l’absence de la variable d’environnement <span class="courier11">HEARTBEATSTEP</span>,
+car elles ne serviront a priori jamais dans le cadre de l’image
+Docker. Le script peut donc être réduit à&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl"><span class="hljs-comment">#!/bin/bash&nbsp;</span>
+<span class="hljs-keyword">while</span> true;&nbsp;
+<span class="hljs-keyword">do</span>&nbsp;
+&nbsp; &nbsp;echo $1 \($(date +%H:%M:%S)\);&nbsp;
+&nbsp; &nbsp;<span class="hljs-keyword">sleep</span> <span class="hljs-string">"$HEARTBEATSTEP"</span>;&nbsp;
+done</code></pre>
+          <p class="defaut">Le lancement de la commande <span class="courier11">build</span> permet de recréer l’image
+avec cette nouvelle version allégée du script&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP33.png" title="images/04EP33.png" src="IMAGES/04EP33.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Nous profitons de ce second build pour montrer
+une particularité de Docker, à savoir la présence
+sur le premier pas du message <span class="courier11">CACHED</span>,
+qui marque que l’opération correspondant au <span class="courier11">FROM</span> n’a pas eu besoin d’être
+recommencée&nbsp;: l’image intermédiaire associée
+a été directement consommée depuis le
+cache. Comme le fichier <span class="courier11">heartbeat.sh</span> a été modifié,
+la commande <span class="courier11">COPY</span> du <span class="courier11">Dockerfile</span> ne peut bien sûr
+pas utiliser elle-même le cache. C’est également
+le cas de toutes les suivantes, par effet de cascade de conséquences.
+Mais toutes les précédentes bénéficieront
+d’un mécanisme de cache mis en place pour Docker pour éviter
+de relancer des opérations longues et identiques d’une
+opération de compilation à une autre. Dans notre
+exemple, seule une étape simple est concernée,
+mais en pratique, ce cache permet de gagner énormément
+de temps. Il est possible, si le fonctionnement le nécessite,
+de passer outre ce cache avec l’option <span class="courier11">--no-cache</span>.
+Nous reviendrons sur ces cas et la meilleure manière de
+les traiter dans la section sur les bonnes pratiques, un peu plus
+loin dans ce chapitre.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À propos des images intermédiaires,
+il est possible de les garder après une compilation correcte,
+par l’utilisation de l’option <span class="courier11">--rm=false</span> de <span class="courier11">docker build</span>. Vous verrez alors autant
+de conteneurs que d’étapes de build si vous exécutez
+la commande <span class="courier11">docker ps -a</span>.</p>
+            </div>
+          </div>
+          <p class="defaut">Les différentes commandes dans le <span class="courier11">Dockerfile</span> n’ont pas toutes le même comportement
+par rapport au cache. La documentation de Docker explique plus en
+détail les conditions d’activation du cache pour chacune
+d’entre elles.</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle21">
+        <h2 class="title">5. Commandes additionnelles</h2>
+        <div class="sect3" id="refTitle22">
+          <h3 class="title">a. Gestion des fichiers</h3>
+          <p class="defaut">Dans notre première réalisation
+d’un <span class="courier11">Dockerfile</span>, nous avons utilisé la
+commande <span class="courier11">COPY</span> pour intégrer
+des fichiers locaux dans l’image générée.
+Il existe également une autre commande, dont la syntaxe
+est très proche (un paramètre pour la source,
+un second pour la destination), mais qui n’est désormais plus
+recommandé en pratique, sauf dans quelques cas particuliers.
+Il s’agit de la commande <span class="courier11">ADD</span>.<var style="display:none"> ADD</var></p>
+          <p class="defaut"><span class="courier11">ADD</span> réalise
+la même action que <span class="courier11">COPY</span> dans
+un <span class="courier11">Dockerfile</span>, mais offre deux fonctionnalités
+additionnelles&nbsp;:<var style="display:none"> COPY</var></p>
+          <div class="divliste1">
+            <ul class="liste1">
+              <li class="liste1">
+                <p class="liste1">Si la source est un
+fichier archive de type <span class="courier11">tar</span>, son
+contenu sera décompressé vers la destination.</p>
+              </li>
+              <li class="liste1">
+                <p class="liste1">Si la source est une URL, le contenu
+sera téléchargé et déposé dans
+la destination.</p>
+              </li>
+            </ul>
+          </div>
+          <p class="defaut">Dès lors, le lecteur serait en droit
+de se demander pourquoi cette commande, reprenant toutes les fonctionnalités
+de <span class="courier11">COPY</span> et en ajoutant, ne devrait
+pas au contraire supplanter cette dernière. La raison est
+que ce surplus de fonctionnalités va à l’encontre&nbsp;d’une
+utilisation simple et parfaitement dénuée d’ambiguïté.
+Par exemple, comment faire en sorte qu’une archive soit copiée
+telle quelle dans l’image&nbsp;? Et si le format n’est pas supporté,
+le fait que l’archive soit copiée comme un simple fichier
+ne risque-t-il pas de poser un problème difficilement détectable
+lors de la compilation de l’image&nbsp;?</p>
+          <p class="defaut">Ces raisons font que la recommandation d’usage
+est d’utiliser <span class="courier11">COPY</span> dans la majorité des
+cas, et de n’utiliser <span class="courier11">ADD</span> que pour
+les cas particuliers décrits. Au passage, nous avons vu
+que la commande <span class="courier11">RUN</span> permettait d’exécuter
+des commandes lors de la compilation de l’image, donc il est tout à fait
+possible d’appeler l’exécutable <span class="courier11">tar</span> manuellement.</p>
+          <p class="defaut">Pour ce qui est de la capacité à récupérer
+des fichiers distants, c’est de toute façon une mauvaise
+pratique d’utiliser <span class="courier11">ADD</span> pour rapatrier
+les fichiers, car ceux-ci font alors partie intégrante
+de l’image et ne peuvent pas être supprimés, même
+si leur usage était temporaire. Or, il est important de
+garder des images les plus légères possibles.
+Sauf cas particulier, il est donc recommandé d’utiliser à nouveau
+la commande <span class="courier11">RUN</span> pour exécuter
+un utilitaire comme <span class="courier11">curl</span> ou <span class="courier11">wget</span>. Ceci permet de récupérer
+des fichiers en ligne, de les exploiter et - si le traitement
+le permet - de les supprimer. Le tout peut d’ailleurs être réalisé en
+une seule ligne pour ne correspondre qu’à une seule couche,
+comme démontré dans la section sur les bonnes
+pratiques un peu plus loin dans ce chapitre.</p>
+        </div>
+        <div class="sect3" id="refTitle23">
+          <h3 class="title">b. Notion de contexte<var style="display:none"> Contexte</var></h3>
+          <p class="defaut">Également en lien avec la gestion
+de fichiers, il est important de savoir que la compilation d’une
+image Docker se fait à l’intérieur d’un contexte,
+qui est le répertoire contenant le fichier <span class="courier11">Dockerfile</span> qui pilote cette génération.</p>
+          <p class="defaut">Ainsi, la commande <span class="courier11">COPY</span> ne
+pourra pas aller chercher n’importe quel fichier sur la machine
+hôte, mais seulement ceux qui se trouvent dans le même
+répertoire que le fichier&nbsp;<span class="courier11">Dockerfile</span> (les
+sous-répertoires sont bien sûr accessibles). Le
+chargement du contexte est d’ailleurs signalé lors de la
+compilation d’une image, comme le montre la capture ci-après.</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP34.png" title="images/04EP34.png" src="IMAGES/04EP34.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Cette particularité vous permet de
+sécuriser votre production d’image, en ne donnant pas accès à tout.
+Elle implique également de bien faire attention à l’endroit
+où vous créez le fichier <span class="courier11">Dockerfile</span>,
+de façon à ne pas intégrer plus de fichiers
+que nécessaire dans le contexte de l’image.</p>
+          <p class="defaut">Nous reviendrons plus loin sur les bonnes
+pratiques de stockage en détail, mais de manière&nbsp;générale,
+la meilleure façon de gérer ses images est de
+créer un répertoire dédié,&nbsp;avec
+le <span class="courier11">Dockerfile</span> au premier niveau
+de ce répertoire, et tous les fichiers nécessaires&nbsp;dans
+des sous-répertoires.</p>
+        </div>
+        <div class="sect3" id="refTitle24">
+          <h3 class="title">c. Retours sur l’affectation du processus à démarrer</h3>
+          <p class="defaut">Dans l’image qui nous a servi d’exemple précédemment,
+nous avons utilisé les opérateurs <span class="courier11">ENTRYPOINT</span> et <span class="courier11">CMD</span> du <span class="courier11">Dockerfile</span>, en expliquant que la première
+correspondait au processus à exécuter et la seconde
+au paramètre qui devait lui être passé par
+défaut&nbsp;:<var style="display:none"> ENTRYPOINT</var><var style="display:none"> CMD</var></p>
+          <pre class="programlisting"><code class="hljs javascript">ENTRYPOINT [<span class="hljs-string">"/entrypoint.sh"</span>]&nbsp;
+CMD [<span class="hljs-string">"heartbeat"</span>]</code></pre>
+          <p class="defaut">Il est important de revenir sur ce point particulier
+de la complémentarité entre les deux opérateurs,
+car de nombreuses informations contradictoires peuvent être
+lues si on ne prend pas garde à la qualité de
+ses sources.</p>
+          <p class="defaut">Évacuons d’abord la différence
+entre <span class="courier11">RUN</span> et <span class="courier11">CMD/ENTRYPOINT</span>,
+car c’est le point le plus facile. La documentation officielle de
+Docker (plus précisément la section sur <span class="courier11">RUN</span>, à savoir <a class="url" href="https://docs.docker.com/engine/reference/builder/#run" target="_blank">https://docs.docker.com/engine/reference/builder/#run</a>)
+explique clairement que cet opérateur exécute
+une commande qui lui est passée en paramètre dans
+une nouvelle couche et valide celle-ci (au sens d’une opération <span class="courier11">commit</span>). La commande <span class="courier11">RUN</span> est donc exécutée
+au moment de la compilation, et bien que ses effets soient visibles à l’exécution
+d’un conteneur, la commande n’est pas jouée lors de celle-ci. <span class="courier11">RUN</span> ne doit donc pas être utilisé pour
+lancer des processus qu’on souhaite voir actifs,&nbsp;car ceux-ci
+seront terminés en fin de compilation, mais uniquement
+pour lancer&nbsp;des commandes de préparation de l’image.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">La mise au point ci-dessus peut sembler évidente
+(sinon, quel intérêt d’avoir deux commandes séparées
+entre <span class="courier11">RUN</span> et <span class="courier11">CMD</span>/<span class="courier11">ENTRYPOINT</span>&nbsp;?), mais comme quelques
+articles sur Internet confondent les deux, il semblait nécessaire
+de bien clarifier ce point.</p>
+            </div>
+          </div>
+          <p class="defaut">Pour revenir ensuite sur la dualité de <span class="courier11">CMD</span> et <span class="courier11">ENTRYPOINT</span> proprement
+dite, il faut expliquer&nbsp;que la première peut être
+utilisée sans la seconde. L’exécutable à démarrer
+lors du lancement du conteneur sera alors spécifié dans <span class="courier11">CMD</span>. Le <span class="courier11">Dockerfile</span> se
+présente&nbsp;alors comme suit&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl">FROM ubuntu:latest&nbsp;
+LABEL maintainer =<span class="hljs-string">"jp.gouigoux@free.fr"</span>&nbsp;
+COPY heartbeat.sh /entrypoint.sh&nbsp;
+RUN <span class="hljs-keyword">chmod</span> +<span class="hljs-keyword">x</span> /entrypoint.sh&nbsp;
+ENV HEARTBEATSTEP <span class="hljs-number">2</span>&nbsp;
+CMD [<span class="hljs-string">"/entrypoint.sh"</span>, <span class="hljs-string">"heartbeat"</span>]</code></pre>
+          <p class="defaut">Dans ce cas, il est possible de lancer un
+conteneur sans paramètre, avec le comportement attendu,
+mais la surcharge ne peut plus se faire sur le seul message à passer
+au script, comme montré ci-dessous&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP35.png" title="images/04EP35.png" src="IMAGES/04EP35.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">En effet, Docker considère alors
+que la surcharge remplace tout le tableau JSON (la syntaxe <span class="courier11">["...", "..."]</span>)
+avec les deux paramètres, et le seul ensemble "Alive and
+kicking" n’est pas une commande, d’où l’erreur.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Attention, le fait qu’une erreur apparaisse
+ne signifie pas nécessairement que le conteneur n’a pas
+pu être créé, et dans le cas ci-dessus,
+il faudra bel et bien supprimer le conteneur nommé <span class="courier11">repeater</span> avant de pouvoir en créer
+un autre avec la même dénomination.</p>
+            </div>
+          </div>
+          <p class="defaut">Une façon possible de lancer la surcharge
+est d’utiliser alors la grammaire suivante, qui remplace tout simplement
+la totalité de la commande à exécuter, avec
+le paramètre associé&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP36.png" title="images/04EP36.png" src="IMAGES/04EP36.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Il est également possible de passer
+un paramètre pour <span class="courier11">entrypoint</span>,
+afin de revenir à la même fonctionnalité qu’au
+début, à la seule différence que le point d’entrée
+est passé au démarrage au lieu de l’intégrer
+dans le <span class="courier11">Dockerfile</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP37.png" title="images/04EP37.png" src="IMAGES/04EP37.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Bien que potentiellement utile, cette
+grammaire n’est pas recommandée, car elle s’éloigne
+de l’intention initiale de la partition entre <span class="courier11">ENTRYPOINT</span> et <span class="courier11">CMD</span>, le premier devant porter ce qui
+ne change pas d’une exécution à l’autre du conteneur
+et le second étant l’opérateur précisément
+dédié à la fourniture d’une valeur par
+défaut destinée à être échangée
+par une valeur de paramètre fournie lors de l’exécution.
+Dans les cas où une image doit pouvoir changer de processus,
+il est plutôt recommandé de créer un
+script de lancement qui réagit au passage d’un paramètre
+et lance lui-même le bon processus, comme cela a été démontré plus
+haut dans l’exemple sur MongoDB.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle25">
+          <h3 class="title">d. Remarque sur le format ligne de commande ou exécution</h3>
+          <p class="defaut">L’opérateur <span class="courier11">CMD</span> permet,
+en plus de la syntaxe passant un tableau JSON, une seconde grammaire,
+qui consiste à donner un texte simple. Il s’agit de la
+forme "ligne de commande" (shell), par opposition à la
+forme "exécution" (exec).</p>
+          <p class="defaut">Supposons que le <span class="courier11">Dockerfile</span> utilise
+la forme suivante, avec un tableau JSON de paramètres,&nbsp;comme
+utilisée jusqu’à maintenant&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl">FROM ubuntu:latest&nbsp;
+LABEL maintainer=<span class="hljs-string">"jp.gouigoux@free.fr"</span>&nbsp;
+COPY heartbeat.sh /entrypoint.sh&nbsp;
+RUN <span class="hljs-keyword">chmod</span> +<span class="hljs-keyword">x</span> /entrypoint.sh&nbsp;
+ENV HEARTBEATSTEP <span class="hljs-number">2</span>&nbsp;
+CMD [<span class="hljs-string">"ps"</span>, <span class="hljs-string">"-aux"</span>]</code></pre>
+          <p class="defaut">L’exécution du conteneur montre que
+le processus principal est <span class="courier11">ps</span>&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP38.png" title="images/04EP38.png" src="IMAGES/04EP38.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Si par contre nous utilisons la forme dite
+"shell" de l’opérateur <span class="courier11">CMD</span>,
+le <span class="courier11">Dockerfile</span> se présentera
+alors sous une forme légèrement différente,
+reprise ci-dessous&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl">FROM ubuntu:latest&nbsp;
+LABEL maintainer=<span class="hljs-string">"jp.gouigoux@free.fr"</span>&nbsp;
+COPY heartbeat.sh /entrypoint.sh&nbsp;
+RUN <span class="hljs-keyword">chmod</span> +<span class="hljs-keyword">x</span> /entrypoint.sh&nbsp;
+ENV HEARTBEATSTEP <span class="hljs-number">2</span>&nbsp;
+CMD ps -aux</code></pre>
+          <p class="defaut">Le résultat de l’exécution
+d’un conteneur basé sur cette définition d’image montrera
+alors qu’un shell a été effectivement lancé pour
+porter la commande&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP39.png" title="images/04EP39.png" src="IMAGES/04EP39.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">Comme on peut le voir, il s’agit bien
+d’un shell différent de celui lancé lors de l’exécution
+du fichier <span class="courier11">entrypoint.sh</span> de notre
+exemple, qui spécifie par le shebang (la première
+ligne) qu’il doit être exécuté par le
+shell Bash.</p>
+            </div>
+          </div>
+          <p class="defaut"><span class="courier11">ENTRYPOINT</span>,
+comme <span class="courier11">CMD</span>, possède les
+deux formes exec et shell, ce qui est logique puisqu’il ne s’agit
+que de deux opérateurs permettant de composer au final
+une seule&nbsp;et même logique de lancement de processus.
+Dans sa forme shell (un simple texte passé&nbsp;comme
+paramètre au lieu d’un tableau au format JSON), c’est encore
+une fois <span class="courier11">/bin/sh -c</span> qui
+sera utilisé pour lancer le paramètre d’<span class="courier11">ENTRYPOINT</span>, et les paramètres&nbsp;additionnels
+(qu’ils proviennent du <span class="courier11">CMD</span> du <span class="courier11">Dockerfile</span> ou de la ligne de lancement <span class="courier11">docker run</span>) seront ignorés.</p>
+          <p class="defaut">La forme shell a l’avantage que les variables
+comme <span class="courier11">$HOME</span> ou autres seront substituées,
+mais elle possède par contre l’inconvénient que
+les signaux ne seront pas correctement remontés, car la
+valeur passée dans <span class="courier11">ENTRYPOINT</span> est alors
+une sous-commande du processus de PID 1, qui est le shell <span class="courier11">/bin/sh</span>. Pour des
+moyens de contrôler plus finement ce fonctionnement, nous
+renvoyons à la documentation officielle (accessible sur <a class="url" href="https://docs.docker.com/engine/reference/builder/#entrypoint" target="_blank">https://docs.docker.com/engine/reference/builder/#entrypoint</a>).
+En règle générale, le plus simple est
+de toujours utiliser la forme "exécution", qui est celle
+recommandée.</p>
+          <p class="defaut">Toujours dans le domaine du traitement des
+signaux, mais cette fois dans le script <span class="courier11">entrypoint.sh</span> qui
+est lancé (ou plutôt dans <span class="courier11">heartbeat.sh</span>,
+qui est le fichier qui sera recopié dans l’image
+avec pour nom <span class="courier11">entrypoint.sh</span>), une
+ligne supplémentaire serait nécessaire pour accepter
+le signal <span class="courier11">SIGTERM</span> envoyé par
+la combinaison [Ctrl]&nbsp;<b>C</b> en
+mode interactif, à savoir la troisième dans le
+script mis à jour et présenté ci-dessous&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs sql"><span class="hljs-comment">#!/bin/bash&nbsp;</span>
+<span class="hljs-keyword">set</span> -e&nbsp;
+trap <span class="hljs-string">"echo SIGNAL"</span> HUP <span class="hljs-built_in">INT</span> QUIT <span class="hljs-keyword">KILL</span> TERM&nbsp;
+&nbsp;
+<span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>;&nbsp;
+<span class="hljs-keyword">do</span>&nbsp;
+&nbsp; &nbsp;echo $<span class="hljs-number">1</span> \($(<span class="hljs-built_in">date</span> +%H:%M:%S)\);&nbsp;
+&nbsp; &nbsp;sleep "$HEARTBEATSTEP";&nbsp;
+done</code></pre>
+          <p class="defaut">La manipulation la plus simple pour voir si
+votre image supporte bien la remontée des signaux est de
+procéder à un <span class="courier11">docker
+stop</span> sur un conteneur démarré. Si la période
+de grâce (par défaut 10 secondes) est nécessaire
+pour que le conteneur s’arrête, c’est que le signal n’est
+a priori pas bien traité, et que c’est le signal <span class="courier11">SIGKILL</span>, plus brutal, qui prend le
+relais. En fonction de l’usage de votre image, ce n’est pas nécessairement
+une catastrophe, mais il est de bonne pratique de faire en sorte
+que les conteneurs réagissent&nbsp;de manière
+propre à un <span class="courier11">SIGTERM</span>, en
+annulant la tâche en cours et en nettoyant ce qui a besoin
+de l’être, puis en s’arrêtant avant d’y être
+forcé.</p>
+          <div class="note">
+            <div class="remarkimg"><span class="icon-note"></span></div>
+            <div class="divinline">
+              <p class="remarque">À noter que l’instruction <span class="courier11">STOPSIGNAL</span> peut être incluse
+dans le fichier <span class="courier11">Dockerfile</span> pour
+spécifier quel signal sera envoyé au conteneur
+pour l’arrêter.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" id="refTitle26">
+          <h3 class="title">e. Commandes diverses</h3>
+          <p class="defaut">Nous n’avons pas fait le tour de toutes les
+instructions utilisables dans un <span class="courier11">Dockerfile</span>,
+et quelques-unes particulièrement utiles restent à expliquer.</p>
+          <p class="defaut"><span class="courier11">WORKDIR</span> est
+utilisé pour fixer le répertoire courant dans
+le déroulement du fichier <span class="courier11">Dockerfile</span>.
+Lorsque plusieurs opérations de type <span class="courier11">RUN</span>, <span class="courier11">COPY</span> ou <span class="courier11">ADD</span> doivent être
+réalisées à la chaîne, il est
+pratique de fixer le répertoire de travail, ce qui permet
+de ne pas le réécrire à chaque ligne
+ensuite. <span class="courier11">WORKDIR</span> peut être utilisé plusieurs
+fois dans le <span class="courier11">Dockerfile</span>. Le répertoire
+de travail évolue alors au fur et à mesure de
+la compilation.</p>
+          <p class="defaut"><span class="courier11">LABEL</span> permet
+de fournir des couples clé/valeur qui serviront
+de métadonnées décrivant l’image lorsque
+celle-ci sera diffusée et utilisée. Cette technique
+permet de facilement communiquer des informations simples aux utilisateurs
+de l’image, qu’il s’agisse de son propre créateur ou d’autres
+personnes. Une utilisation classique est de faire porter la version
+de l’image sur un tel libellé&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs javascript">LABEL version=<span class="hljs-string">"1.0"</span></code></pre>
+          <p class="defaut">Les métadonnées sont également
+un endroit particulièrement approprié pour contenir
+des instructions d’utilisation&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs sql">LABEL description="This image emits a regular message on STDIN"&nbsp;
+LABEL readme="The HEARTBEATSTEP environment variable shall be \&nbsp;
+modified <span class="hljs-keyword">with</span> a <span class="hljs-keyword">value</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">seconds</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">order</span> <span class="hljs-keyword">to</span> <span class="hljs-keyword">change</span> the <span class="hljs-built_in">time</span> \&nbsp;
+<span class="hljs-built_in">interval</span> <span class="hljs-keyword">between</span> messages, <span class="hljs-keyword">while</span> messages themselves can be \&nbsp;
+modified <span class="hljs-keyword">by</span> <span class="hljs-keyword">passing</span> the <span class="hljs-keyword">updated</span> <span class="hljs-keyword">value</span> <span class="hljs-keyword">as</span> a parameter placed \&nbsp;
+<span class="hljs-keyword">at</span> the <span class="hljs-keyword">end</span> <span class="hljs-keyword">of</span> the docker run command line.<span class="hljs-string">"</span></code></pre>
+          <p class="defaut">Le symbole <span class="courier11">\</span> permet
+de poursuivre une entrée à la ligne suivante.
+Par convention, il est précédé d’un espace.
+Nous reviendrons sur son usage dans les bonnes pratiques plus bas.</p>
+          <p class="defaut">C’est la commande <span class="courier11">docker
+inspect</span> qui permet de retrouver les métadonnées
+sur une image donnée (ne pas oublier de compiler juste
+avant, bien sûr)&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP40.png" title="images/04EP40.png" src="IMAGES/04EP40.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Les libellés se retrouvent également
+sur les conteneurs lancés depuis cette image&nbsp;:</p>
+          <div class="image">
+            <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP41.png" title="images/04EP41.png" src="IMAGES/04EP41.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmNEDq54y7jYiAs%3d"></div>
+          </div>
+          <p class="defaut">Dans les deux cas, les métadonnées
+sont triées par ordre alphabétique de la clé.</p>
+          <p class="defaut"><span class="courier11">USER</span> est le
+mot-clé <span class="courier11">Dockerfile</span> permettant
+de modifier l’utilisateur en cours pour les commandes suivantes
+de l’opération de création de l’image,
+et du coup pour les conteneurs qui seront lancés à partir
+de l’image créée. Vu que les images sont
+traditionnellement en charge de l’exécution d’un
+seul processus et que la seule voie de communication qui lui est
+assignée est en général un port, de nombreux <span class="courier11">Dockerfile</span> ne spécifient
+pas cette commande, ce qui fait que le processus ne fonctionne pas
+en mode "moindre privilège". Dans une approche de défense
+en profondeur, il reste une bonne pratique d’affecter un utilisateur
+dédié avec des droits réduits, ce qui
+limite l’impact d’une faille éventuelle.
+La syntaxe de cette commande est très simple (le groupe
+est optionnel)&nbsp;:</p>
+          <p><span class="bridgehead_niv4">Modifier l’utilisateur en cours</span></p>
+          <pre class="programlisting"><code class="hljs scss">USER utilisateur<span class="hljs-selector-attr">[:groupe]</span><var style="display:none"> USER</var></code></pre>
+          <p class="defaut"><span class="courier11">ARG</span> est une
+commande qu’il est nécessaire d’expliquer également,
+ne serait-ce que parce qu’il est facile de se perdre dans
+les différents moyens de passer des valeurs d’arguments&nbsp;à une
+image. Nous avons vu qu’il était possible de faire passer
+une variable&nbsp;d’environnement de l’hôte
+au conteneur lorsque celui-ci est lancé. Il était également
+possible de passer des commandes différentes en surchargeant
+par la ligne de commande le contenu fixé par défaut
+par la commande <span class="courier11">CMD</span>. La commande <span class="courier11">ARG</span>, quant à elle, permet
+de passer des valeurs au moment de la compilation de l’image.
+Pour cela, il est nécessaire de déclarer la variable
+dans le <span class="courier11">Dockerfile</span> avec une valeur
+par défaut. Dans notre exemple, nous pourrions utiliser <span class="courier11">ARG</span> pour modifier, à la compilation,
+la valeur par défaut de <span class="courier11">HEARTBEATSTEP</span> qui
+est portée dans l’image (bien sûr, sans
+empêcher que la valeur de <span class="courier11">HEARTBEATSTEP</span> elle-même
+puisse être modifiée puisqu’elle est
+placée dans une variable d’environnement). Le
+fichier <span class="courier11">Dockerfile</span> ressemblerait à ceci&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs perl">FROM ubuntu:latest&nbsp;
+ARG HEARTBEATSTEPDEFAULT=<span class="hljs-number">2</span>&nbsp;
+LABEL maintainer=<span class="hljs-string">"jp.gouigoux@free.fr"</span>&nbsp;
+COPY heartbeat.sh /entrypoint.sh&nbsp;
+RUN <span class="hljs-keyword">chmod</span> +<span class="hljs-keyword">x</span> /entrypoint.sh&nbsp;
+ENV HEARTBEATSTEP ${HEARTBEATSTEPDEFAULT}&nbsp;
+ENTRYPOINT [<span class="hljs-string">"./entrypoint.sh"</span>]&nbsp;
+CMD [<span class="hljs-string">"heartbeat"</span>]</code></pre>
+          <p class="defaut">Ensuite, c’est au moment de la compilation
+qu’on pourrait intervenir pour changer cette valeur par
+défaut, lançant la commande modifiée
+comme suit&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs sql">docker build -t jpgouigoux/repeater <span class="hljs-comment">--build-arg </span>
+HEARTBEATSTEPDEFAULT=4 .</code></pre>
+          <p class="defaut">Et comme expliqué plus haut, cela
+n’a rien à voir avec le fait qu’il soit
+possible de modifier&nbsp;la valeur de <span class="courier11">HEARTBEATSTEP</span> au
+lancement.</p>
+          <p class="defaut">L’usage typique des arguments de
+build est de permettre de générer plusieurs images
+avec des comportements partiellement différents sans avoir à dupliquer
+les fichiers <span class="courier11">Dockerfile</span>. Ainsi,
+nous pourrions obtenir des images comme suit&nbsp;:</p>
+          <pre class="programlisting"><code class="hljs sql">docker build -t jpgouigoux/repeater-quick <span class="hljs-comment">--build-arg &nbsp;</span>
+HEARTBEATSTEPDEFAULT=1 .&nbsp;
+docker build -t jpgouigoux/repeater-slow <span class="hljs-comment">--build-arg &nbsp;</span>
+HEARTBEATSTEPDEFAULT=10 .</code></pre>
+          <p class="defaut">Cet exemple clôt notre étude
+des opérateurs utilisables dans le fichier <span class="courier11">Dockerfile</span>. Le but du présent
+ouvrage n’est encore une fois pas de relever de manière
+exhaustive les fonctionnalités de Docker, mais il se trouve
+que la grammaire des <span class="courier11">Dockerfile</span> est
+assez simple et qu’elle ne contient pour l’instant pas réellement
+d’autres opérateurs qu’on puisse considérer comme
+indispensables à ce stade. La commande <span class="courier11">SHELL</span> est
+surtout utilisée pour passer du shell CMD au PowerShell
+ou inversement dans les images Windows, dont les spécificités
+seront abordées dans un autre chapitre. Les commandes <span class="courier11">ONBUILD</span>, <span class="courier11">HEALTHCHECK</span>, <span class="courier11">EXPOSE</span> et <span class="courier11">VOLUME</span> seront
+détaillées par la suite.</p>
+        </div>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

@@ -1,0 +1,157 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_11d829d4-3a86-4a3e-b1b4-8046ca9fa6a5" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Azure Container Instances<var style="display:none"> Azure Container Instances</var></h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Principe</h2>
+        <p class="defaut">À titre de curiosité, imaginons
+que le lecteur souhaite déployer une image Docker sans
+avoir ne serait-ce qu’à appeler un cluster de machines&nbsp;;
+bref, obtenir un vrai "Container as a Service" dans lequel seule
+l’image serait spécifiée ainsi que les paramètres
+d’exposition, un système externe se chargeant de tout le
+reste.</p>
+        <p class="defaut">Le déploiement prendrait alors juste
+le temps de créer l’image, et c’est la promesse portée
+par le service Azure Container Instances qui va être exposé ci-dessous.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Préparation d’une image</h2>
+        <p class="defaut">Pour faire fonctionner cet exemple, nous allons
+créer une image basée sur l’image officielle&nbsp;<span class="courier11">nginx</span> et qui portera simplement en
+plus quelques fichiers statiques correspondant à un site
+web. Le site sera ainsi immutable. Le lecteur est normalement autonome&nbsp;désormais
+pour produire le fichier <span class="courier11">Dockerfile</span> suivant&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs css"><span class="hljs-selector-tag">FROM</span> <span class="hljs-selector-tag">nginx</span><span class="hljs-selector-pseudo">:1.19.3</span>&nbsp;
+<span class="hljs-selector-tag">ADD</span> <span class="hljs-selector-tag">ftpperso</span><span class="hljs-selector-class">.free</span><span class="hljs-selector-class">.fr</span><span class="hljs-comment">/* /usr/share/nginx/html/</span></code></pre>
+        <p class="defaut">Le dossier pourrait par exemple avoir été créé par
+une simple commande <span class="courier11">wget -m ftp://user:motdepasse@ftpperso.free.fr</span> aspirant
+le contenu complet d’un site web sur lequel l’utilisateur possède
+un accès FTP en lecture. À partir du moment&nbsp;où le
+contenu inclut un fichier <span class="courier11">index.html</span>,
+c’est suffisant pour créer une image autonome&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs">docker build -t jpgouigoux/antuallarmor .</code></pre>
+        <p class="defaut">Une commande <span class="courier11">docker
+login</span> plus loin, cette image est poussée sur le
+registre Docker&nbsp;Hub&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs perl">docker <span class="hljs-keyword">push</span> jpgouigoux/antuallarmor</code></pre>
+        <p class="defaut">Et il est donc désormais possible
+de l’exposer de toutes les manières possibles que nous
+avons vues avec Docker, mais aussi avec ACI comme nous allons le montrer
+dans la prochaine section.</p>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Lancement du conteneur</h2>
+        <p class="defaut">Le démarrage du conteneur dans ACI
+est on ne peut plus simple, dans le sens où tout ou presque
+tient sur une page, qu’on accède en cherchant les mots <span class="courier11">Container Instances</span> dans la place
+de marché, comme nous l’avons fait plus haut pour d’autres
+services Azure.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP51.png" title="images/06EP51.png" src="IMAGES/06EP51.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Les paramètres à remplir
+sont&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">l’abonnement, si la
+valeur par défaut ne convient pas&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">le groupe de ressources&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">un nom pour le conteneur&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">l’adresse de l’image&nbsp;;</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">la taille des ressources à utiliser,
+si les valeurs par défaut doivent être ajustées.</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">Le seul paramètre additionnel est à trouver
+dans l’onglet suivant de l’assistant portant sur la mise en réseau,
+et permet de fournir une étiquette de nom DNS pour accéder
+au contenu du conteneur depuis Internet&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP52.png" title="images/06EP52.png" src="IMAGES/06EP52.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">L’onglet suivant est affiché à titre
+d’information, pour montrer qu’on peut jouer sur les paramètres
+attendus, comme le "restart policy", les variables d’environnement
+ou la valeur de la commande initiale (<span class="courier11">CMD</span>)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP53.png" title="images/06EP53.png" src="IMAGES/06EP53.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Une fois les paramètres entrés
+et les validations réalisées, le déploiement
+est extrêmement rapide et, après quelques secondes,
+le contenu est en ligne&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP54.png" title="images/06EP54.png" src="IMAGES/06EP54.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Correction de l’erreur et relance</h2>
+        <p class="defaut">Une erreur de <span class="courier11">Dockerfile</span> avait été introduite
+pour montrer la simple façon de relancer&nbsp;le contenu.
+Corrigeons dans un premier temps le <span class="courier11">Dockerfile</span>, qui
+aurait dû être écrit comme suit&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs css"><span class="hljs-selector-tag">FROM</span> <span class="hljs-selector-tag">nginx</span><span class="hljs-selector-pseudo">:1.19.3</span>&nbsp;
+<span class="hljs-selector-tag">ADD</span> <span class="hljs-selector-tag">ftpperso</span><span class="hljs-selector-class">.free</span><span class="hljs-selector-class">.fr</span><span class="hljs-comment">/* /usr/share/nginx/html/</span></code></pre>
+        <p class="defaut">Après l’avoir recompilé et
+poussé sur Docker Hub (ce que nous aurions pu également
+automatiser, comme montré plus haut avec les Automated
+Builds), il suffit de relancer le groupe de conteneurs sur le portail
+Azure avec le bouton <b>Redémarrer</b>.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP55.png" title="images/06EP55.png" src="IMAGES/06EP55.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Quelques secondes plus tard, le site est en
+ligne dans une version correcte (bien que ne répondant
+plus aux canons d’élégance depuis une vingtaine d’années)&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP56.png" title="images/06EP56.png" src="IMAGES/06EP56.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle4">
+        <h2 class="title">5. Coût et effort</h2>
+        <p class="defaut">Au-delà de la rapidité de
+mise en œuvre, le vrai gain de cette approche est qu’aucune
+gestion du déploiement n’est nécessaire&nbsp;:
+l’utilisateur fournit l’image et le service se charge de tout le
+reste, y compris le monitoring des ressources et des accès
+publics, la journalisation de l’activité administrative
+sur la ressource, la sécurisation des accès privés,&nbsp;etc.</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP57.png" title="images/06EP57.png" src="IMAGES/06EP57.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Encore plus sophistiqué, il est possible
+de créer des alertes sur des seuils dynamiques, pour être
+prévenu par exemple d’une activité anormale sur
+un site exposé&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP58.png" title="images/06EP58.png" src="IMAGES/06EP58.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">L’interface permet même de se connecter
+en ligne de commande sans bouger du portail, de façon à diagnostiquer
+l’intérieur même du conteneur si nécessaire&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/06EP59.png" title="images/06EP59.png" src="IMAGES/06EP59.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmOOexe9y7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Bien sûr, le coût reste
+un peu plus élevé que celui d’un hébergement
+très simple pour un site web personnel, et il reste à fournir
+le nom de domaine, mais le rapport qualité/prix
+par rapport à la gestion par soi-même d’une infrastructure Docker équivalente
+est absolument sans commune mesure. La simple mise en place ne serait-ce
+que d’une partie de ces fonctionnalités avancées
+prendrait des mois à une équipe spécialisée.
+Quant à la capacité élastique quasi infinie (et
+récemment abondée de la capacité de mettre
+en place des machines avec des GPU), elle n’est bien sûr
+accessible que pour les éditeurs majeurs de cloud.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

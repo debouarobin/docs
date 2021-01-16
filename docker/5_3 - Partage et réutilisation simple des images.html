@@ -1,0 +1,188 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_f63ddf13-97d8-4228-8207-9c4f34758b56" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Partage et réutilisation simple des images</h1>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Envoi sur votre compte Docker Hub<var style="display:none"> Docker Hub</var></h2>
+        <p class="defaut">Dans le chapitre précédent,
+nous avons montré comment se connecter à Docker
+Hub et associer le compte avec un dépôt sur GitHub.
+Par la suite, nous avons fait en sorte que ce dépôt
+crée une image Docker à jour à chaque
+commit de code source.</p>
+        <p class="defaut">Il est également possible de pousser
+dans un registre Docker une image créée localement,
+comme celles que nous avons mises en œuvre dans le présent
+chapitre. Pour cela,&nbsp;nous utiliserons une commande que
+nous n’avons pas encore présentée.</p>
+        <p><span class="bridgehead_niv4">Envoyer une image locale sur le registre
+Docker Hub</span></p>
+        <pre class="programlisting"><code class="hljs scss">docker push <span class="hljs-selector-attr">[image]</span></code></pre>
+        <p class="defaut">Pour que cette commande fonctionne, il faut
+toutefois que l’image possède un nom complet,
+préfixé du nom du compte Docker Hub. C’est
+la raison pour laquelle l’image créée
+plus haut avait été nommée <span class="courier11">jpgouigoux/repeater</span>. Il aurait également été possible
+de la nommer simplement <span class="courier11">repeater</span> tant
+que l’exercice était local, puis d’utiliser
+la commande <span class="courier11">docker tag</span> pour lui
+adjoindre une étiquette supplémentaire correspondant à ce
+nom complet.</p>
+        <p class="defaut">Au passage, le nom véritablement
+complet de l’image créée était <span class="courier11">docker.io/jpgouigoux/repeater</span>,
+comme on peut le voir en bas de la capture de la commande de compilation
+ci-dessous&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP42.png" title="images/04EP42.png" src="IMAGES/04EP42.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Par défaut, Docker part en effet
+du principe que nous utiliserons le registre d’images Docker Hub,
+dont l’adresse symbolique est <span class="courier11">docker.io</span>.
+Il existe toutefois d’autres registres,&nbsp;comme celui de
+Microsoft. Pour donner un exemple, Docker Hub référence
+bien l’image de la runtime .NET&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP43.png" title="images/04EP43.png" src="IMAGES/04EP43.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">En descendant dans la description, nous voyons
+d’ailleurs les différentes versions disponibles,&nbsp;avec
+un changement majeur sur la version 5.0&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP44.png" title="images/04EP44.png" src="IMAGES/04EP44.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Toutefois, si on suit le dernier lien visible
+sur cette page, on arrive à une page Docker Hub qui ne
+propose pas une commande de <span class="courier11">pull</span> sur
+son propre dépôt, mais bien sur celui entretenu
+par Microsoft&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP45.png" title="images/04EP45.png" src="IMAGES/04EP45.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">En cliquant sur l’icône tout à droite
+permettant de copier la valeur proposée pour la commande
+de <span class="courier11">pull</span>, on obtient en effet le
+texte suivant&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs">docker pull mcr.microsoft.com/dotnet/runtime</code></pre>
+        <p class="defaut">Comme on le voit, la première partie
+de l’adresse complète n’est pas <span class="courier11">docker.io</span> mais <span class="courier11">mcr.microsoft.com</span> pour Microsoft Container
+Registry, soit le registre privé de Microsoft. Ce dernier
+ne se pose pas en remplacement de Docker Hub, mais plutôt
+comme la source de référence pour les images liées à l’éditeur.
+Le fait que ce registre soit sur le domaine <span class="courier11">microsoft.com</span> donne bien
+sûr une forte sécurité supplémentaire
+quant au contenu des images, et qui va au-delà de ce que
+Docker peut proposer avec des assurances comme quoi les images sont
+de bonne qualité, car on reste tout de même sur
+un registre grand public.</p>
+        <p class="defaut">Pour revenir à la commande <span class="courier11">push</span>, appliquons celle-ci sur l’image
+que nous avons créée précédemment&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP46.png" title="images/04EP46.png" src="IMAGES/04EP46.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Cette première tentative est un échec
+car, pour remonter une image Docker dans son compte sur le registre
+Docker Hub, il faut y être connecté. Nous utilisons
+donc au préalable la commande <span class="courier11">docker
+login</span>, et le <span class="courier11">push</span> se déroule alors
+correctement&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP47.png" title="images/04EP47.png" src="IMAGES/04EP47.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Après quelques secondes ou minutes,
+en fonction de la taille de l’image et de la rapidité de
+la connexion Internet utilisée, l’image peut être
+vue sur Docker Hub&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP48.png" title="images/04EP48.png" src="IMAGES/04EP48.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Docker optimise bien sûr
+la remontée des couches, et sur une image comme celle qui
+nous sert pour l’exercice, avec une base <span class="courier11">ubuntu</span> et
+très peu de modifications, la taille téléchargée
+est très faible, avec environ 1,5&nbsp;ko remontés.</p>
+          </div>
+        </div>
+        <p class="defaut">Un clic sur le dépôt permet
+d’accéder à ses propriétés&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP49.png" title="images/04EP49.png" src="IMAGES/04EP49.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Il est alors possible de rendre cette image
+privée (seul le compte utilisé pour la déposer
+pourra la voir et la récupérer) en utilisant la
+commande <b>Make Private</b> dans l’onglet <b>Settings</b>. Sur un compte gratuit, Docker
+Hub ne permet pour l’instant qu’une seule image privée.
+Si vous souhaitez utiliser Docker Hub de manière plus intensive
+sans toutefois rendre vos images privées, une solution est
+de souscrire à une offre commerciale. Une autre est de
+maintenir votre propre registre, sur un service cloud ou bien par
+vos propres moyens sur une infrastructure dédiée.</p>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque">Nous verrons un peu plus loin que
+Docker Hub n’est pas le seul moyen de rendre disponibles vos images.
+En première approche, il s’agit toutefois de la méthode
+la plus simple&nbsp;: une connexion internet suffit.</p>
+          </div>
+        </div>
+        <p class="defaut">Bien sûr, le type d’envoi réalisé par
+la commande <span class="courier11">push</span> ne s’occupe que
+de l’image proprement dite&nbsp;: pas de code source, pas de <span class="courier11">readme.md</span>, etc. Il est toutefois possible
+d’éditer directement une description dans la page montrée juste
+au-dessus, en cliquant sur l’icône représentant
+un crayon, en haut à droite de la description&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP50.png" title="images/04EP50.png" src="IMAGES/04EP50.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Attention, si vous interrompez volontairement
+le processus d’envoi d’une image sur le registre, il est possible
+que vous obteniez lors du prochain essai une erreur de type <span class="courier11">push is already in progress</span>, parce
+que Docker annule la commande, mais pas le téléchargement
+en tâche de fond. Vous pouvez attendre que le téléchargement
+prenne fin pour recommencer, ou redémarrer le démon
+pour l’annuler. La commande à utiliser est <span class="courier11">sudo service docker restart</span> sous Ubuntu.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Export et import sous forme de fichiers</h2>
+        <p class="defaut">Parfois, il n’est pas possible de s’en remettre
+au registre Docker Hub pour passer&nbsp;des images d’une machine à une
+autre ou les distribuer à des personnes autorisées,
+pour des raisons de confidentialité ou de propriété intellectuelle. Un
+moyen des plus manuels est d’exporter une image sous forme d’un
+fichier archive. Ceci permet un transport par n’importe quel moyen,
+du plus simple (copie sur clé USB) au plus sophistiqué (échange
+par coffre-fort numérique).</p>
+        <p><span class="bridgehead_niv4">Export d’une image sous forme d’archive</span></p>
+        <pre class="programlisting"><code class="hljs scss">docker save -o <span class="hljs-selector-attr">[fichier]</span> <span class="hljs-selector-attr">[image]</span><var style="display:none"> docker save</var></code></pre>
+        <p class="defaut">Attention à ne pas déposer
+l’archive au même endroit que le fichier <span class="courier11">Dockerfile</span>, sinon&nbsp;il viendra
+polluer le contexte lors d’une prochaine opération de compilation.</p>
+        <p class="defaut">Comme on le voit dans la capture ci-dessous,
+la taille de l’archive est conséquente, car toutes les
+couches sont contenues dans le fichier, y compris celle de l’image
+de base <span class="courier11">ubuntu</span>&nbsp;:</p>
+        <div class="image">
+          <div class="mediaobject"><img class="imagedata picturebox" alt="images/04EP51.png" title="images/04EP51.png" src="IMAGES/04EP51.png?id=AAEAAAD%2f%2f%2f%2f%2fAQAAAAAAAAAMAgAAAE1FbmkuRWRpdGlvbnMuTWVkaWFwbHVzLCBWZXJzaW9uPTEuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49bnVsbAUBAAAAJ0VuaS5FZGl0aW9ucy5NZWRpYXBsdXMuQ29tbW9uLldhdGVybWFyawIAAAAHcGlzVGV4dAlwaWR0ZURhdGUBAA0CAAAABgMAAAAyTGF2b2NvIEVuem8gLSBiNGFhNGUzYy01ODBkLTQyNWQtOWMwOC1mNDBjMjRlNTY0ZmPiYx6Hy7jYiAs%3d"></div>
+        </div>
+        <p class="defaut">Bien sûr, cette commande n’a d’intérêt
+qu’accompagnée de son pendant correspondant à l’import
+d’une image à partir du fichier généré lors
+de l’export.</p>
+        <p><span class="bridgehead_niv4">Import d’une archive d’image</span></p>
+        <pre class="programlisting"><code class="hljs sql">docker <span class="hljs-keyword">load</span> -i [<span class="hljs-keyword">archive</span>]<var style="display:none"> docker <span class="hljs-keyword">load</span></var></code></pre>
+        <p class="defaut">Il doit être noté que l’archive
+de l’image est complète, ce qui est très pratique car
+elle ne nécessite pas de dépendances pour être
+utilisée sur n’importe quelle machine et est donc autosuffisante.
+Mais le résultat est également très coûteux
+en espace disque. Dans notre exemple pourtant simplissime, l’archive pèse
+plus de 76 Mo&nbsp;: moins de 1&nbsp;Mo pour la partie rajoutée
+par nos soins, tout le reste correspondant à l’image <span class="courier11">ubuntu</span> sur laquelle nous nous étions
+basés, et qui fait partie de l’archive. Et encore, cette
+image de base a fait de gros progrès de compaction par
+rapport aux versions utilisées lors des premières éditions
+du présent ouvrage, qui avoisinaient les 125&nbsp;Mo.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>

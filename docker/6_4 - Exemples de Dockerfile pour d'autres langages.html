@@ -1,0 +1,271 @@
+﻿<kendo-pdf-export _ngcontent-uvf-c168="" papersize="A4" margin="2cm" id="div-book-content" class="col-12 col-sm-10 offset-0 div-book-content" uipath_custom_id="10"><div><app-page-content _ngcontent-uvf-c168="" _nghost-uvf-c166="" class="font-size-14 font-size-sm-20"><div _ngcontent-uvf-c166="" class="mainContent mt-4"><div _ngcontent-uvf-c166="" id="bookContent" class="bookContent"><div _ngcontent-uvf-c166="" id="content"><div class="sect1" style="abcpdf-tag-visible: true" id="AU_a5b10c2a-c60e-4058-b762-a864a52e82c5" uri="ImagesUri_../download/5c180f28-f752-47db-98e8-8656c84b148d/images/">
+      <h1 class="title">Exemples de Dockerfile pour d’autres langages<var style="display:none"> Dockerfile</var></h1>
+      <p class="defaut">Un des avantages des architectures de microservices
+est que, les services étant parfaitement autonomes au point
+d’être contenus dans des processus applicatifs séparés,
+il est tout à fait possible d’utiliser des plateformes
+de développement distinctes pour différents services.</p>
+      <p class="defaut">Ceci présente de nombreux avantages&nbsp;:</p>
+      <div class="divliste1">
+        <ul class="liste1">
+          <li class="liste1">
+            <p class="liste1">Adopter le meilleur
+langage ou framework pour l’usage souhaité, au lieu d’essayer
+de forcer l’usage d’une technologie qui n’est pas adaptée.</p>
+          </li>
+          <li class="liste1">
+            <p class="liste1">Pouvoir adapter rapidement les ressources&nbsp;:
+dans un environnement industriel où les développeurs
+efficaces sont de plus en plus demandés, pouvoir élargir
+son pool de collaborateurs en n’étant pas restreint à une
+technologie est une façon de ne pas se mettre en danger
+de pénurie de développeurs.</p>
+          </li>
+          <li class="liste1">
+            <p class="liste1">Effet corollaire du précédent
+point, les développeurs sont plus enclins à entrer
+dans une structure leur permettant de choisir leur outil de travail
+que dans une entreprise forçant l’utilisation d’une technologie,
+surtout si celle-ci est perçue comme obsolète,
+voire simplement plus à la mode.</p>
+          </li>
+          <li class="liste1">
+            <p class="liste1">Une application créée
+avec plusieurs technologies est plus facile à réécrire par
+morceaux, à l’inverse d’un monolithe compilé d’un
+bloc ou presque et qui nécessite en général,
+pour basculer, de faire migrer d’un seul coup toute la base de code,
+ce qui est à la fois coûteux et dangereux pour
+la stabilité de la plateforme.</p>
+          </li>
+          <li class="liste1">
+            <p class="liste1">Du point de vue de la sécurité,
+présenter une hétérogénéité de
+plateformes rend plus difficile pour un attaquant de trouver une
+faille qui permettra un accès large. Si un service se base
+sur un composant qui pose un problème mais que les autres
+utilisent des plateformes complètement différentes,
+le risque de sécurité sera limité à un
+domaine&nbsp;contraint et donc la surface d’attaque réduite.</p>
+          </li>
+        </ul>
+      </div>
+      <p class="defaut">Attention bien sûr à ne
+pas présenter, à l’inverse, une trop grande diversité de technologies,
+car les risques sont également réels dans l’autre
+sens&nbsp;:</p>
+      <div class="divliste1">
+        <ul class="liste1">
+          <li class="liste1">
+            <p class="liste1">Plus de difficulté de
+maintenance&nbsp;: si on se restreint à une seule plateforme, il
+est beaucoup plus aisé de la maintenir.</p>
+          </li>
+          <li class="liste1">
+            <p class="liste1">De la même manière,
+la réduction du nombre de plateformes permet de disposer
+d’une meilleure expertise que lorsque les savoirs sont éparpillés.</p>
+          </li>
+          <li class="liste1">
+            <p class="liste1">Pour ce qui est des risques, un
+trop grand foisonnement de technologies peut également
+rendre difficile le suivi de toutes les failles déclarées.</p>
+          </li>
+        </ul>
+      </div>
+      <p class="defaut">En règle générale,
+et à moins de tomber dans des approches extrêmes,
+les avantages de la diversité des technologies dépassent
+largement les inconvénients. C’est la raison pour laquelle
+nous présentons ci-dessous quelques exemples de <span class="courier11">Dockerfile</span> pour mettre en œuvre
+des plateformes différentes de .NET Core, que nous avons
+pour l’instant utilisé comme framework unique.</p>
+      <div class="note">
+        <div class="remarkimg"><span class="icon-note"></span></div>
+        <div class="divinline">
+          <p class="remarque">Les précédentes
+versions du livre utilisaient un exemple d’application microservices
+basé sur des langages divers. Le resserrement à une
+seule plateforme pour la seconde version majeure de l’application
+a été décidé pour des raisons
+de simplicité de maintenance, l’auteur étant seul
+en charge de faire en sorte que tous les microservices compilent
+et fonctionnent correctement après les sessions étudiantes
+qui ajoutent des fonctionnalités, mais pas toujours de
+manière finalisée, à cause des contraintes
+horaires.&nbsp;</p>
+        </div>
+      </div>
+      <div class="sect2" id="refTitle0">
+        <h2 class="title">1. Python<var style="display:none"> Python</var></h2>
+        <p class="defaut">Python est de plus en plus utilisé dans
+l’industrie du développement et a l’avantage, outre sa
+versatilité et sa courbe d’apprentissage abordable, d’être très
+aisé à mettre en œuvre, ce qui se reflète
+dans le <span class="courier11">Dockerfile</span> exemple montré ci-dessous&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs sql">FROM python:3.6&nbsp;
+WORKDIR /usr/src/app&nbsp;
+COPY requirements.txt ./&nbsp;
+RUN pip <span class="hljs-keyword">install</span> <span class="hljs-comment">--no-cache-dir -r requirements.txt&nbsp;</span>
+EXPOSE <span class="hljs-number">5000</span>&nbsp;
+COPY webtest.py ./&nbsp;
+ENTRYPOINT [<span class="hljs-string">"python"</span>, <span class="hljs-string">"-u"</span>, <span class="hljs-string">"./webtest.py"</span>]</code></pre>
+        <p class="defaut">Python dispose d’images Docker officielles,
+ce qui fait que l’installation des outils n’est pas de notre ressort
+et que même l’outil <span class="courier11">pip</span> de
+gestion des dépendances est déjà en place
+dans l’image de base.</p>
+        <p class="defaut">Il est ainsi possible de fournir uniquement
+le fichier des dépendances (nommé <span class="courier11">requirements.txt</span>)&nbsp;et le code
+source (ici, le fichier <span class="courier11">webtest.py</span>)
+et de lancer l’application.&nbsp;L’option <span class="courier11">--no-cache-dir</span> permet à <span class="courier11">pip</span> de ne pas mettre en place un répertoire
+de cache, ce qui serait inutile puisque le cache est géré un
+niveau plus haut par la compilation Docker.</p>
+        <p class="defaut"><span class="courier11">ENTRYPOINT</span> porte
+la commande de lancement du processus python avec l’option <span class="courier11">-u</span>, qui est indispensable en mode
+de débogage, car elle empêche la bufferisation
+des logs. Sans cette option, la visualisation des logs peut réserver des
+surprises, avec des entrées restées dans les buffers
+pour améliorer la performance alors qu’on souhaiterait
+les voir affichées dans les logs.</p>
+        <div class="note">
+          <div class="remarkimg"><span class="icon-note"></span></div>
+          <div class="divinline">
+            <p class="remarque"><a class="url" href="http://stackoverflow.com/questions/29663459/python-app-does-not-print-anything-when-running-detached-in-docker" target="_blank">http://stackoverflow.com/questions/29663459/python-app-does-not-print-anything-when-running-detached-in-docker</a> explique
+en détail cette particularité de fonctionnement.</p>
+          </div>
+        </div>
+        <p class="defaut">En second paramètre de la commande <span class="courier11">python</span> vient le nom du fichier à lancer.
+Python&nbsp;est en effet un langage en mode interprété et
+non compilé. L’application à appeler&nbsp;est
+donc le processus <span class="courier11">python</span>. De plus,
+le script <span class="courier11">webtest.py</span> que nous avons
+créé doit lui être passé en
+paramètre pour être chargé et pour que
+ses commandes soient interprétées.</p>
+      </div>
+      <div class="sect2" id="refTitle1">
+        <h2 class="title">2. Java<var style="display:none"> Java</var></h2>
+        <p class="defaut">L’édition précédente
+du présent ouvrage utilisait un service en Java et le <span class="courier11">Dockerfile</span> associé est toujours
+fonctionnel à ce jour&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs sql">FROM java:8&nbsp;
+&nbsp;
+<span class="hljs-comment"># Install maven&nbsp;</span>
+RUN apt-get <span class="hljs-keyword">update</span> &amp;&amp; apt-<span class="hljs-keyword">get</span> <span class="hljs-keyword">install</span> -y maven&nbsp;
+&nbsp;
+WORKDIR /code&nbsp;
+&nbsp;
+<span class="hljs-comment"># Prepare by downloading dependencies&nbsp;</span>
+<span class="hljs-keyword">ADD</span> pom.xml /code/pom.xml&nbsp;
+RUN [<span class="hljs-string">"mvn"</span>, <span class="hljs-string">"dependency:resolve"</span>]&nbsp;
+RUN [<span class="hljs-string">"mvn"</span>, <span class="hljs-string">"verify"</span>]&nbsp;
+&nbsp;
+<span class="hljs-comment"># Adding source, compile and package into a fat jar&nbsp;</span>
+<span class="hljs-keyword">ADD</span> src /code/src&nbsp;
+RUN [<span class="hljs-string">"mvn"</span>, <span class="hljs-string">"package"</span>]&nbsp;
+&nbsp;
+EXPOSE <span class="hljs-number">5000</span>&nbsp;
+CMD [<span class="hljs-string">"/usr/lib/jvm/java-8-openjdk-amd64/bin/java"</span>, <span class="hljs-string">"-jar"</span>, <span class="hljs-string">"target/ 
+sparkexample-jar-with-dependencies.jar"</span>]</code></pre>
+        <p class="defaut">Les points à noter sont les suivants&nbsp;:</p>
+        <div class="divliste1">
+          <ul class="liste1">
+            <li class="liste1">
+              <p class="liste1">L’outil Maven est
+installé pour gérer de manière simple
+les dépendances et la compilation de l’application.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Le fichier <span class="courier11">pom.xml</span> décrit
+l’application et ses dépendances, versions, etc. Maven
+se servira de ce fichier pour réaliser les opérations
+de génération du livrable binaire.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Il est de bonne pratique de placer
+l’instruction de recopie des codes sources en dessous de l’instruction
+de préparation des dépendances, car les dépendances
+changent beaucoup moins souvent que le code source et leur téléchargement
+est une opération longue et coûteuse en bande
+passante, qui bénéficie pleinement d’une mise
+en cache.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">Le fichier JAR généré par
+Maven est disponible dans le répertoire <span class="courier11">target</span>.</p>
+            </li>
+            <li class="liste1">
+              <p class="liste1">L’application lancée par
+le conteneur sera <span class="courier11">java</span>, avec en
+paramètre le fichier JAR généré.&nbsp;</p>
+            </li>
+          </ul>
+        </div>
+        <p class="defaut">L’image <span class="courier11">java</span> étant
+désormais commerciale, une alternative est d’utiliser l’image <span class="courier11">openjdk</span>, dont la documentation sur
+Docker Hub montre un <span class="courier11">Dockerfile</span> minimaliste
+pour une application en mode console&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs vbnet"><span class="hljs-keyword">FROM</span> openjdk:<span class="hljs-number">7</span>&nbsp;
+COPY . /usr/src/myapp&nbsp;
+WORKDIR /usr/src/myapp&nbsp;
+RUN javac Main.java&nbsp;
+CMD [<span class="hljs-string">"java"</span>, <span class="hljs-string">"Main"</span>]</code></pre>
+        <p class="defaut">Dans ce cas, Maven n’est pas utilisé,
+et la compilation est réalisée de manière bien
+plus simple avec un simple appel au compilateur <span class="courier11">javac</span>.
+Cette approche pourra toutefois difficilement être utilisée
+pour de réels développements industriels, la gestion
+des dépendances&nbsp;nécessitant une mise
+en œuvre un peu plus sophistiquée.</p>
+        <p class="defaut">La plateforme Java étant largement
+répandue, il est aisé de trouver des exemples
+de <span class="courier11">Dockerfile</span> pour la plupart de
+ses usages standards.</p>
+      </div>
+      <div class="sect2" id="refTitle2">
+        <h2 class="title">3. Node.js</h2>
+        <p class="defaut">L’utilisation de Docker avec Node.js bénéficie
+d’une bonne documentation, et en particulier d’un guide de bonnes
+pratiques (<a class="url" href="https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md" target="_blank">https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md</a>)
+dont nous reprenons un exemple de <span class="courier11">Dockerfile</span> en
+mode multi-étages&nbsp;:</p>
+        <pre class="programlisting"><code class="hljs sql">FROM node:alpine as builder&nbsp;
+&nbsp;
+<span class="hljs-comment">## Install build toolchain, install node deps and compile native add-ons&nbsp;</span>
+RUN apk add <span class="hljs-comment">--no-cache python make g++&nbsp;</span>
+RUN npm <span class="hljs-keyword">install</span> [ your npm dependencies here ]&nbsp;
+&nbsp;
+<span class="hljs-keyword">FROM</span> node:alpine <span class="hljs-keyword">as</span> app&nbsp;
+&nbsp;
+<span class="hljs-comment">## Copy built node modules and binaries without including the toolchain&nbsp;</span>
+COPY <span class="hljs-comment">--from=builder node_modules .</span></code></pre>
+        <p class="defaut">On peut constater que le premier étage
+produit le contenu du répertoire <span class="courier11">node_modules</span>&nbsp;avec
+les dépendances qui seront récupérés
+dans le second. Ce mode de fonctionnement illustre au passage le
+fait que la seconde étape n’utilise pas obligatoirement
+une image différente et plus légère que
+la première&nbsp;: le seul fait de passer à un
+autre étage de compilation fait que le contexte repart de
+zéro, libérant ainsi de la place autrement utilisée
+par des couches intermédiaires inutiles à la runtime.<var style="display:none"> Node.js</var></p>
+      </div>
+      <div class="sect2" id="refTitle3">
+        <h2 class="title">4. Go<var style="display:none"> Go</var></h2>
+        <p class="defaut">Comme pour presque toutes les plateformes
+de développement logiciel, le meilleur point de départ
+pour Go est la page associée à l’image officielle, à savoir <a class="url" href="https://hub.docker.com/_/golang" target="_blank">https://hub.docker.com/_/golang</a></p>
+        <p class="defaut">Toutefois, une des particularités
+de Go est qu’il est facile de générer des binaires
+complètement autonomes, ce qui rend possible de se servir
+d’une image <span class="courier11">golang</span> pour la génération
+du livrable puis de recopier ce dernier dans un autre étage
+de compilation Docker qui sera basé sur une image vide
+grâce à l’instruction <span class="courier11">FROM
+SCRATCH</span> déjà abordée. Au lieu
+d’une image pesant plus de 839&nbsp;Mo, il sera ainsi possible
+de réduire à quelques mégaoctets seulement la
+taille de l’image produite.</p>
+      </div>
+    </div></div></div></div></app-page-content><!----><!----><!----></div></kendo-pdf-export>
